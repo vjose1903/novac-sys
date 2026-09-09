@@ -126,6 +126,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   factura_a_rellenar: FacturasI;
   formPropietario: UntypedFormGroup;
+  private clienteContadoSeleccionado = false;
   fecha;
   modo_factura;
   is_adelantada;
@@ -224,6 +225,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   rellenando_factura_archivada = false;
   config_articulos: ConfigArticuloI;
   private lastExternalFacturaClickAt = 0;
+  private travelConfigSub?: { unsubscribe: () => void };
+  private travelFeatureState?: boolean;
 
   facturasSerieOptions = seriesDGII();
   htmlServ = inject(HtmlElementsService);
@@ -255,6 +258,13 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   ngOnInit() {
     this.configApp = Ss.configServ.config;
+    this.travelFeatureState = this.configApp?.usa_modulo_viajes !== false;
+    this.travelConfigSub = Ss.configServ.config$.subscribe(config => {
+      const enabled = config?.usa_modulo_viajes !== false;
+      if (enabled === this.travelFeatureState) return;
+      this.travelFeatureState = enabled;
+      this.validatePermisos();
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -265,6 +275,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   ngOnDestroy(): void {
     this._destroy_mixin();
     clearInterval(this.timeInterval);
+    this.travelConfigSub?.unsubscribe();
   }
 
   ngAfterViewInit() {}
@@ -452,6 +463,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         [this.is_adelantada, this.is_viaje, this.is_external, this.factura_pendiente, this.is_editando, this.errorComprobante] = Array(6).fill(false);
         [this.DESCUENTO, this.BRUTO, this.TOTAL, this.ITBIS, this.camion_row, this.chofer_row] = Array(6).fill(0);
         [this.factServ.pre_venta_selected, this.factServ.cotizacion_selected, this.factura_a_rellenar, this.factServ.propietario_factura, this.objArchivo, this.factura_guardada, this.popover] = Array(7).fill(undefined);
+        this.clienteContadoSeleccionado = false;
         this.showDeactivationModal.set(true);
         this.NCFcompra.set('');
         this.CostoYgasto.set('');
@@ -536,7 +548,12 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       let productos_devueltos = original_factura?.productos_devueltos || [];
       this.factServ.propietario_factura = {};
-      this.factServ.tipoDocumento.set(factura.tipo as tipoDocFacturacion);
+      // Una cotización usada para crear una factura solo aporta los datos
+      // de la plantilla; el documento que se está creando sigue siendo una venta.
+      const documentoTipo = original_factura.action === actionFacturacion.bill_from_cotizacion
+        ? tipoDocFacturacion.venta
+        : (factura.tipo as tipoDocFacturacion);
+      this.factServ.tipoDocumento.set(documentoTipo);
 
       if (factura.id_documento) this.id_documento ??= factura.id_documento;
 
@@ -563,7 +580,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const { currentSerie, equivalentSerie } = this.refillStateServ.getSerieForRefill({ factura, action: original_factura.action, configApp: this.configApp });
 
       this.factServ
-        .setTipos({ metodo: this.factServ.tipoDocumento(), serie: currentSerie, equivalentSerie, tipoFacturaId: factura.tipo_factura_id })
+        .setTipos({
+          metodo: this.factServ.tipoDocumento(),
+          serie: currentSerie,
+          equivalentSerie,
+          // El tipo de la cotización no debe reutilizarse como comprobante:
+          // seleccionar una cotización siempre inicia una factura de consumo.
+          tipoFacturaId: original_factura.action === actionFacturacion.bill_from_cotizacion ? undefined : factura.tipo_factura_id,
+        })
         .then(async result => {
           if (shouldActivateExternalFlow) await this.externalFlowServ.activateExternalState(this);
 
@@ -593,7 +617,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
           // Configurar propiedades de la factura
           this.is_viaje = this.is_external ? false : factura.is_viaje;
-          this.condicion_fact = this.is_external ? 'Contado' : this.refillStateServ.shouldForceContado(factura.action) ? this.condicion_fact : factura.condicion;
+          this.condicion_fact = this.is_external ? 'Contado' : this.refillStateServ.shouldForceContado(original_factura.action) ? 'Contado' : factura.condicion;
 
           // Configurar NCF y costo para compras
           this.NCFcompra.set(factura.tipo === tipoDocFacturacion.compra ? factura.numero_comprobante : undefined);
@@ -1018,16 +1042,22 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   iniciarFactura() {
     this.closeFacturaPrimeSelects();
 
-    if (this.condicion_fact !== 'Crédito') {
-      this.factServ.propietario_factura = this.formPropietario.getRawValue();
-
-      this.calcularPorcientoComprobante().then(continuar => {
-        if (continuar) setTimeout(() => this.cuerpo.seleccionarCampoEnTurno(), 10);
-        else this.errorComprobante = true;
-      });
-    } else {
-      fun.toastWarning('Para facturar a crédito debe de seleccionar un cliente', 'Aviso');
+    const propietarioSeleccionado = this.tienePropietarioIdentificadoSeleccionado() || this.isClienteContadoSeleccionado();
+    if (!propietarioSeleccionado) {
+      const mensaje = this.factServ.isCotizacion() ? 'Para crear una cotización debe de seleccionar un cliente' : 'Para facturar a crédito debe de seleccionar un cliente';
+      fun.toastWarning(mensaje, 'Aviso');
+      return;
     }
+
+    this.factServ.propietario_factura = {
+      ...(this.factServ.propietario_factura || {}),
+      ...this.formPropietario.getRawValue(),
+    };
+
+    this.calcularPorcientoComprobante().then(continuar => {
+      if (continuar) setTimeout(() => this.cuerpo.seleccionarCampoEnTurno(), 10);
+      else this.errorComprobante = true;
+    });
   }
 
   activarNombreDireccion() {
@@ -1328,6 +1358,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     const data = args.data;
 
     if (data?.is_existing_client) {
+      this.clienteContadoSeleccionado = false;
       this.factServ.propietario_factura = data.cliente;
       this.formPropietario.patchValue({
         ...data.cliente,
@@ -1341,6 +1372,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
 
     if (data?.is_no_cliente) {
+      this.clienteContadoSeleccionado = false;
       const noCliente = {
         id: null,
         direccion: this.configApp?.direccion_empresa ?? this.factServ.clienteContado.direccion,
@@ -1371,16 +1403,15 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     if (args.type == modalCloseType.returnData) {
       const { data } = args;
-      const normalizeText = (value: any) => String(value ?? '').trim().toLowerCase();
-      const clienteContadoNombre = normalizeText(this.factServ.clienteContado.nombre_completo);
 
-      const esContado =
-        fun.isEmpty(data?.id) &&
-        (normalizeText(data?.nombre_completo) === clienteContadoNombre || normalizeText(data?.nombre) === clienteContadoNombre);
+      const esContado = data?.is_cliente_contado === true || (!!data && fun.isEmpty(data.id) && !fun.hasValue(data.NoCliente_rnc));
+
+      this.clienteContadoSeleccionado = esContado;
 
       this.factServ.propietario_factura = esContado
         ? {
             ...data,
+            __cliente_contado: true,
             nombre_completo: this.factServ.clienteContado.nombre_completo,
             direccion: this.factServ.clienteContado.direccion,
             NoCliente_rnc: null,
@@ -1430,6 +1461,9 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   private isClienteContadoSeleccionado(): boolean {
     const propietario = this.factServ?.propietario_factura ?? this.formPropietario?.getRawValue();
+    if (this.clienteContadoSeleccionado) return true;
+    if (propietario?.__cliente_contado === true) return true;
+
     const nombrePropietario = String(propietario?.nombre_completo ?? '').trim().toLowerCase();
     const nombreContado = String(this.factServ.clienteContado.nombre_completo ?? '').trim().toLowerCase();
 
@@ -1437,6 +1471,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   private isClienteContadoPermitido(): boolean {
+    if (this.factServ.isCotizacion()) return true;
+
     const facturaConsumoReferencia = comprobante[this.factServ.serieType()]?.factura_de_consumo;
 
     return (
@@ -1458,6 +1494,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   private limpiarClienteCasualSeleccionado() {
+    this.clienteContadoSeleccionado = false;
     this.factServ.propietario_factura = null;
     this.formPropietario.reset();
     fun.toastWarning('No se pueden tener clientes casuales con los parametros introducidos', 'Aviso');
@@ -1511,8 +1548,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
     // Verificación de propietario
     if (!this.tienePropietarioSeleccionado()) {
-      const entidad = this.factServ.isCompra() ? 'suplidor' : 'cliente';
-      return fun.toastWarning(`${documento.descripcion} no tiene ${entidad} seleccionado`, 'Aviso');
+      const mensaje = this.factServ.isCotizacion() ? 'Para crear una cotización debe de seleccionar un cliente' : `${documento.descripcion} no tiene cliente seleccionado`;
+      return fun.toastWarning(mensaje, 'Aviso');
     }
 
     // Verificación de cuerpo de factura

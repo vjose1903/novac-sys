@@ -155,9 +155,7 @@ export class AppComponent extends MixinClass implements OnInit, AfterViewInit, O
   private setupSubscriptions(): void {
     // Suscripción al loader
     this.loaderServ.isLoading.pipe(takeUntil(this.destroy$)).subscribe(loading => {
-      this.zone.runOutsideAngular(() => {
-        this.loading.set(loading);
-      });
+      this.loading.set(loading);
     });
 
     // Solo escuchar cambios en la configuración para recargarla

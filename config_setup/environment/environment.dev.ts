@@ -7,7 +7,7 @@ export const Environment = {
   '74d7485d1259d8cc34706e9291b334a0bc9fcea63f1a80900b55e894d39ba4d0': 'http://10.0.0.252:$$DB_PORT$$',
   config_password: '3791',
   config_user: '1973',
-  empresa_key: 'agrodemi',
+  empresa_key: '$$CUSTOMER_NAME$$',
   firebaseConfig: {
     apiKey: "AIzaSyAgzaqIOEa55uNu09qNhbRcS7w3ZM068TI",
     authDomain: "novac-pc-configuration.firebaseapp.com",

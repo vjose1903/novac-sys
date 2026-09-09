@@ -133,7 +133,7 @@ export class BuscarClienteSuplidorComponent extends MixinClass implements OnInit
     const contado_name = 'Cliente contado';
 
     if (this.include_contado && !this.isSuplidor && contado_name.includes(palabra_a_buscar)) {
-      data.unshift({ id: null, nombre: contado_name, direccion: this.configApp.direccion_empresa, telefono: null });
+      data.unshift({ id: null, nombre: contado_name, direccion: this.configApp.direccion_empresa, telefono: null, is_cliente_contado: true });
     }
 
     return data.map(entidad => {

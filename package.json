@@ -1,7 +1,7 @@
 {
   "name": "novac-system",
   "productName": "Novac-System",
-  "version": "10.2.0",
+  "version": "10.3.0",
   "description": "Sistema facturación e inventario NOVAC.",
   "author": {
     "name": "Victor José Vásquez Santos",
@@ -18,8 +18,8 @@
     "clean:actualizacion": "rimraf ./actualizacion",
     "clean:dist": "rimraf ./dist",
     "start": "npm-run-all -p ng:serve electron:serve",
-    "ng:serve": "ng serve --port 5220 -c dev",
-    "electron:serve": "wait-on tcp:5220 && npm run electron:serve-tsc && npx electron . --serve",
+    "ng:serve": "node scripts/run-dev.js ng",
+    "electron:serve": "node scripts/run-dev.js electron",
     "electron:serve-tsc": "tsc -p tsconfig.serve.json",
     "build": "npm run clean:dist && ng build --stats-json --base-href ./ && npm run electron:serve-tsc",
     "build:prod": "npm run clean:dist && ng build --stats-json --base-href ./ -c production && npm run electron:serve-tsc",

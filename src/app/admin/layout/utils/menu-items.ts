@@ -68,6 +68,7 @@ export const MENU_CONFIG: MenuItemI[] = [
     module: 'viajes',
     title: 'Pedidos',
     icon: 'assets/img/viaje.png',
+    featureFlag: 'usa_modulo_viajes',
     permission: [],
     type: 'single',
     route: 'recibos/viajes/0',
@@ -217,6 +218,7 @@ export interface MenuItemI {
   subItems?: SubMenuItemI[];
   activeRoutes?: string[];
   cssClass?: string;
+  featureFlag?: keyof import('@core/interface/config-interface').ConfigI;
 }
 
 export interface SubMenuItemI {

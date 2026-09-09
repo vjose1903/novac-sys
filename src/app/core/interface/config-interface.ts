@@ -19,6 +19,8 @@ export interface ConfigI {
   color_app:                   ThemeColor;
   mode_app:                    ThemeMode;
   machineId?:                  string;
+  firebase_empresa_id?:        string;
+  firebase_config_missing?:     boolean;
   operative_system?:           operativeSystemE;
   url_servidor:                string;
   url_servidor_respaldo:       string;
@@ -36,6 +38,7 @@ export interface ConfigI {
   facturacion_editar_precio:   boolean;
   vende_sin_inventario:        boolean;
   use_ecf?:                    boolean;
+  usa_modulo_viajes?:          boolean;
   documentos_a_imprimir:       string;
   serie_default:               serie;
   medida_producto_terminado:   string;

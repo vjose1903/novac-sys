@@ -21,6 +21,7 @@
   "facturacion_editar_precio": false,
   "vende_sin_inventario": false,
   "use_ecf": true,
+  "usa_modulo_viajes": true,
   "medida_producto_terminado": "Quintal",
   "serie_default": "electronica",
 

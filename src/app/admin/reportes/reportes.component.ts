@@ -1,6 +1,7 @@
 import { Permisos } from '@core/typescript/permisos';
 import { Ss } from '@core/services/singleton.service';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { LoaderService } from '../../loader/loader.service';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { Router } from '@angular/router';
@@ -27,7 +28,9 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
   reporteClass = new ReporteC();
 
   permissions = Permisos;
-  hasPermisoCamiones: boolean;
+  hasPermisoCamiones = signal(false);
+  private permissionCamiones = false;
+  private configSub?: Subscription;
 
   instancesClases = {
     cuadre: CuadreC,
@@ -51,11 +54,22 @@ export class ReportesComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._init_mixin({ component: 'reportes', is_routing: true });
-    Ss.permissionsService.hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion).then(result => (this.hasPermisoCamiones = result));
+    this.configSub = Ss.configServ.config$.subscribe(config => this.updateTravelReportVisibility(config));
+    Ss.permissionsService
+      .hasPermission(this.permissions.factura_venta.seleccionar_camion_en_facturacion)
+      .then(result => {
+        this.permissionCamiones = result;
+        this.updateTravelReportVisibility(Ss.configServ?.config);
+      });
   }
 
   ngOnDestroy() {
+    this.configSub?.unsubscribe();
     this._destroy_mixin();
+  }
+
+  private updateTravelReportVisibility(config: any) {
+    this.hasPermisoCamiones.set(this.permissionCamiones && config?.usa_modulo_viajes !== false);
   }
 
   openReporteForm(params: { tipo: string; titulo: string }) {

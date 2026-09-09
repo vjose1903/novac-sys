@@ -21,6 +21,7 @@
   "facturacion_editar_precio": false,
   "vende_sin_inventario": false,
   "use_ecf": false,
+  "usa_modulo_viajes": false,
   "medida_producto_terminado": "Producto",
   "serie_default": "normal",
 

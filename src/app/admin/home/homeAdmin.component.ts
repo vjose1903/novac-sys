@@ -114,6 +114,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   private chartObserver?: IntersectionObserver;
   private chartViewportChangesSub?: Subscription;
   private themeConfigSub?: Subscription;
+  private travelConfigSub?: Subscription;
   private readonly prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   @ViewChildren('chartViewport') private chartViewportRefs?: QueryList<ElementRef<HTMLElement>>;
@@ -174,6 +175,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   kpiSectionStates = signal<DashboardBlockState<DashboardKpiSection>[]>([]);
   chartStates = signal<DashboardBlockState<DashboardChartBlock>[]>([]);
   visibleChartIds = signal<Set<string>>(new Set());
+  travelModuleEnabled = signal(true);
   expandedChart = signal<{ state: DashboardBlockState<DashboardChartBlock>; originRect: DOMRect } | null>(null);
   appliedFilters = signal<Record<string, DashboardAppliedFilter>>({});
   draftFilters = signal<Record<string, DashboardDraftFilter>>({});
@@ -183,7 +185,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   rankingChartStates = computed(() => this.chartStates().filter(state => ['top_customers', 'top_products'].includes(state.id)));
   visibleKpiSectionStates = computed(() => this.kpiSectionStates().filter(state => state.id !== 'receivables_kpis'));
   secondaryChartStates = computed(() =>
-    this.chartStates().filter(state => !['sales_by_period', 'cash_vs_credit_sales', 'ar_aging', 'invoiced_vs_collected', 'monthly_pending_balance', 'top_customers', 'top_products'].includes(state.id))
+    this.chartStates().filter(state => !['sales_by_period', 'cash_vs_credit_sales', 'ar_aging', 'invoiced_vs_collected', 'monthly_pending_balance', 'top_customers', 'top_products'].includes(state.id) && (state.id !== 'top_vehicles_by_trips' || this.usesTravelModule()))
   );
 
   dashboardResource = httpResource<DashboardResponse>(() => {
@@ -241,6 +243,13 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
 
   ngOnInit() {
     this._init_mixin({ component: 'home', is_routing: true });
+    this.travelModuleEnabled.set(Ss.configServ?.config?.usa_modulo_viajes !== false);
+    this.travelConfigSub = Ss.configServ.config$.subscribe(config => {
+      const enabled = config?.usa_modulo_viajes !== false;
+      if (enabled === this.travelModuleEnabled()) return;
+      this.travelModuleEnabled.set(enabled);
+      this.loadDashboard();
+    });
     this.initDashboardState();
     this.listenThemeChanges();
     this.loadDashboard();
@@ -505,6 +514,10 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   usesItbis(): boolean {
     const config = Ss.configServ.config as any;
     return Boolean(config?.usa_itbis ?? config?.calcular_itbis);
+  }
+
+  usesTravelModule(): boolean {
+    return this.travelModuleEnabled();
   }
 
   private normalizeLookupText(value: string): string {
@@ -926,7 +939,8 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   }
 
   private allBlockIds(): string[] {
-    return [this.heroConfig.id, ...this.kpiConfigs.map(config => config.id), ...this.chartConfigs.map(config => config.id)];
+    const chartIds = this.chartConfigs.filter(config => config.id !== 'top_vehicles_by_trips' || this.usesTravelModule()).map(config => config.id);
+    return [this.heroConfig.id, ...this.kpiConfigs.map(config => config.id), ...chartIds];
   }
 
   private getBlockConfig(blockId: string): DashboardBlockConfig | null {
@@ -962,6 +976,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
     this.chartObserver?.disconnect();
     this.chartViewportChangesSub?.unsubscribe();
     this.themeConfigSub?.unsubscribe();
+    this.travelConfigSub?.unsubscribe();
     this.dashboardResource.destroy();
     this._destroy_mixin();
   }

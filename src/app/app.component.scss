@@ -4,6 +4,9 @@
   height: 14rem;
   position: absolute;
   z-index: 9999999;
+  animation-iteration-count: infinite;
+  transform: translateZ(0);
+  will-change: transform;
   
 }
 

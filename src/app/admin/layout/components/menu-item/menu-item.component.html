@@ -1,3 +1,4 @@
+@if (isFeatureEnabled()) {
 <div *ngxPermissionsOnly="menuItem.permission" class="menuList" [class.active]="isActive" [class.submenu-open]="isSubMenuActive" [id]="menuItemId">
   <button type="button" class="menuButton" (click)="onMenuClick($event)" [attr.aria-label]="menuItem.title">
     <span class="iconFrame">
@@ -17,3 +18,4 @@
     </div>
   }
 </div>
+}
