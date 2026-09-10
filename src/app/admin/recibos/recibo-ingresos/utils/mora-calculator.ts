@@ -1,6 +1,7 @@
 import { DateUtils } from '@vjose1903/dateutils';
 import { fun } from '@core/services/functions.service';
 import { FacturasI, Pago } from '../../../facturacion/factura';
+import { Ss } from '@core/services/singleton.service';
 
 export class MoraCalculator {
   last_pago_valido: Pago;
@@ -39,6 +40,8 @@ export class MoraCalculator {
 
   getMora(args: { porcentaje: number | string; formateado?: boolean }): string | number {
     let { porcentaje, formateado = true } = args;
+
+    if (Ss.configServ.config?.usa_mora !== true) return formateado ? '0.00' : 0;
 
     if (!this.hasMora || porcentaje === mora_personalizada) return '0.00';
 
