@@ -17,6 +17,7 @@ import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic
 import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import { CuerpoFacturaFormService } from './services/cuerpo-factura-form.service';
+import Big from 'big.js';
 
 @Component({
   selector: 'app-cuerpo-factura',
@@ -685,49 +686,51 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   calcularMontosRow(index: number) {
     const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
-    const detalle = {};
+    const detalle: Record<string, any> = {};
     let { cantidad, articulo, codigo, key, precio, costo, descuento_valor } = formGroup.value;
 
     precio = fun.desformatearStNumber(precio);
     costo = fun.desformatearStNumber(costo);
-    let descuento = fun.isEmpty(descuento_valor) ? 0 : fun.desformatearStNumber(descuento_valor);
+    const descuento = fun.isEmpty(descuento_valor) ? 0 : fun.desformatearStNumber(descuento_valor);
+    const descuentoAplicado = descuento > 0 ? descuento : 0;
 
     const precioOcosto = this.factServ.isCompra() ? costo : precio;
+    const tieneValores = fun.hasValue(codigo) && fun.hasValue(precioOcosto) && fun.hasValue(cantidad);
 
-    const total = precioOcosto * cantidad - descuento;
-    const itbis = articulo?.calcular_itbis ? total * 0.18 : 0;
+    let totalNeto = Big(0);
+    let itbis = Big(0);
+    let total = Big(0);
 
-    if (descuento == 0 || fun.isEmpty(descuento)) {
-      if (fun.hasValue(codigo) && (fun.isEmpty(descuento) || descuento == 0)) {
-        formGroup.controls['descuento_valor'].reset();
-
-        if (fun.hasValue(total) && total > 0) {
-          detalle['total'] = fun.roundNumberToDecimal(total);
-        }
-        this.sacarDescuento(key);
-      }
-    } else {
-      if (descuento < 0) {
-        fun.toastWarning('El descuento no puede ser menor a 0', 'AVISO');
-        detalle['descuento_valor'] = 0;
-        fun.enfocarInput(`descuento_valor-${index}`);
-      }
+    if (descuento < 0) {
+      fun.toastWarning('El descuento no puede ser menor a 0', 'AVISO');
+      detalle['descuento_valor'] = 0;
+      fun.enfocarInput(`descuento_valor-${index}`);
     }
 
-    if (fun.hasValue(codigo) && fun.hasValue(precioOcosto) && fun.hasValue(cantidad)) {
-      if (total < 0) {
+    if (tieneValores) {
+      totalNeto = Big(precioOcosto).times(cantidad).minus(descuentoAplicado);
+
+      if (totalNeto.lt(0)) {
         fun.toastError('El descuento no puede ser mayor al valor total de la venta.');
         fun.enfocarAndSelectInput(`descuento_valor-${index}`);
       } else {
         let currentDescuento = this.listaDeDescuentos.find(item => item.key == key);
 
-        if (fun.hasValue(currentDescuento)) currentDescuento.valor = descuento;
-        else this.listaDeDescuentos.push({ key: key, valor: descuento });
+        if (descuentoAplicado === 0) {
+          formGroup.controls['descuento_valor'].reset();
+          this.sacarDescuento(key);
+        } else if (fun.hasValue(currentDescuento)) currentDescuento.valor = descuentoAplicado;
+        else this.listaDeDescuentos.push({ key: key, valor: descuentoAplicado });
 
-        detalle['total'] = fun.roundNumberToDecimal(total);
-        detalle['itbis'] = fun.roundNumberToDecimal(itbis);
+        itbis = this.configApp.calcular_itbis && articulo?.calcular_itbis ? totalNeto.times(0.18) : Big(0);
+        total = totalNeto.plus(itbis);
+
+        detalle['total'] = fun.roundNumberToDecimal(total.toNumber());
+        detalle['itbis'] = fun.roundNumberToDecimal(itbis.toNumber());
         this.ajustarSecuencia();
       }
+    } else if (!this.configApp.calcular_itbis) {
+      detalle['itbis'] = fun.roundNumberToDecimal(0);
     }
 
     formGroup.patchValue(detalle);
@@ -741,11 +744,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   enviarTotalesGenerales() {
-    const tempTotal = this.factServ.filasDetalle.controls.reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.value.total), 0);
-    const tempDesc = this.listaDeDescuentos.reduce((acumulado, item) => acumulado + item.valor, 0);
-    const tempItbis = this.factServ.filasDetalle.controls.reduce((acumulado, item) => acumulado + fun.desformatearStNumber(item.value.itbis) * item.value.cantidad, 0);
+    const tempTotal = this.factServ.filasDetalle.controls.reduce((acumulado, item) => acumulado.plus(fun.desformatearStNumber(item.value.total) || 0), Big(0));
+    const tempDesc = this.listaDeDescuentos.reduce((acumulado, item) => acumulado.plus(item.valor || 0), Big(0));
+    const tempItbis = this.factServ.filasDetalle.controls.reduce((acumulado, item) => acumulado.plus(fun.desformatearStNumber(item.value.itbis) || 0), Big(0));
 
-    const obj = { total: fun.roundNumberToDecimal(tempTotal), itbis: fun.roundNumberToDecimal(tempItbis), descuento: fun.roundNumberToDecimal(tempDesc) };
+    const obj = {
+      total: fun.roundNumberToDecimal(tempTotal.toNumber()),
+      itbis: fun.roundNumberToDecimal(tempItbis.toNumber()),
+      descuento: fun.roundNumberToDecimal(tempDesc.toNumber()),
+    };
 
     this.getCalculosDinero.emit(obj);
   }
