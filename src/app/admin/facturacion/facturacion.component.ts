@@ -269,7 +269,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   ngOnChanges(changes: SimpleChanges): void {
     this._init_mixin({ component: 'cabeza_factura', is_routing: true });
-    this.entryFlowServ.enter(this).catch(error => console.error(error));
+    this.entryFlowServ.enter(this).catch(error => {
+      console.error(error);
+      fun.toastError(error?.message || 'No se pudo inicializar la facturacion.', 'ERROR');
+    });
   }
 
   ngOnDestroy(): void {
@@ -448,7 +451,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   rellenarVariables() {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve, reject) => {
       this.isInitialized = false;
       this.factServ.tipoDocumento.set(this.tipo_documento);
       this.factServ.action = this.action;
@@ -499,7 +502,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         this.isInitialized = true;
 
         resolve();
-      });
+      }).catch(reject);
     });
   }
 

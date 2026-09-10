@@ -5,6 +5,7 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UploadImgModule } from '@components/upload-img/upload-img.module';
 import { SelectModule } from 'primeng/select';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -14,6 +15,6 @@ import { FormErrorMsgComponent } from '@core/components/form-error-msg/form-erro
 
 @NgModule({
   declarations: [ConfiguracionesComponent],
-  imports: [CommonModule, ConfiguracionesRoutingModule, FormsModule, ReactiveFormsModule, InputMaskModule, UploadImgModule, SelectModule, DirectivesModule, MultiSelectModule, PrimengModule, FormErrorMsgComponent],
+  imports: [CommonModule, ConfiguracionesRoutingModule, FormsModule, ReactiveFormsModule, InputMaskModule, UploadImgModule, SelectModule, SelectButtonModule, DirectivesModule, MultiSelectModule, PrimengModule, FormErrorMsgComponent],
 })
 export class ConfiguracionesModule {}

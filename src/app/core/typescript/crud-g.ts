@@ -2,8 +2,7 @@ import { Observable } from 'rxjs';
 
 import { Ss } from '../services/singleton.service';
 
-import { Environment } from '@environments/environment';
-import { ConfigI } from '../interface/config-interface';
+import { getUrlInUse } from './url-server.utils';
 import { fun } from '../services/functions.service';
 
 export interface extraArgs {
@@ -20,7 +19,26 @@ export interface responseModel<T> {
 } // NOTE: <================================================================ PARA DESPUES`
 
 export class CrudG<T> {
+  private cachedGetAll?: { key: string; promise: Promise<responseModel<T>> };
+
   constructor(private path: string) {}
+
+  async getAllCached(arg?: extraArgs, options: { force?: boolean } = {}): Promise<responseModel<T>> {
+    const key = JSON.stringify([this.makeUrl('backend', arg), arg?.requestParams]);
+    if (!this.cachedGetAll || this.cachedGetAll.key !== key || options.force) {
+      const promise = this.getAll(arg).catch(error => {
+        if (this.cachedGetAll?.promise === promise) this.cachedGetAll = undefined;
+        throw error;
+      });
+      this.cachedGetAll = { key, promise };
+    }
+
+    const result = await this.cachedGetAll.promise;
+    if (key !== JSON.stringify([this.makeUrl('backend', arg), arg?.requestParams])) {
+      return this.getAllCached(arg);
+    }
+    return result;
+  }
 
   async dynamic(arg?: extraArgs, tipo: 'backend' | 'externo' = 'backend') {
     let url = this.makeUrl(tipo, arg);
@@ -96,16 +114,8 @@ export class CrudG<T> {
     return `?${params.toString()}`;
   }
 
-  private getUrlInUse() {
-    const configApp: ConfigI = Ss.configServ.config;
-    const url = !Environment.production ? Environment[configApp.machineId] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
-
-    // const url = configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
-    return url;
-  }
-
   private makeUrl(tipo, args?, id = null) {
-    let url = `${this.getUrlInUse()}${fun.hasValue(this.path) ? `/${this.path}` : ''}`;
+    let url = `${getUrlInUse()}${fun.hasValue(this.path) ? `/${this.path}` : ''}`;
 
     const proxyurl = 'https://cors-anywhere.herokuapp.com/';
 

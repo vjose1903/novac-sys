@@ -26,7 +26,6 @@ export class FacturacionService {
 
   tipoFacturaClass = new TiposFacturaC();
   serieType = signal(serie.electronica);
-  private tiposFacturasInflight: Promise<TipoFacturaI[]> | null = null;
 
   isCompra = computed(() => this.tipoDocumento() == tipoDocFacturacion.compra);
   isVenta = computed(() => this.tipoDocumento() == tipoDocFacturacion.venta);
@@ -48,9 +47,11 @@ export class FacturacionService {
 
   constructor() {}
 
-  setTipos(args: { metodo: tipoDocFacturacion; serie: serie; equivalentSerie?: boolean; tipoFacturaId?: number }) {
-    return new Promise<any>(async (resolve, reject) => {
+  async setTipos(args: { metodo: tipoDocFacturacion; serie: serie; equivalentSerie?: boolean; tipoFacturaId?: number }) {
       const { metodo, serie, equivalentSerie, tipoFacturaId } = args;
+
+      await this.getTiposFacturas();
+      if (!comprobante[serie]) throw new Error('La serie de facturacion configurada no es valida. Revise la configuracion.');
 
       this.serieType.set(serie);
 
@@ -89,9 +90,13 @@ export class FacturacionService {
         this.tipoFactura = this.lista_tipos_facturas.find(tipo_factura => tipo_factura.key == tFacturaKey.pre_venta && tipo_factura.serie == this.serieType());
       }
 
+      if (!this.tipoFactura) {
+        this.tipoFacturaReferenciaSelected = undefined;
+        throw new Error(`No se encontro el tipo de factura para ${metodo} en la serie ${serie}. Revise los tipos de factura del servidor seleccionado.`);
+      }
+
       await this.setTipoFacturaSelected({ value: this.tipoFactura.id, by: 'id', equivalentSerie: false });
-      resolve(true);
-    });
+      return true;
   }
 
   setTipoFacturaSelected(args: { value: any; by: string; equivalentSerie?: boolean }) {
@@ -184,21 +189,9 @@ export class FacturacionService {
 
   async getTiposFacturas(options: { force?: boolean } = {}): Promise<void> {
     try {
-      if (this.lista_tipos_facturas?.length && !options.force) return;
-
-      if (!this.tiposFacturasInflight || options.force) {
-        this.tiposFacturasInflight = this.tipoFacturaClass
-          .getAll()
-          .then(res => {
-            const tiposFacturas = res as unknown as TipoFacturaI[];
-            return tiposFacturas.sort((a, b) => fun.compare(a, b, ['id'], 'asc')) as TipoFacturaI[];
-          })
-          .finally(() => {
-            this.tiposFacturasInflight = null;
-          });
-      }
-
-      this.lista_tipos_facturas = await this.tiposFacturasInflight;
+      const response = await this.tipoFacturaClass.getAllCached(undefined, options);
+      const tiposFacturas = response as unknown as TipoFacturaI[];
+      this.lista_tipos_facturas = [...tiposFacturas].sort((a, b) => fun.compare(a, b, ['id'], 'asc'));
     } catch (error) {
       fun.logRed('error: ', error);
       throw error;

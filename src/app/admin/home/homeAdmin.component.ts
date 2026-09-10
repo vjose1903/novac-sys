@@ -1,7 +1,7 @@
-import { AfterViewInit, Component, computed, effect, ElementRef, OnDestroy, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, ElementRef, OnDestroy, OnInit, QueryList, signal, untracked, ViewChildren } from '@angular/core';
 import { httpResource } from '@angular/common/http';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { getUrlInUse } from '@core/typescript/url-server.utils';
+import { CrudGSignal } from '@core/typescript/crud-g-signal';
 import { DashboardChartData, DashboardChartParserService, DashboardChartType } from './dashboard-chart-parser.service';
 import { Subscription } from 'rxjs';
 import { Ss } from '@core/services/singleton.service';
@@ -188,6 +188,8 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
     this.chartStates().filter(state => !['sales_by_period', 'cash_vs_credit_sales', 'ar_aging', 'invoiced_vs_collected', 'monthly_pending_balance', 'top_customers', 'top_products'].includes(state.id) && (state.id !== 'top_vehicles_by_trips' || this.usesTravelModule()))
   );
 
+  private readonly dashboardApi = new CrudGSignal<DashboardResponse>('api/dashboard');
+
   dashboardResource = httpResource<DashboardResponse>(() => {
     const request = this.dashboardRequest();
     if (!request) return undefined;
@@ -201,10 +203,9 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
 
     if (request.blockIds?.length) params.blocks = request.blockIds.join(',');
 
-    return {
-      url: `${getUrlInUse()}/api/dashboard`,
-      params,
-    };
+    return this.dashboardApi.getAllRequest({
+      requestParams: Object.entries(params).map(([key, value]) => ({ key, value })),
+    });
   }, {
     defaultValue: {
       startDate: '',
@@ -227,12 +228,14 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
       if (!request) return;
 
       if (status === 'resolved' || status === 'local') {
-        this.applyDashboardResponse(this.dashboardResource.value(), request.requestedBlocks, request.filter);
+        const response = this.dashboardResource.value();
+        untracked(() => this.applyDashboardResponse(response, request.requestedBlocks, request.filter));
         return;
       }
 
       if (status === 'error') {
-        this.setBlocksStatus(request.requestedBlocks, 'error', this.getErrorMessage(this.dashboardResource.error()));
+        const error = this.dashboardResource.error();
+        untracked(() => this.setBlocksStatus(request.requestedBlocks, 'error', this.getErrorMessage(error)));
       }
     });
   }
@@ -969,6 +972,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   }
 
   private getErrorMessage(error): string {
+    if (error?.status === 0) return 'No se pudo conectar con el servidor. Intente cargar de nuevo esta secci\u00f3n.';
     return error?.error?.message || error?.message || 'No se pudo cargar este bloque.';
   }
 

@@ -1,7 +1,5 @@
 import { HttpHeaders } from '@angular/common/http';
-import { Environment } from '@environments/environment';
-import { ConfigI } from '@core/interface/config-interface';
-import { Ss } from '@core/services/singleton.service';
+import { getUrlInUse } from './url-server.utils';
 import { fun } from '@core/services/functions.service';
 
 export interface SignalCrudArgs {
@@ -56,7 +54,7 @@ export class CrudGSignal<T> {
   }
 
   protected makeUrl(args?: SignalCrudArgs, id: number | string = null) {
-    let url = `${this.getUrlInUse()}${fun.hasValue(this.path) ? `/${this.path}` : ''}`;
+    let url = `${getUrlInUse()}${fun.hasValue(this.path) ? `/${this.path}` : ''}`;
 
     if (id) url += `/${id}`;
     if (fun.objHas(args, 'afterPath') && fun.hasValue(args.afterPath)) url += `/${args.afterPath}`;
@@ -93,8 +91,4 @@ export class CrudGSignal<T> {
     return parametros;
   }
 
-  private getUrlInUse() {
-    const configApp: ConfigI = Ss.configServ.config;
-    return !Environment.production ? Environment[configApp.machineId] : configApp.usa_url_principal ? configApp.url_servidor : configApp.url_servidor_respaldo;
-  }
 }

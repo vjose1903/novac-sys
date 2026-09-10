@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { getUrlInUse } from '@core/typescript/url-server.utils';
+import { CrudGSignal } from '@core/typescript/crud-g-signal';
 import { firstValueFrom } from 'rxjs';
 import { CalendarApiResponse, CalendarEventInput, CalendarEventPayload, CalendarEventType, CalendarLinkableRecord } from '../calendario.models';
 
@@ -21,6 +21,7 @@ interface InflightRequest {
 
 @Injectable({ providedIn: 'root' })
 export class CalendarioService {
+  private readonly calendarApi = new CrudGSignal<CalendarEventPayload>('calendar');
   private readonly timezone = 'America/Santo_Domingo';
   private readonly dbName = 'novac_calendar_cache';
   private readonly dbVersion = 1;
@@ -78,7 +79,7 @@ export class CalendarioService {
 
   async getEventTypes(): Promise<CalendarEventType[]> {
     const response = await firstValueFrom(
-      this.http.get<CalendarApiResponse<CalendarEventType[]>>(`${this.baseUrl}/calendar/event_types`, {
+      this.http.get<CalendarApiResponse<CalendarEventType[]>>(this.calendarApi.getAllRequest({ afterPath: 'event_types' }).url, {
         params: { spinner: 'no_show' },
       })
     );
@@ -87,19 +88,20 @@ export class CalendarioService {
 
   async saveEvent(payload: CalendarEventPayload) {
     const { id, ...data } = payload;
-    const request = id ? this.http.patch(`${this.baseUrl}/calendar/events/${id}`, data) : this.http.post(`${this.baseUrl}/calendar/events`, data);
+    const url = this.calendarApi.getAllRequest({ afterPath: id ? `events/${id}` : 'events' }).url;
+    const request = id ? this.http.patch(url, data) : this.http.post(url, data);
     return firstValueFrom(request);
   }
 
   async deleteEvent(id: string) {
-    return firstValueFrom(this.http.delete(`${this.baseUrl}/calendar/events/${id}`));
+    return firstValueFrom(this.http.delete(this.calendarApi.getAllRequest({ afterPath: `events/${id}` }).url));
   }
 
   async searchLinkables(entityType: string, q: string): Promise<CalendarLinkableRecord[]> {
     if (!entityType || q.trim().length < 2) return [];
 
     const response = await firstValueFrom(
-      this.http.get<CalendarApiResponse<{ records: CalendarLinkableRecord[] }>>(`${this.baseUrl}/calendar/linkables/search`, {
+      this.http.get<CalendarApiResponse<{ records: CalendarLinkableRecord[] }>>(this.calendarApi.getAllRequest({ afterPath: 'linkables/search' }).url, {
         params: { entity_type: entityType, q: q.trim(), page: 1, per_page: 10, spinner: 'no_show' },
       })
     );
@@ -107,12 +109,8 @@ export class CalendarioService {
     return response.data?.records ?? [];
   }
 
-  private get baseUrl() {
-    return getUrlInUse();
-  }
-
   private async fetchEvents(start: string, end: string, signal: AbortSignal): Promise<CalendarEventInput[]> {
-    const url = new URL(`${this.baseUrl}/calendar/events`);
+    const url = new URL(this.calendarApi.getAllRequest({ afterPath: 'events' }).url);
     url.searchParams.set('start', start);
     url.searchParams.set('end', end);
     url.searchParams.set('links', 'true');

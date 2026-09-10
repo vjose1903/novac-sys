@@ -258,6 +258,22 @@
                     </div>
                   </div>
                 </div>
+                @if (isDevelopment) {
+                  <div class="col-12 mt-3">
+                    <div class="form-group">
+                      <label id="development-server-label" class="control-label d-block mb-2">Servidor de desarrollo</label>
+                      <p-selectButton
+                        [options]="developmentServerOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        [(ngModel)]="developmentServerMode"
+                        [ngModelOptions]="{ standalone: true }"
+                        [allowEmpty]="false"
+                        ariaLabelledBy="development-server-label">
+                      </p-selectButton>
+                    </div>
+                  </div>
+                }
               </div>
             </form>
           }
