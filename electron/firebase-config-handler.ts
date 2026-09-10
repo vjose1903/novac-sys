@@ -35,6 +35,7 @@ const GENERAL_CONFIG_KEYS: Array<keyof ConfigI> = [
   'is_produccion',
   'has_contabilidad',
   'calcular_itbis',
+  'usa_mora',
   'is_db_local',
   'facturacion_editar_precio',
   'vende_sin_inventario',

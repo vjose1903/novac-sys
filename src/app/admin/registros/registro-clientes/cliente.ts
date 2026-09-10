@@ -100,7 +100,7 @@ export class ClienteC extends CrudG<any> {
 
       if (tipo == 'cuentas_cobrar_cliente') {
         inputs['dynamic_switches'].unshift(ClienteC.inputMostrarPendienteAnterior);
-        inputs['dynamic_switches'].push(ClienteC.inputsIncludeMora);
+        if (Ss.configServ.config?.usa_mora === true) inputs['dynamic_switches'].push(ClienteC.inputsIncludeMora);
       }
 
       if (tipo == 'cuentas_cobrar_ant_saldo') {
@@ -131,7 +131,7 @@ export class ClienteC extends CrudG<any> {
     let objTipo = { cuentas_cobrar_cliente: CxC.por_cliente, cuentas_cobrar_ant_saldo: formReporte.tipo };
     let tipo;
     let requestParameters;
-    let includeMora = formReporte.include_mora ?? false;
+    let includeMora = Ss.configServ.config?.usa_mora === true && (formReporte.include_mora ?? false);
 
     switch (pdfParams.tipo) {
       case 'cuentas_cobrar_cliente':

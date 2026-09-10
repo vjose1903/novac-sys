@@ -17,6 +17,7 @@
   "has_contabilidad": true,
   "is_db_local": true,
   "calcular_itbis": false,
+  "usa_mora": false,
   "is_produccion": true,
   "facturacion_editar_precio": true,
   "vende_sin_inventario": true,

@@ -30,6 +30,7 @@ export interface ConfigI {
   is_produccion:               boolean;
   has_contabilidad:            boolean;
   calcular_itbis:              boolean;
+  usa_mora:                    boolean;
   pages_sizes:                 Documentos;
   printer_selected:            Documentos;
   printersList?:               Printer[] | string [];

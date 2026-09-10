@@ -62,10 +62,10 @@ const configuraciones = {
 // ==========================================================================================================================================================
 
 export function makeReporte(data) {
-  const configuration = getReporteConfiguration(data);
+  const configApp: ConfigI = Ss.configServ.config;
+  const configuration = getReporteConfiguration(data, configApp);
 
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
-  const configApp: ConfigI = Ss.configServ.config;
 
   const margin_top = data.mostrar_sub_titulo ? 125 : 111.5;
   const dd = {
@@ -90,14 +90,27 @@ export function makeReporte(data) {
   return obj;
 }
 
-function getReporteConfiguration(data) {
+function getReporteConfiguration(data, configApp: ConfigI) {
   let configuration = configuraciones[data.tipo_reporte];
 
   if (data.tipo_reporte?.startsWith('cxc_ant')) {
     configuration = filterCxcAntConfiguration(configuration, normalizeColumnasAntiguedad(data.columnas_antiguedad));
   }
 
-  return configuration;
+  if (configApp?.usa_mora === true || !configuration?.info?.some(info => ['mora', 'total_mora'].includes(info.key))) return configuration;
+
+  const moraIndexes = configuration.info.reduce((indexes, info, index) => {
+    if (['mora', 'total_mora'].includes(info.key)) indexes.push(index);
+    return indexes;
+  }, [] as number[]);
+
+  return {
+    ...configuration,
+    widths: configuration.widths?.filter((_width, index) => !moraIndexes.includes(index)),
+    info: configuration.info.filter(info => !['mora', 'total_mora'].includes(info.key)),
+    customTotalizacion: configuration.customTotalizacion?.filter(item => item.key !== 'mora'),
+    mostrar_mora: false,
+  };
 }
 
 function normalizeColumnasAntiguedad(columnasAntiguedad: string[] | string) {

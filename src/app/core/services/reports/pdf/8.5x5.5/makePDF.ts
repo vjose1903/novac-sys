@@ -36,7 +36,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const is_electronica = data?.serie == serie.electronica;
   
   const configApp: ConfigI = Ss.configServ.config;
-  const configuration = configuraciones[tipo_pdf];
+  const configuration = getConfiguration(tipo_pdf, configApp);
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
 
   const dd = {
@@ -55,6 +55,22 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
 
   const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: pageO };
   return obj;
+}
+
+function getConfiguration(tipo_pdf: string, configApp: ConfigI) {
+  const configuration = configuraciones[tipo_pdf];
+  if (configApp?.usa_mora === true || tipo_pdf !== 'recibo_ingreso') return configuration;
+
+  const moraIndexes = configuration.info.reduce((indexes, info, index) => {
+    if (info.key === 'mora') indexes.push(index);
+    return indexes;
+  }, [] as number[]);
+
+  return {
+    ...configuration,
+    widths: configuration.widths?.filter((_width, index) => !moraIndexes.includes(index)),
+    info: configuration.info.filter(info => info.key !== 'mora'),
+  };
 }
 
 // ==========================================================================================================================================================

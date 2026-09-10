@@ -133,6 +133,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
       [formFieldName.is_db_local]: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
       [formFieldName.calcular_itbis]: [{ value: this.getValue(data, 'calcular_itbis'), disabled: false }, Validators.required],
+      [formFieldName.usa_mora]: [{ value: this.getValue(data, 'usa_mora') ?? false, disabled: false }, Validators.required],
       [formFieldName.is_produccion]: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
       [formFieldName.usa_modulo_viajes]: [{ value: this.getValue(data, 'usa_modulo_viajes') !== false, disabled: false }],
       [formFieldName.facturacion_editar_precio]: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
