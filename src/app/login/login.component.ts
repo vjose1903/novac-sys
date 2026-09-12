@@ -118,7 +118,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
   }
 
   private async syncInitialConfigurationIfNeeded(): Promise<void> {
-    if (!this.configApp?.firebase_config_missing) return;
+    if (!this.configApp?.firebase_config_missing && !this.configApp?.firebase_config_needs_sync) return;
 
     const empresaId = this.configApp.firebase_empresa_id;
     if (!empresaId || !this.configApp.machineId) {
@@ -157,6 +157,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
 
       Object.assign(config, configurationResponse?.data || {}, {
         firebase_config_missing: false,
+        firebase_config_needs_sync: false,
         firebase_sync_done: true,
       });
       await this._ipc.setAppConfig(config);

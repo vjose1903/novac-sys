@@ -21,6 +21,7 @@ export interface ConfigI {
   machineId?:                  string;
   firebase_empresa_id?:        string;
   firebase_config_missing?:     boolean;
+  firebase_config_needs_sync?:  boolean;
   operative_system?:           operativeSystemE;
   url_servidor:                string;
   url_servidor_respaldo:       string;

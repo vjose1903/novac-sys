@@ -86,6 +86,9 @@ export class InterceptorService implements HttpInterceptor {
           }
         }
         const errorDesconocido = () => fun.toastError('Error <strong>desconocido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR');
+        const esErrorDeViajesDeshabilitado = response?.error?.msg?.some?.(mensaje => typeof mensaje === 'string' && mensaje.toLowerCase().includes('módulo de viajes'));
+
+        if (esErrorDeViajesDeshabilitado) return throwError(() => response);
 
         if (fun.isEmpty(response.error)) {
           errorDesconocido();

@@ -330,25 +330,29 @@ export default class FirebaseConfigHandler {
     };
   }
 
-  private async getOrCreateGeneralConfig(legacyConfig: Partial<ConfigI>): Promise<Partial<ConfigI>> {
+  private async getOrCreateGeneralConfig(legacyConfig: Partial<ConfigI>): Promise<{ data: Partial<ConfigI>; needsSync: boolean }> {
     const generalConfigRef = this.getGeneralConfigRef();
     const defaultGeneralConfig = this.makeDefaultGeneralConfig();
     const generalSnapshot = await getDoc(generalConfigRef);
     if (!generalSnapshot.exists()) {
       writeLogs('----- Configuración general no encontrada; usando valores locales -----');
       return {
-        ...defaultGeneralConfig,
-        ...this.pickConfigValues(legacyConfig, GENERAL_CONFIG_KEYS),
+        data: {
+          ...defaultGeneralConfig,
+          ...this.pickConfigValues(legacyConfig, GENERAL_CONFIG_KEYS),
+        },
+        needsSync: true,
       };
     }
 
     const currentGeneralConfig = this.mapDocumentToObject<ConfigI>(generalSnapshot);
+    const missingKeys = GENERAL_CONFIG_KEYS.filter(key => currentGeneralConfig[key] === undefined && defaultGeneralConfig[key] !== undefined);
     const normalizedGeneralConfig = {
       ...defaultGeneralConfig,
       ...this.pickConfigValues(currentGeneralConfig, GENERAL_CONFIG_KEYS),
     };
 
-    return normalizedGeneralConfig;
+    return { data: normalizedGeneralConfig, needsSync: missingKeys.length > 0 };
   }
 
   /**
@@ -361,13 +365,15 @@ export default class FirebaseConfigHandler {
 
     try {
       const machineConfigResult = await this.getMachineConfig(seedConfig);
-      const generalConfig = await this.getOrCreateGeneralConfig(machineConfigResult.legacyData);
+      const generalConfigResult = await this.getOrCreateGeneralConfig(machineConfigResult.legacyData);
+      const generalConfig = generalConfigResult.data;
 
       writeLogs('----- Configuración mergeada encontrada en Firebase -----');
       const config = this.mergeConfig(generalConfig, machineConfigResult.data);
       return {
         ...this.mergeConfig(await this.loadStoredLogos(config), machineConfigResult.data),
         firebase_config_missing: machineConfigResult.missing,
+        firebase_config_needs_sync: machineConfigResult.needsSave || generalConfigResult.needsSync,
       };
     } catch (error) {
       writeLogs(error, 'ERROR al obtener configuración desde Firebase');

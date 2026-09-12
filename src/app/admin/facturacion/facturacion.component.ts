@@ -263,6 +263,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const enabled = config?.usa_modulo_viajes !== false;
       if (enabled === this.travelFeatureState) return;
       this.travelFeatureState = enabled;
+      if (!enabled) {
+        this.is_viaje = false;
+        this.movimientosSelected = [];
+      }
       this.validatePermisos();
     });
   }
