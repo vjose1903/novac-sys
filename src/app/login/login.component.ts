@@ -104,14 +104,65 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
         .then(res => {
           fun.setTimeout(() => {
             this.currentUserServ.setUser(res.data).then(() => {
-              Ss.factServ.getTiposFacturas();
-              this.router.navigateByUrl('/admin/dashboard');
+              this.syncInitialConfigurationIfNeeded().finally(() => {
+                Ss.factServ.getTiposFacturas();
+                this.router.navigateByUrl('/admin/dashboard');
+              });
             });
           }, 250);
         })
         .catch(error => {
           if (error.status === 0) fun.toastError('El servidor está <strong>caido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR SERVIDOR');
         });
+    }
+  }
+
+  private async syncInitialConfigurationIfNeeded(): Promise<void> {
+    if (!this.configApp?.firebase_config_missing) return;
+
+    const empresaId = this.configApp.firebase_empresa_id;
+    if (!empresaId || !this.configApp.machineId) {
+      console.error('No se puede sincronizar la configuración inicial: faltan empresa_id o machine_id.');
+      return;
+    }
+
+    try {
+      const config = { ...this.configApp };
+      const toImageDataUrl = (value: string) => {
+        if (!value) return value;
+        return value.startsWith('data:image/') ? value : `data:image/png;base64,${value}`;
+      };
+
+      const logoResponse = await this.requestClass.createOne(
+        {
+          empresa_id: empresaId,
+          logos: {
+            logo_empresa: toImageDataUrl(config.logo_empresa),
+            logo_impresion: toImageDataUrl(config.logo_impresion),
+          },
+        },
+        { afterPath: 'firebase/logos' }
+      );
+
+      Object.assign(config, logoResponse?.data || {});
+
+      const configurationResponse = await this.requestClass.createOne(
+        {
+          empresa_id: empresaId,
+          machine_id: config.machineId,
+          config,
+        },
+        { afterPath: 'firebase/configuration' }
+      );
+
+      Object.assign(config, configurationResponse?.data || {}, {
+        firebase_config_missing: false,
+        firebase_sync_done: true,
+      });
+      await this._ipc.setAppConfig(config);
+      this.configServ.config = config;
+    } catch (error) {
+      console.error('No se pudo sincronizar la configuración inicial:', error);
     }
   }
 

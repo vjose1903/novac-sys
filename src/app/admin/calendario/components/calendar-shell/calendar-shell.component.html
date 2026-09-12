@@ -10,13 +10,13 @@
       <button type="button" class="today-btn" (click)="goToday()">Hoy</button>
     </div>
 
-    <h5>{{ currentTitle }}</h5>
+    <h5>{{ currentTitle() }}</h5>
 
     <div class="view-switch">
-      <button type="button" [class.active]="currentView === 'dayGridMonth'" (click)="changeView('dayGridMonth')">Mes</button>
-      <button type="button" [class.active]="currentView === 'timeGridWeek'" (click)="changeView('timeGridWeek')">Semana</button>
-      <button type="button" [class.active]="currentView === 'timeGridDay'" (click)="changeView('timeGridDay')">Dia</button>
-      <button type="button" [class.active]="currentView === 'listMonth'" (click)="changeView('listMonth')">Lista</button>
+      <button type="button" [class.active]="currentView() === 'dayGridMonth'" (click)="changeView('dayGridMonth')">Mes</button>
+      <button type="button" [class.active]="currentView() === 'timeGridWeek'" (click)="changeView('timeGridWeek')">Semana</button>
+      <button type="button" [class.active]="currentView() === 'timeGridDay'" (click)="changeView('timeGridDay')">Dia</button>
+      <button type="button" [class.active]="currentView() === 'listMonth'" (click)="changeView('listMonth')">Lista</button>
     </div>
   </div>
 

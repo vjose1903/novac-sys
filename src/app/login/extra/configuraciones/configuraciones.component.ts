@@ -10,6 +10,9 @@ import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
 import { formFieldId, formFieldName } from './configuraciones.model';
 import { EmpresaService } from '@core/services/empresa.service';
 import { ThemeService } from '@core/services/theme.service';
+import { RequestC } from '@core/typescript/requests';
+import { Environment } from '@environments/environment';
+import { DevelopmentServerMode, getDevelopmentServerMode, setDevelopmentServerMode } from '@core/typescript/url-server.utils';
 @Component({
   selector: 'app-configuraciones',
   templateUrl: './configuraciones.component.html',
@@ -23,6 +26,13 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   configApp;
   configCopy;
   form;
+  readonly isDevelopment = !Environment.production;
+  developmentServerMode: DevelopmentServerMode = 'remote';
+  private savedDevelopmentServerMode: DevelopmentServerMode = 'remote';
+  readonly developmentServerOptions = [
+    { label: 'Servidor local', value: 'local' },
+    { label: 'Servidor remoto', value: 'remote' },
+  ];
 
   formFieldName = formFieldName;
   formFieldId = formFieldId;
@@ -72,6 +82,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   htmlServ = inject(HtmlElementsService);
   empresaServ = inject(EmpresaService);
   themeServ = inject(ThemeService);
+  private readonly requestClass = new RequestC();
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -82,6 +93,8 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.configApp = Ss.configServ.config;
+    if (this.isDevelopment) this.developmentServerMode = getDevelopmentServerMode();
+    this.savedDevelopmentServerMode = this.developmentServerMode;
 
     this.configCopy = fun.deepCloning(this.configApp);
     this.parseDocumentosAImprimir(this.configApp).then(() => {
@@ -120,7 +133,9 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
       [formFieldName.is_db_local]: [{ value: this.getValue(data, 'is_db_local'), disabled: false }, Validators.required],
       [formFieldName.calcular_itbis]: [{ value: this.getValue(data, 'calcular_itbis'), disabled: false }, Validators.required],
+      [formFieldName.usa_mora]: [{ value: this.getValue(data, 'usa_mora') ?? false, disabled: false }, Validators.required],
       [formFieldName.is_produccion]: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
+      [formFieldName.usa_modulo_viajes]: [{ value: this.getValue(data, 'usa_modulo_viajes') !== false, disabled: false }],
       [formFieldName.facturacion_editar_precio]: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
       [formFieldName.vende_sin_inventario]: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
       [formFieldName.medida_producto_terminado]: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
@@ -166,6 +181,11 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
   getValue(data, key) {
     return fun.getProperty(data, key);
+  }
+
+  private toImageDataUrl(value: string): string {
+    if (!value) return value;
+    return value.startsWith('data:image/') ? value : `data:image/png;base64,${value}`;
   }
 
   capitalice(control, arg) {
@@ -269,6 +289,11 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     if (!this.form) return true;
     if (!this.form.valid) return true;
 
+    const serverChanged = this.isDevelopment && this.developmentServerMode !== this.savedDevelopmentServerMode;
+    return !serverChanged && !this.hasConfigurationChanges();
+  }
+
+  private hasConfigurationChanges(): boolean {
     const formulario = this.getFormularioToSend();
     const keysConfig = Object.keys(formulario);
 
@@ -284,17 +309,55 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       }
     });
 
-    return !hasChanges;
+    return hasChanges;
   }
 
   async submit(): Promise<void> {
+    if (this.formIsInvalid()) return;
+
     try {
+      if (!this.hasConfigurationChanges()) {
+        this.handleSubmitSuccess(this.configApp);
+        return;
+      }
+
       // Preparar formulario con cliente
       const formulario = {
         ...this.getFormularioToSend(),
         cliente: this.getValue(this.configApp, 'cliente'),
         mode_app: this.themeServ.getMode(),
       };
+
+      const empresaId = this.configApp.firebase_empresa_id || this.empresaServ.empresa?.id;
+      if (!empresaId) {
+        throw new Error('No se encontró el ID de la empresa en Firebase.');
+      }
+
+      this.configApp.firebase_empresa_id = empresaId;
+
+      const logoResponse = await this.requestClass.createOne(
+        {
+          empresa_id: empresaId,
+          logos: {
+            logo_empresa: this.toImageDataUrl(formulario.logo_empresa),
+            logo_impresion: this.toImageDataUrl(formulario.logo_impresion),
+          },
+        },
+        { afterPath: 'firebase/logos' }
+      );
+
+      Object.assign(formulario, logoResponse?.data || {});
+
+      const configurationResponse = await this.requestClass.createOne(
+        {
+          empresa_id: empresaId,
+          machine_id: this.configApp.machineId,
+          config: formulario,
+        },
+        { afterPath: 'firebase/configuration' }
+      );
+
+      Object.assign(formulario, configurationResponse?.data || {}, { firebase_sync_done: true });
 
       const config_response = await this._ipc.setAppConfig(formulario);
 
@@ -306,6 +369,11 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   }
 
   private handleSubmitSuccess(config_response: any): void {
+    if (this.isDevelopment && this.developmentServerMode !== this.savedDevelopmentServerMode) {
+      setDevelopmentServerMode(this.developmentServerMode);
+      this.savedDevelopmentServerMode = this.developmentServerMode;
+    }
+
     // Mostrar toast solo si no está en modal
     if (!this.is_on_modal) {
       this.sharedServ.nextCanToast(true);
@@ -337,7 +405,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
   }
 
   private handleSubmitError(error: any): void {
-    const errorMessage = error?.msg || 'Error al cambiar la configuración de la aplicación';
+    const errorMessage = error?.msg || error?.message || 'Error al cambiar la configuración de la aplicación';
     fun.toastError(errorMessage, 'ERROR');
     console.error('Error en submit:', error);
   }

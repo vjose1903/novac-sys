@@ -74,11 +74,13 @@
                   }
                 </div>
                 <div class="derecha">
-                  <span class="detalleBalance metric-card metric-orange">
-                    <span class="metric-icon"><i class="fas fa-exclamation-triangle"></i></span>
-                    <span class="metric-label">Mora:</span>
-                    <span class="metric-value">RD$ {{ formatoNumero(mora_general()) }}</span>
-                  </span>
+                  @if (usaMora) {
+                    <span class="detalleBalance metric-card metric-orange">
+                      <span class="metric-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                      <span class="metric-label">Mora:</span>
+                      <span class="metric-value">RD$ {{ formatoNumero(mora_general()) }}</span>
+                    </span>
+                  }
 
                   <span class="detalleBalance metric-card metric-blue">
                     <span class="metric-icon"><i class="fas fa-arrow-trend-up"></i></span>
@@ -120,10 +122,12 @@
               <div class="more-pages animated flash slower infinite"><strong class="me-2">Atención: </strong> Existen múltiples páginas</div>
             }
 
-            <div class="mora-general-control">
-              <span>Mora General</span>
-              <app-mora-selector [showMora]="false" [showMoraPersonalizada]="false" [(porcentajeSelected)]="porcentajeSelected" (changePorcentajeMora)="changeMoraGeneral($event)" [subscribeChanges]="false"></app-mora-selector>
-            </div>
+            @if (usaMora) {
+              <div class="mora-general-control">
+                <span>Mora General</span>
+                <app-mora-selector [showMora]="false" [showMoraPersonalizada]="false" [(porcentajeSelected)]="porcentajeSelected" (changePorcentajeMora)="changeMoraGeneral($event)" [subscribeChanges]="false"></app-mora-selector>
+              </div>
+            }
 
             @if (areAllSelected()) {
               <input class="apple-switch" type="checkbox" (change)="selectAllPagoTotal()" [checked]="areAllSelectedPagoTotal()" pTooltip="{{ areAllSelectedPagoTotal() ? 'Deseleccionar pago total' : 'Marcar pago total' }}" tooltipPosition="left" />

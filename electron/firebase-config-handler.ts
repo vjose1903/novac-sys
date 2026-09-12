@@ -1,5 +1,6 @@
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore, doc, getDoc, setDoc, collection, query, where, limit, getDocs, addDoc, runTransaction, deleteField } from 'firebase/firestore';
+import { getFirestore, Firestore, doc, getDoc, collection, query, where, limit, getDocs } from 'firebase/firestore';
+import { getStorage, FirebaseStorage, ref, getBytes } from 'firebase/storage';
 import { ConfigI, EmpresaI } from '../src/app/core/interface/config-interface.js';
 import { pathAdd, writeLogs } from '../main';
 import MachineId from './machine-id.js';
@@ -25,8 +26,6 @@ const GENERAL_CONFIG_KEYS: Array<keyof ConfigI> = [
   'rnc_empresa',
   'direccion_empresa',
   'telefono_empresa',
-  'logo_empresa',
-  'logo_impresion',
   'color_app',
   'url_servidor',
   'url_servidor_respaldo',
@@ -36,10 +35,12 @@ const GENERAL_CONFIG_KEYS: Array<keyof ConfigI> = [
   'is_produccion',
   'has_contabilidad',
   'calcular_itbis',
+  'usa_mora',
   'is_db_local',
   'facturacion_editar_precio',
   'vende_sin_inventario',
   'use_ecf',
+  'usa_modulo_viajes',
   'documentos_a_imprimir',
   'serie_default',
   'medida_producto_terminado',
@@ -53,6 +54,7 @@ export default class FirebaseConfigHandler {
   private firebase: FirebaseApp | null = null;
   private actualClient: string | null = null;
   private db: Firestore | null = null;
+  private storage: FirebaseStorage | null = null;
   private machineId: string | null = null;
   private isInitialized: boolean = false;
   private readonly empresaCollection: string = 'Empresas';
@@ -130,6 +132,7 @@ export default class FirebaseConfigHandler {
       // Inicializar Firebase
       this.firebase = initializeApp(firebaseConfig);
       this.db = getFirestore(this.firebase);
+      this.storage = getStorage(this.firebase);
 
       // Inicializar HandlerConfigFile
       this.handlerConfigFile = await HandlerConfigFile.getInstance(machineId);
@@ -193,6 +196,44 @@ export default class FirebaseConfigHandler {
     return doc(this.db, stringRef);
   }
 
+  private getLogoStoragePath(name: 'logo_empresa' | 'logo_impresion'): string {
+    return `${this.empresaCollection}/${this._empresa.id}/logos/${name}`;
+  }
+
+  private async readLogoFromStorage(pathValue: unknown): Promise<string | null> {
+    if (!this.storage || typeof pathValue !== 'string' || !pathValue) return null;
+
+    try {
+      const bytes = await getBytes(ref(this.storage, pathValue));
+      return Buffer.from(bytes).toString('base64');
+    } catch (error) {
+      writeLogs(error, `Logo no disponible en Firebase Storage: ${pathValue}`);
+      return null;
+    }
+  }
+
+  private async loadStoredLogos(config: Partial<ConfigI>): Promise<Partial<ConfigI>> {
+    try {
+      const snapshot = await getDoc(this.getGeneralConfigRef());
+      if (!snapshot.exists()) return config;
+
+      const stored = snapshot.data() as Record<string, unknown>;
+      const [logoEmpresa, logoImpresion] = await Promise.all([
+        this.readLogoFromStorage(stored.logo_empresa_path),
+        this.readLogoFromStorage(stored.logo_impresion_path),
+      ]);
+
+      return {
+        ...config,
+        ...(logoEmpresa ? { logo_empresa: logoEmpresa } : {}),
+        ...(logoImpresion ? { logo_impresion: logoImpresion } : {}),
+      };
+    } catch (error) {
+      writeLogs(error, 'No se pudieron cargar logos desde Firebase Storage; se conservarán los logos locales');
+      return config;
+    }
+  }
+
   /**
    * Obtiene el snapshot de configuración actual
    */
@@ -240,6 +281,7 @@ export default class FirebaseConfigHandler {
       ...generalConfig,
       ...machineConfig,
       machineId: this.machineId,
+      firebase_empresa_id: this._empresa.id,
     }) as ConfigI;
   }
 
@@ -254,7 +296,7 @@ export default class FirebaseConfigHandler {
       .every(key => allowedKeys.has(key));
   }
 
-  private async getMachineConfig(seedConfig?: Partial<ConfigI>): Promise<{ data: Partial<ConfigI>; legacyData: Partial<ConfigI>; needsSave: boolean; docRef?: any }> {
+  private async getMachineConfig(seedConfig?: Partial<ConfigI>): Promise<{ data: Partial<ConfigI>; legacyData: Partial<ConfigI>; needsSave: boolean; missing: boolean; docRef?: any }> {
     const configSnapshot = await this.getCurrentConfigSnapShot();
 
     if (configSnapshot.empty) {
@@ -267,6 +309,7 @@ export default class FirebaseConfigHandler {
         },
         legacyData,
         needsSave: true,
+        missing: true,
       };
     }
 
@@ -282,65 +325,28 @@ export default class FirebaseConfigHandler {
       },
       legacyData: data,
       needsSave,
+      missing: false,
       docRef: docSnapshot.ref,
     };
-  }
-
-  private async upsertMachineConfig(machineConfig: Partial<ConfigI>, docRef?: any): Promise<void> {
-    const data = this.removeUndefinedValues({
-      ...this.pickConfigValues(machineConfig, MACHINE_CONFIG_KEYS),
-      machineId: this.machineId,
-    });
-
-    if (docRef) {
-      await setDoc(docRef, data);
-      return;
-    }
-
-    const configCollectionRef = this.getCurrentConfigCollection();
-    await addDoc(configCollectionRef, data);
   }
 
   private async getOrCreateGeneralConfig(legacyConfig: Partial<ConfigI>): Promise<Partial<ConfigI>> {
     const generalConfigRef = this.getGeneralConfigRef();
     const defaultGeneralConfig = this.makeDefaultGeneralConfig();
-
-    const generalConfigResult = await runTransaction(this.db, async transaction => {
-      const generalSnapshot = await transaction.get(generalConfigRef);
-
-      if (generalSnapshot.exists()) {
-        return {
-          created: false,
-          data: this.mapDocumentToObject<ConfigI>(generalSnapshot),
-        };
-      }
-
-      const migratedGeneralConfig = {
+    const generalSnapshot = await getDoc(generalConfigRef);
+    if (!generalSnapshot.exists()) {
+      writeLogs('----- Configuración general no encontrada; usando valores locales -----');
+      return {
         ...defaultGeneralConfig,
         ...this.pickConfigValues(legacyConfig, GENERAL_CONFIG_KEYS),
       };
-
-      transaction.set(generalConfigRef, this.removeUndefinedValues(migratedGeneralConfig));
-      return {
-        created: true,
-        data: migratedGeneralConfig,
-      };
-    });
-
-    if (generalConfigResult.created) {
-      writeLogs('----- Configuración general creada en Firebase -----');
-      return generalConfigResult.data;
     }
 
-    const currentGeneralConfig = generalConfigResult.data;
+    const currentGeneralConfig = this.mapDocumentToObject<ConfigI>(generalSnapshot);
     const normalizedGeneralConfig = {
       ...defaultGeneralConfig,
       ...this.pickConfigValues(currentGeneralConfig, GENERAL_CONFIG_KEYS),
     };
-
-    if (this.hasMissingKeys(currentGeneralConfig, GENERAL_CONFIG_KEYS) || !this.hasOnlyKeys(currentGeneralConfig, GENERAL_CONFIG_KEYS)) {
-      await setDoc(generalConfigRef, { ...this.removeUndefinedValues(normalizedGeneralConfig), mode_app: deleteField() }, { merge: true });
-    }
 
     return normalizedGeneralConfig;
   }
@@ -357,12 +363,12 @@ export default class FirebaseConfigHandler {
       const machineConfigResult = await this.getMachineConfig(seedConfig);
       const generalConfig = await this.getOrCreateGeneralConfig(machineConfigResult.legacyData);
 
-      if (machineConfigResult.needsSave) {
-        await this.upsertMachineConfig(machineConfigResult.data, machineConfigResult.docRef);
-      }
-
       writeLogs('----- Configuración mergeada encontrada en Firebase -----');
-      return this.mergeConfig(generalConfig, machineConfigResult.data);
+      const config = this.mergeConfig(generalConfig, machineConfigResult.data);
+      return {
+        ...this.mergeConfig(await this.loadStoredLogos(config), machineConfigResult.data),
+        firebase_config_missing: machineConfigResult.missing,
+      };
     } catch (error) {
       writeLogs(error, 'ERROR al obtener configuración desde Firebase');
 
@@ -389,12 +395,16 @@ export default class FirebaseConfigHandler {
         machineId: this.machineId,
       };
 
-      await setDoc(this.getGeneralConfigRef(), { ...this.removeUndefinedValues(generalConfig), mode_app: deleteField() }, { merge: true });
+      if (!(config as any).firebase_sync_done) throw new Error('La configuración debe guardarse mediante el servidor de configuración');
 
-      const currentMachineConfig = await this.getMachineConfig();
-      await this.upsertMachineConfig(machineConfig, currentMachineConfig.docRef);
-
-      return this.mergeConfig(generalConfig, machineConfig);
+      return this.mergeConfig(
+        {
+          ...generalConfig,
+          logo_empresa: config.logo_empresa,
+          logo_impresion: config.logo_impresion,
+        },
+        machineConfig
+      );
     } catch (error) {
       writeLogs(error, 'ERROR al actualizar configuración en Firebase');
 
@@ -410,6 +420,7 @@ export default class FirebaseConfigHandler {
       // Limpiar referencias
       this.firebase = null;
       this.db = null;
+      this.storage = null;
       this.machineId = null;
       this.isInitialized = false;
       this._empresa = null;

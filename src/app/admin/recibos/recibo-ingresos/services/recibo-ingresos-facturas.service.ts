@@ -6,6 +6,7 @@ import moment from '../../../../core/javascript/moment';
 import { MoraCalculator } from '../utils/mora-calculator';
 import { ReciboIngresosCalculosService } from './recibo-ingresos-calculos.service';
 import { MoraSelectorKeyI } from '../components/mora-selector/mora-selector.service';
+import { Ss } from '@core/services/singleton.service';
 
 @Injectable({
   providedIn: 'root',
@@ -47,6 +48,12 @@ export class ReciboIngresosFacturasService {
   }
 
   setFacturaMora(factura: FacturasI, factura_selected: FacturasI | undefined, porcentajeSelected: number) {
+    if (Ss.configServ.config?.usa_mora !== true) {
+      factura.porcentaje_mora = 0;
+      factura.mora = 0;
+      return;
+    }
+
     const moraCalculator = new MoraCalculator(factura);
 
     factura.porcentaje_mora = factura_selected?.porcentaje_mora ?? porcentajeSelected;
@@ -93,6 +100,8 @@ export class ReciboIngresosFacturasService {
   }
 
   applyMoraGeneral(params: { facturas: FacturasI[]; porcentaje: number; getFacturaEnTabla: (facturaId: number) => FacturasI | null; updateSelected: (factura: FacturasI, monto: string | number, mora: string | number, porcentaje_mora: string | number) => void }) {
+    if (Ss.configServ.config?.usa_mora !== true) return params.facturas;
+
     return params.facturas.map(fact => {
       const factura_tabla = params.getFacturaEnTabla(fact.id);
       const moraCalculator = new MoraCalculator(fact);
@@ -122,8 +131,13 @@ export class ReciboIngresosFacturasService {
 
     if (fun.hasValue(factura_selected)) item = factura_selected;
 
-    item.porcentaje_mora = factura_selected?.porcentaje_mora || factura_from_all?.porcentaje_mora || porcentajeSelected;
-    item.mora = factura_selected?.mora ?? factura_from_all?.mora ?? new MoraCalculator(item).getMora({ porcentaje: item.porcentaje_mora });
+    if (Ss.configServ.config?.usa_mora === true) {
+      item.porcentaje_mora = factura_selected?.porcentaje_mora || factura_from_all?.porcentaje_mora || porcentajeSelected;
+      item.mora = factura_selected?.mora ?? factura_from_all?.mora ?? new MoraCalculator(item).getMora({ porcentaje: item.porcentaje_mora });
+    } else {
+      item.porcentaje_mora = 0;
+      item.mora = 0;
+    }
     item.pagoT = factura_selected?.pagoT || false;
     item.monto = fun.roundNumberToDecimal(fun.desformatearStNumber(item.monto));
 
@@ -131,6 +145,12 @@ export class ReciboIngresosFacturasService {
   }
 
   updateMoraFromSelector(factura: FacturasI, data: { key: MoraSelectorKeyI; value: string | number }) {
+    if (Ss.configServ.config?.usa_mora !== true) {
+      factura.porcentaje_mora = 0;
+      factura.mora = 0;
+      return factura;
+    }
+
     if (data.key == MoraSelectorKeyI.mora) {
       factura.mora = data.value;
       return factura;

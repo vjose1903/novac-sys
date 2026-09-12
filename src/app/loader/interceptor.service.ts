@@ -47,6 +47,7 @@ export class InterceptorService implements HttpInterceptor {
           expiry: `${localStorage.getItem('expiry')}`,
           uid: `${localStorage.getItem('uid')}`,
           'token-type': `${localStorage.getItem('token-type')}`,
+          'X-Empresa-Id': `${Ss.configServ?.config?.firebase_empresa_id || ''}`,
         },
         params: sendParams,
       });

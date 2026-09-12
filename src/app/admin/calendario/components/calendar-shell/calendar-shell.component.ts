@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, signal } from '@angular/core';
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, DateClickInfo, DatesSetInfo, EventClickInfo } from 'fullcalendar';
 import dayGridPlugin from '@fullcalendar/angular/daygrid';
@@ -21,8 +21,8 @@ export class CalendarShellComponent {
   @Output() eventSelected = new EventEmitter<CalendarEventInput>();
   @Output() dateSelected = new EventEmitter<string>();
 
-  currentTitle = '';
-  currentView = 'dayGridMonth';
+  currentTitle = signal('');
+  currentView = signal('dayGridMonth');
   private visibleRange?: { start: string; end: string; view: string; center: Date };
   private renderTimer?: any;
 
@@ -72,8 +72,10 @@ export class CalendarShellComponent {
   }
 
   private handleDatesSet(info: DatesSetInfo) {
-    this.currentTitle = info.view.title;
-    this.currentView = info.view.type;
+    queueMicrotask(() => {
+      this.currentTitle.set(info.view.title);
+      this.currentView.set(info.view.type);
+    });
     const range = {
       start: this.toDateOnly(info.startStr),
       end: this.toDateOnly(info.endStr),

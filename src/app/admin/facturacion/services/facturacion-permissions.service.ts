@@ -19,10 +19,12 @@ export class FacturacionPermissionsService {
       Ss.permissionsService.hasPermission(Permisos.factura_venta.seleccionar_camion_en_facturacion),
     ]);
 
+    const usaModuloViajes = Ss.configServ?.config?.usa_modulo_viajes !== false;
+
     return {
       hasPermisoPreVenta,
       hasPermisoCotizacion,
-      hasPermisoCamiones,
+      hasPermisoCamiones: usaModuloViajes && hasPermisoCamiones,
     };
   }
 }

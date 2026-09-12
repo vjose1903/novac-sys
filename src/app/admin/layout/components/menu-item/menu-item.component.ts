@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, AfterViewInit, input } from '@angular/core';
+import { Component, EventEmitter, Input, Output, AfterViewInit, input, OnDestroy, OnInit, signal } from '@angular/core';
 import { NgxPermissionsModule } from 'ngx-permissions';
 import { MenuClickEvent, MenuItemI, SubMenuItemI } from '../../utils/menu-items';
 import { fun } from '@core/services/functions.service';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Ss } from '@core/services/singleton.service';
 @Component({
   selector: 'app-menu-item',
@@ -11,7 +11,7 @@ import { Ss } from '@core/services/singleton.service';
   templateUrl: './menu-item.component.html',
   styleUrl: './menu-item.component.scss',
 })
-export class MenuItemComponent implements AfterViewInit {
+export class MenuItemComponent implements AfterViewInit, OnInit, OnDestroy {
   @Input() menuItem!: MenuItemI;
   actualPath = input<string>('');
   nextModule = input<string>('');
@@ -20,9 +20,25 @@ export class MenuItemComponent implements AfterViewInit {
   @Output() subMenuClick = new EventEmitter<MenuClickEvent>();
 
   private destroy$ = new Subject<void>();
+  private configSub?: Subscription;
+  private featureEnabled = signal(true);
+
+  ngOnInit(): void {
+    this.updateFeatureState(Ss.configServ?.config);
+    this.configSub = Ss.configServ.config$.subscribe(config => this.updateFeatureState(config));
+  }
+
+  private updateFeatureState(config: any): void {
+    const featureFlag = this.menuItem?.featureFlag;
+    this.featureEnabled.set(!featureFlag || config?.[featureFlag] !== false);
+  }
 
   get menuItemId(): string {
     return `menu-item-${this.menuItem.id}`;
+  }
+
+  isFeatureEnabled(): boolean {
+    return this.featureEnabled();
   }
 
   get isActive(): boolean {
@@ -48,6 +64,12 @@ export class MenuItemComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.scrollToActiveIfNeeded();
+  }
+
+  ngOnDestroy(): void {
+    this.configSub?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private scrollToActiveIfNeeded(): void {

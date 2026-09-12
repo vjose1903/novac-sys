@@ -17,6 +17,7 @@ import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-moda
 import { ReciboIngresosCalculosService } from '../services/recibo-ingresos-calculos.service';
 import { ReciboIngresosFacturasService } from '../services/recibo-ingresos-facturas.service';
 import { ReciboIngresosModalService } from '../services/recibo-ingresos-modal.service';
+import { Ss } from '@core/services/singleton.service';
 
 @Component({
   selector: 'app-ingresos',
@@ -34,6 +35,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   tipo_recibo = 'Pago factura';
   is_print = false;
   isSubmitting = false;
+  usaMora = false;
   private clienteBalanceRequestId = 0;
   // =============================================
   //  TABLAS
@@ -157,6 +159,8 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   ngOnInit() {
     this._init_mixin({ component: 'ingresos', is_routing: true });
+    this.usaMora = Ss.configServ.config?.usa_mora === true;
+    if (!this.usaMora) this.table_config.info = this.table_config.info.filter(item => item.titulo !== 'Mora');
     this.necesarioStart();
   }
 

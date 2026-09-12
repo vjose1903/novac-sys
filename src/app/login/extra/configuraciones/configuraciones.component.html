@@ -223,6 +223,12 @@
                         <label [for]="formFieldId.is_produccion" class="mb-0 c-pointer">Tienen Modulo Producción</label>
                         <form-error-msg [control]="form.get(formFieldName.is_produccion)"></form-error-msg>
                       </div>
+
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.usa_modulo_viajes" formControlName="usa_modulo_viajes" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.usa_modulo_viajes" class="mb-0 c-pointer">Usa módulo de viajes</label>
+                        <form-error-msg [control]="form.get(formFieldName.usa_modulo_viajes)"></form-error-msg>
+                      </div>
                     </div>
 
                     <div class="col-6 p-0">
@@ -245,6 +251,12 @@
                       </div>
 
                       <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.usa_mora" formControlName="usa_mora" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.usa_mora" class="mb-0 c-pointer">Usa mora</label>
+                        <form-error-msg [control]="form.get(formFieldName.usa_mora)"></form-error-msg>
+                      </div>
+
+                      <div class="form-group horizontal-layout mb-2">
                         <input [id]="formFieldId.usa_facturas_externas" formControlName="usa_facturas_externas" class="apple-switch" type="checkbox" />
                         <label [for]="formFieldId.usa_facturas_externas" class="mb-0 c-pointer">Usa facturas externas</label>
                         <form-error-msg [control]="form.get(formFieldName.usa_facturas_externas)"></form-error-msg>
@@ -252,6 +264,22 @@
                     </div>
                   </div>
                 </div>
+                @if (isDevelopment) {
+                  <div class="col-12 mt-3">
+                    <div class="form-group">
+                      <label id="development-server-label" class="control-label d-block mb-2">Servidor de desarrollo</label>
+                      <p-selectButton
+                        [options]="developmentServerOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        [(ngModel)]="developmentServerMode"
+                        [ngModelOptions]="{ standalone: true }"
+                        [allowEmpty]="false"
+                        ariaLabelledBy="development-server-label">
+                      </p-selectButton>
+                    </div>
+                  </div>
+                }
               </div>
             </form>
           }

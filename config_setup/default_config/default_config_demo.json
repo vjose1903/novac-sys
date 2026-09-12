@@ -17,10 +17,12 @@
   "has_contabilidad": true,
   "is_db_local": false,
   "calcular_itbis": true,
+  "usa_mora": false,
   "is_produccion": false,
   "facturacion_editar_precio": false,
   "vende_sin_inventario": false,
   "use_ecf": false,
+  "usa_modulo_viajes": false,
   "medida_producto_terminado": "Producto",
   "serie_default": "normal",
 

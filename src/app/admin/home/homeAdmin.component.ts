@@ -1,7 +1,7 @@
-import { AfterViewInit, Component, computed, effect, ElementRef, OnDestroy, OnInit, QueryList, signal, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, ElementRef, OnDestroy, OnInit, QueryList, signal, untracked, ViewChildren } from '@angular/core';
 import { httpResource } from '@angular/common/http';
 import { MixinClass } from '@core/typescript/MixinClass';
-import { getUrlInUse } from '@core/typescript/url-server.utils';
+import { CrudGSignal } from '@core/typescript/crud-g-signal';
 import { DashboardChartData, DashboardChartParserService, DashboardChartType } from './dashboard-chart-parser.service';
 import { Subscription } from 'rxjs';
 import { Ss } from '@core/services/singleton.service';
@@ -114,6 +114,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   private chartObserver?: IntersectionObserver;
   private chartViewportChangesSub?: Subscription;
   private themeConfigSub?: Subscription;
+  private travelConfigSub?: Subscription;
   private readonly prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   @ViewChildren('chartViewport') private chartViewportRefs?: QueryList<ElementRef<HTMLElement>>;
@@ -174,6 +175,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   kpiSectionStates = signal<DashboardBlockState<DashboardKpiSection>[]>([]);
   chartStates = signal<DashboardBlockState<DashboardChartBlock>[]>([]);
   visibleChartIds = signal<Set<string>>(new Set());
+  travelModuleEnabled = signal(true);
   expandedChart = signal<{ state: DashboardBlockState<DashboardChartBlock>; originRect: DOMRect } | null>(null);
   appliedFilters = signal<Record<string, DashboardAppliedFilter>>({});
   draftFilters = signal<Record<string, DashboardDraftFilter>>({});
@@ -183,8 +185,10 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   rankingChartStates = computed(() => this.chartStates().filter(state => ['top_customers', 'top_products'].includes(state.id)));
   visibleKpiSectionStates = computed(() => this.kpiSectionStates().filter(state => state.id !== 'receivables_kpis'));
   secondaryChartStates = computed(() =>
-    this.chartStates().filter(state => !['sales_by_period', 'cash_vs_credit_sales', 'ar_aging', 'invoiced_vs_collected', 'monthly_pending_balance', 'top_customers', 'top_products'].includes(state.id))
+    this.chartStates().filter(state => !['sales_by_period', 'cash_vs_credit_sales', 'ar_aging', 'invoiced_vs_collected', 'monthly_pending_balance', 'top_customers', 'top_products'].includes(state.id) && (state.id !== 'top_vehicles_by_trips' || this.usesTravelModule()))
   );
+
+  private readonly dashboardApi = new CrudGSignal<DashboardResponse>('api/dashboard');
 
   dashboardResource = httpResource<DashboardResponse>(() => {
     const request = this.dashboardRequest();
@@ -199,10 +203,9 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
 
     if (request.blockIds?.length) params.blocks = request.blockIds.join(',');
 
-    return {
-      url: `${getUrlInUse()}/api/dashboard`,
-      params,
-    };
+    return this.dashboardApi.getAllRequest({
+      requestParams: Object.entries(params).map(([key, value]) => ({ key, value })),
+    });
   }, {
     defaultValue: {
       startDate: '',
@@ -225,12 +228,14 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
       if (!request) return;
 
       if (status === 'resolved' || status === 'local') {
-        this.applyDashboardResponse(this.dashboardResource.value(), request.requestedBlocks, request.filter);
+        const response = this.dashboardResource.value();
+        untracked(() => this.applyDashboardResponse(response, request.requestedBlocks, request.filter));
         return;
       }
 
       if (status === 'error') {
-        this.setBlocksStatus(request.requestedBlocks, 'error', this.getErrorMessage(this.dashboardResource.error()));
+        const error = this.dashboardResource.error();
+        untracked(() => this.setBlocksStatus(request.requestedBlocks, 'error', this.getErrorMessage(error)));
       }
     });
   }
@@ -241,6 +246,13 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
 
   ngOnInit() {
     this._init_mixin({ component: 'home', is_routing: true });
+    this.travelModuleEnabled.set(Ss.configServ?.config?.usa_modulo_viajes !== false);
+    this.travelConfigSub = Ss.configServ.config$.subscribe(config => {
+      const enabled = config?.usa_modulo_viajes !== false;
+      if (enabled === this.travelModuleEnabled()) return;
+      this.travelModuleEnabled.set(enabled);
+      this.loadDashboard();
+    });
     this.initDashboardState();
     this.listenThemeChanges();
     this.loadDashboard();
@@ -505,6 +517,10 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   usesItbis(): boolean {
     const config = Ss.configServ.config as any;
     return Boolean(config?.usa_itbis ?? config?.calcular_itbis);
+  }
+
+  usesTravelModule(): boolean {
+    return this.travelModuleEnabled();
   }
 
   private normalizeLookupText(value: string): string {
@@ -926,7 +942,8 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   }
 
   private allBlockIds(): string[] {
-    return [this.heroConfig.id, ...this.kpiConfigs.map(config => config.id), ...this.chartConfigs.map(config => config.id)];
+    const chartIds = this.chartConfigs.filter(config => config.id !== 'top_vehicles_by_trips' || this.usesTravelModule()).map(config => config.id);
+    return [this.heroConfig.id, ...this.kpiConfigs.map(config => config.id), ...chartIds];
   }
 
   private getBlockConfig(blockId: string): DashboardBlockConfig | null {
@@ -955,6 +972,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
   }
 
   private getErrorMessage(error): string {
+    if (error?.status === 0) return 'No se pudo conectar con el servidor. Intente cargar de nuevo esta secci\u00f3n.';
     return error?.error?.message || error?.message || 'No se pudo cargar este bloque.';
   }
 
@@ -962,6 +980,7 @@ export class HomeAdminComponent extends MixinClass implements OnInit, AfterViewI
     this.chartObserver?.disconnect();
     this.chartViewportChangesSub?.unsubscribe();
     this.themeConfigSub?.unsubscribe();
+    this.travelConfigSub?.unsubscribe();
     this.dashboardResource.destroy();
     this._destroy_mixin();
   }

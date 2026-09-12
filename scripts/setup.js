@@ -86,7 +86,6 @@ const moverArchivo = (cliente, obj_file) => {
   console.log(`ARCHIVO: ${obj_file.file_name} movido.`);
 };
 
-
 // Configuración principal
 function configuraCliente(cliente) {
   if (!clientes.includes(cliente)) {

@@ -17,10 +17,12 @@
   "has_contabilidad": true,
   "is_db_local": false,
   "calcular_itbis": false,
+  "usa_mora": true,
   "is_produccion": true,
   "facturacion_editar_precio": false,
   "vende_sin_inventario": false,
   "use_ecf": true,
+  "usa_modulo_viajes": true,
   "medida_producto_terminado": "Quintal",
   "serie_default": "electronica",
 

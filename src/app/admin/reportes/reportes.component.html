@@ -23,7 +23,7 @@
               <span class="report-link" (click)="openReporteForm({ tipo: 'ventas_productos', titulo: 'Reporte de productos vendidos por dia' })"><i class="fas fa-shopping-basket"></i><span>Relación de productos vendidos</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
               <span class="report-link" (click)="openReporteForm({ tipo: 'cuentas_con_pagos', titulo: 'Reporte de facturas a crédito con sus pagos' })"><i class="fas fa-file-invoice-dollar"></i><span>Relación de ventas a crédito con sus movimientos</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
               <span class="report-link" (click)="openReporteForm({ tipo: 'ventas_cliente', titulo: 'Reporte de venta por cliente' })"><i class="fas fa-user-tag"></i><span>Relación de ventas por cliente</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
-              @if (hasPermisoCamiones) {
+              @if (hasPermisoCamiones()) {
                 <span class="report-link" (click)="openReporteForm({ tipo: 'movimientos_vehiculo', titulo: 'Reporte de viajes por camión' })"><i class="fas fa-truck-moving"></i><span>Relación de viajes por camión</span><i class="fas fa-arrow-right report-link-arrow"></i></span>
               }
             </div>
