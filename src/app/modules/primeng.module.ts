@@ -12,12 +12,13 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { PopoverModule } from 'primeng/popover';
 import { DatePickerModule } from 'primeng/datepicker';
 import { AccordionModule } from 'primeng/accordion';
+import { PrimeDropdownKeyboardDirective } from './prime-dropdown-keyboard.directive';
 
 const modulos = [DialogModule, ProgressBarModule, DrawerModule, TooltipModule, SelectModule, InputMaskModule, TagModule, TabsModule, MultiSelectModule, PopoverModule, DatePickerModule, AccordionModule];
 
 @NgModule({
-  declarations: [],
+  declarations: [PrimeDropdownKeyboardDirective],
   imports: [CommonModule, ...modulos],
-  exports: modulos,
+  exports: [...modulos, PrimeDropdownKeyboardDirective],
 })
 export class PrimengModule {}
