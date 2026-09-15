@@ -61,6 +61,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   step = signal(1);
   selectedCuadre = signal<any | null>(null);
   closingDate = signal(this.today());
+  preparedDate = signal<string | null>(null);
   source = signal<'stored' | 'calculated' | null>(null);
   existsCuadre = signal(false);
   notes = signal('');
@@ -82,6 +83,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   configCuadre = signal<ConfigCuadreValues>({ target_fondo: 0 });
   autoApplyDifference = signal(false);
   private pendingArchivedMerge: any = null;
+  private pendingPrepareMerge: any = null;
 
   private configCuadresClass = new ConfigCuadresC();
 
@@ -353,9 +355,60 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   prepare() {
-    if (!this.closingDate()) return;
-    this.prepareClosingDate.set(this.closingDate());
+    const date = this.closingDate();
+    if (!date) return;
+
+    if (!this.canArchiveCurrentForm()) {
+      this.pendingPrepareMerge = null;
+      this.requestPrepare(date);
+      return;
+    }
+
+    const activeDate = this.selectedCuadre()?.closing_date || this.selectedCuadre()?.fecha || this.preparedDate() || this.closingDate();
+    if (this.dateKey(activeDate) === this.dateKey(date)) {
+      CanDeactivateGuard.showConfirmationModal('Ya tienes un cuadre con cambios sin guardar para esta fecha. <strong>¿Deseas mezclar los datos actuales con la nueva consulta o iniciar desde cero?</strong>', {
+        showCancelButton: true,
+        showNoButton: true,
+        cancelText: 'Cancelar',
+        noText: 'Iniciar desde cero',
+        yesText: 'Mezclar datos',
+        header: 'Actualizar cuadre',
+        width: '34rem',
+        onNo: () => {
+          this.pendingPrepareMerge = null;
+          this.requestPrepare(date);
+        },
+        onYes: () => {
+          this.pendingPrepareMerge = this.createArchiveSnapshot();
+          this.requestPrepare(date);
+        },
+      });
+      return;
+    }
+
+    CanDeactivateGuard.showConfirmationModal('La fecha consultada es distinta a la del cuadre en edición. <strong>Si continúa, se borrarán los cambios actuales.</strong>', {
+      showCancelButton: false,
+      showNoButton: true,
+      noText: 'Cancelar',
+      yesText: 'Continuar',
+      header: 'Cambiar fecha del cuadre',
+      width: '34rem',
+      onYes: () => {
+        this.pendingPrepareMerge = null;
+        this.requestPrepare(date);
+      },
+    });
+  }
+
+  private requestPrepare(date: string) {
+    this.prepareClosingDate.set(date);
     this.step.set(2);
+  }
+
+  private dateKey(value: string | Date | null | undefined) {
+    if (!value) return '';
+    if (value instanceof Date) return this.dateToString(value);
+    return String(value).slice(0, 10);
   }
 
   setClosingDate(date: Date | string) {
@@ -566,12 +619,17 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   setOtherPaymentMethods(items: CuadreMovimiento[]) {
-    this.otherPaymentMethods.set(items.map(item => ({ ...item, movement_group: 'other_payment_methods' })));
+    this.otherPaymentMethods.set(items.filter(item => item.payment_method !== 'card').map((item): CuadreMovimiento => ({ ...item, movement_group: 'other_payment_methods' })));
     this.markDirty();
   }
 
   setCardPaymentMethods(items: CuadreMovimiento[]) {
-    this.cardPaymentMethods.set(items.map(item => ({ ...item, movement_group: 'other_payment_methods' })));
+    const normalized: CuadreMovimiento[] = items.map((item): CuadreMovimiento => ({ ...item, movement_group: 'other_payment_methods' }));
+    const movedToOther = normalized.filter(item => item.payment_method !== 'card');
+    this.cardPaymentMethods.set(normalized.filter(item => item.payment_method === 'card'));
+    if (movedToOther.length) {
+      this.otherPaymentMethods.set([...this.otherPaymentMethods(), ...movedToOther]);
+    }
     this.markDirty();
   }
 
@@ -603,7 +661,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   canArchiveCurrentForm() {
-    return this.isCreando() && this.step() >= 3 && fun.hasValue(this.source()) && this.selectedIsNewFlow() && !this.readOnly() && !this.formPristine();
+    const hasWorkingData = !this.formPristine() || this.archivedCuadreRestored();
+    return this.isCreando() && this.step() >= 3 && fun.hasValue(this.source()) && this.selectedIsNewFlow() && !this.readOnly() && hasWorkingData;
   }
 
   canSubmit() {
@@ -656,8 +715,9 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     const stored = prepareResponse.exists_cuadre ? prepareResponse.cuadre : null;
     this.divisaPrincipal.set(prepareResponse.divisa_principal || stored?.divisa_principal || null);
     this.divisas.set(prepareResponse.divisas || stored?.divisas || []);
-    const archivedMerge = this.pendingArchivedMerge;
+    const archivedMerge = this.pendingArchivedMerge || this.pendingPrepareMerge;
     this.pendingArchivedMerge = null;
+    this.pendingPrepareMerge = null;
     const normalized = this.normalizePreparedData(prepareResponse, stored);
     if (archivedMerge) {
       const archivedMovements = [...(archivedMerge.otherPaymentMethods || []), ...(archivedMerge.cardPaymentMethods || [])];
@@ -677,6 +737,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.source.set(prepareResponse.source);
     this.selectedCuadre.set(stored ? this.mapListItem({ ...stored, is_new_flow: this.resolvePrepareIsNewFlow(prepareResponse, stored) }) : null);
     this.closingDate.set(prepareResponse.closing_date || this.closingDate());
+    this.preparedDate.set(prepareResponse.closing_date || this.preparedDate());
     this.systemIncome.set(normalized.systemIncome);
     this.totals.set(normalized.totals);
     this.notes.set(normalized.notes);
@@ -791,7 +852,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     const totals = stored ? stored?.totals || {} : response.totals || {};
     const responseTotals = response.totals || {};
     const reconciliationTolerance = stored && isNewFlow ? (stored?.totals?.reconciliation_tolerance ?? responseTotals?.reconciliation_tolerance ?? '0.00') : '0.00';
-    const suggested = (responseMovements.suggested_from_system || []).map(item => ({ ...item, movement_group: item.movement_group || 'other_payment_methods' }));
+    const suggested = (responseMovements.suggested_from_system || []).map(item => ({ ...item, movement_group: item.movement_group || 'other_payment_methods', source: 'system_suggestion' }));
     const configTargetFondo = stored && stored?.totals?.next_day_cash_fund ? stored?.totals?.next_day_cash_fund : (this.configCuadre().target_fondo ?? 0);
 
     return {
@@ -837,7 +898,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     return normalized.length ? normalized : fallback;
   }
 
-  private normalizeMovements(responseItems: CuadreMovimiento[] = [], storedItems: CuadreMovimiento[] = [], group) {
+  private normalizeMovements(responseItems: CuadreMovimiento[] = [], storedItems: CuadreMovimiento[] = [], group: CuadreMovimiento['movement_group']): CuadreMovimiento[] {
     const storedSource = this.movementsByGroup(storedItems, group);
     const source = responseItems.length ? responseItems : storedSource;
     return source.map(item => ({
@@ -846,6 +907,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       description: item.description || '',
       reference: item.reference || '',
       amount: fun.roundNumberToDecimal(item.amount || '0.00'),
+      source: item.source || (responseItems.length ? 'system_suggestion' : 'manual'),
     }));
   }
 
@@ -980,6 +1042,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.selectedCuadre.set(null);
     this.savedInCurrentForm.set(false);
     this.prepareClosingDate.set(null);
+    this.preparedDate.set(null);
     this.existsCuadre.set(false);
     this.source.set(null);
     this.notes.set('');

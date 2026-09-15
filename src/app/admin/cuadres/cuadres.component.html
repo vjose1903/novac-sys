@@ -14,20 +14,20 @@
           [tooltipPosition]="'right'"
           (clickFunction)="openModalConfig()">
         </btn-icon-circular>
+        @if (archivedCuadre()) {
+          <div class="cuadre-archive-tag">
+            <button type="button" class="cuadre-archive-tag-main" (click)="restoreArchivedCuadre()" [disabled]="archivedCuadreRestored()">
+              <i class="fas fa-box-archive"></i>
+              <span>{{ archivedCuadreRestored() ? 'Continuando cuadre archivado' : 'Hay un cuadre almacenado' }}</span>
+              <small>{{ formatArchivedAt(archivedCuadre()?.archivedAt) }}</small>
+            </button>
+            <button type="button" class="cuadre-archive-delete" (click)="confirmDeleteArchivedCuadre($event)" pTooltip="Borrar cuadre archivado" tooltipPosition="top">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        }
       </div>
     </div>
-    @if (archivedCuadre()) {
-      <div class="cuadre-archive-tag">
-        <button type="button" class="cuadre-archive-tag-main" (click)="restoreArchivedCuadre()" [disabled]="archivedCuadreRestored()">
-          <i class="fas fa-box-archive"></i>
-          <span>{{ archivedCuadreRestored() ? 'Continuando cuadre archivado' : 'Hay un cuadre almacenado' }}</span>
-          <small>{{ formatArchivedAt(archivedCuadre()?.archivedAt) }}</small>
-        </button>
-        <button type="button" class="cuadre-archive-delete" (click)="confirmDeleteArchivedCuadre($event)" pTooltip="Borrar cuadre archivado" tooltipPosition="top">
-          <i class="fas fa-trash"></i>
-        </button>
-      </div>
-    }
   </div>
 
   <div class="col-12 p-0 colFormularioListado">
@@ -86,9 +86,9 @@
                     <app-cuadre-denomination-input title="Monedas" type="coin" [items]="coins()" [divisas]="principalDivisaOptions()" [readonly]="readOnly()" [fixedRows]="true" (itemsChange)="setCoins($event)" />
                     <app-cuadre-denomination-input class="foreign-currency" title="Divisas" type="foreign_currency" [items]="foreignCurrency()" [divisas]="foreignDivisaOptions()" [readonly]="readOnly()" (itemsChange)="setForeignCurrency($event)" />
                     @if (cardPaymentMethods().length > 0) {
-                      <app-cuadre-movements-editor title="Tarjetas" group="other_payment_methods" [items]="cardPaymentMethods()" [readonly]="readOnly()" (itemsChange)="setCardPaymentMethods($event)" />
+                      <app-cuadre-movements-editor title="Tarjetas" group="other_payment_methods" [items]="cardPaymentMethods()" [readonly]="readOnly()" [cardSection]="true" [disableSystemItems]="true" (itemsChange)="setCardPaymentMethods($event)" />
                     }
-                    <app-cuadre-movements-editor title="Cheques, depósitos y transferencias" group="other_payment_methods" [items]="otherPaymentMethods()" [readonly]="readOnly()" (itemsChange)="setOtherPaymentMethods($event)" />
+                    <app-cuadre-movements-editor title="Cheques, depósitos y transferencias" group="other_payment_methods" [items]="otherPaymentMethods()" [readonly]="readOnly()" [hideCard]="true" [disableSystemItems]="true" (itemsChange)="setOtherPaymentMethods($event)" />
                     <app-cuadre-movements-editor title="Transferencias adicionales" group="additional_transfers" [items]="additionalTransfers()" [readonly]="readOnly()" (itemsChange)="setAdditionalTransfers($event)" />
                   </div>
 

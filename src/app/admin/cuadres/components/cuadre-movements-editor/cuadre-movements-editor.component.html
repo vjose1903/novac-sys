@@ -15,11 +15,11 @@
       <p-select
         styleClass="cuadre-method-select"
         appendTo="body"
-        [options]="paymentMethods"
+        [options]="availablePaymentMethods()"
         optionLabel="label"
         optionValue="value"
         [ngModel]="item.payment_method"
-        [disabled]="readonly"
+        [disabled]="readonly || cardSection || isSystemItem(item)"
         (ngModelChange)="patchItem($index, 'payment_method', $event)"
       />
       <input class="form-control form-control-sm" [value]="item.description" [readonly]="readonly" (input)="patchItem($index, 'description', $any($event.target).value)" />
