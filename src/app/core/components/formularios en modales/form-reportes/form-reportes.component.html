@@ -1,12 +1,15 @@
 <form [formGroup]="form">
   <div class="row">
     <!-- ----- SIMPLE_SWITCH -----  -->
-    @if (verifyConditionalRender(reportField.simpleSwitchField) && dinamycSwitchReady && reportTypeHasfield(reportField.simpleSwitchField)) {
+    @if (verifyConditionalRender(reportField.simpleSwitchField) && dinamycSwitchReady && reportTypeHasfield(reportField.simpleSwitchField) && !showPaymentMethodSwitch() && !simpleSwitchAfterType) {
       @for (dinamyc_switch of dynamic_switches; track dinamyc_switch.id) {
         <div class="col-12 p-0">
           <div class="form-group horizontal-layout">
             <label class="control-label mb-0">{{ dinamyc_switch.label }}:</label>
-            <input [formControlName]="dinamyc_switch.formControl" class="apple-switch" type="checkbox" />
+            <input
+              [formControlName]="dinamyc_switch.formControl"
+              class="apple-switch"
+              type="checkbox" />
           </div>
         </div>
       }
@@ -165,6 +168,17 @@
       </div>
     }
 
+    @if (simpleSwitchAfterType && verifyConditionalRender(reportField.simpleSwitchField) && dinamycSwitchReady && reportTypeHasfield(reportField.simpleSwitchField)) {
+      @for (dinamyc_switch of dynamic_switches; track dinamyc_switch.id) {
+        <div class="col-12 p-0">
+          <div class="form-group horizontal-layout">
+            <label class="control-label mb-0">{{ dinamyc_switch.label }}:</label>
+            <input [formControlName]="dinamyc_switch.formControl" class="apple-switch" type="checkbox" />
+          </div>
+        </div>
+      }
+    }
+
     <!-- ----- TIPO FACTURAS -----  -->
     @if (verifyConditionalRender(reportField.billTypeField) && reportTypeHasfield(reportField.billTypeField)) {
       <div class="col-12 p-0">
@@ -212,6 +226,16 @@
           </div>
         }
       </div>
+      @if (showPaymentMethodSwitch() && dinamycSwitchReady) {
+        <div [formGroup]="form">
+          @for (dinamyc_switch of dynamic_switches; track dinamyc_switch.id) {
+            <div class="form-group mb-2 horizontal-layout">
+              <label class="control-label mb-0">{{ dinamyc_switch.label }}:</label>
+              <input [formControlName]="dinamyc_switch.formControl" class="apple-switch" type="checkbox" />
+            </div>
+          }
+        </div>
+      }
       @if (showExternalReportButton()) {
         <div class="sin_comprobante_btn mt-2" [ngClass]="{ active: is_external }" (click)="activarReporteFacturasExternas()"></div>
       }

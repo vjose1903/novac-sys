@@ -70,7 +70,12 @@ export class ReciboC extends CrudG<ReciboI> {
       const inputs = { tipo_reporte: tipo };
 
       inputs['dynamic_selections'] = ReciboC.inputsBuscarPor;
-      inputs['conditionalRender'] = { ...ReciboC.clienteConditionalRender };
+      inputs['dynamic_switches'] = [{ label: 'Mostrar forma de pago', formControl: 'mostrar_forma_pago', defaultValue: false }];
+      inputs['simpleSwitchAfterType'] = true;
+      inputs['conditionalRender'] = {
+        ...ReciboC.clienteConditionalRender,
+        [reportField.simpleSwitchField]: (formValue: any) => formValue.tipo === ReportGroupTypeE.detallado,
+      };
       ReporteC.objReporte = { inputs: inputs, id: tipo, header: titulo, callback: returnDataFromModal };
 
       function returnDataFromModal(arg: ICallbackModal) {
@@ -95,6 +100,7 @@ export class ReciboC extends CrudG<ReciboI> {
     requestParameters['tipo'] = formReporte.tipo;
     requestParameters['search_by'] = formReporte.search_by || SearchBy.general;
     requestParameters['cliente_id'] = formReporte.cliente_id || null;
+    requestParameters['mostrar_forma_pago'] = formReporte.mostrar_forma_pago === true && formReporte.tipo === ReportGroupTypeE.detallado;
 
     const requestParams = { afterPath: `custom/${pdfParams.tipo}`, parameters: requestParameters };
 
@@ -109,6 +115,7 @@ export class ReciboC extends CrudG<ReciboI> {
       const data = requestResponse;
 
       if (requestParameters['search_by'] == SearchBy.por_cliente && formReporte.tipo == ReportGroupTypeE.detallado) data.tipo_reporte = 'recibos_cliente';
+      data.mostrar_forma_pago = requestParameters['mostrar_forma_pago'];
 
       return data;
     }
