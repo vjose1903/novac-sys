@@ -84,6 +84,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   autoApplyDifference = signal(false);
   private pendingArchivedMerge: any = null;
   private pendingPrepareMerge: any = null;
+  private initialNewRequestHandled = false;
 
   private configCuadresClass = new ConfigCuadresC();
 
@@ -181,7 +182,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   readonly readOnly = computed(() => {
     const status = this.selectedCuadre()?.status || this.selectedCuadre()?.estado;
-    return !this.selectedIsNewFlow() || (this.existsCuadre() && !['reopened', 'rejected'].includes(status));
+    return !this.selectedIsNewFlow() || (this.existsCuadre() && status !== 'reopened');
   });
   readonly useStoredTotals = computed(() => this.existsCuadre() && this.selectedIsNewFlow() && this.readOnly());
 
@@ -297,7 +298,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       if (status === 'resolved' && request) {
         untracked(() => {
           this.saveRequest.set(null);
-          this.afterSave(value);
+          void this.afterSave(value);
         });
       }
     });
@@ -313,6 +314,18 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
         });
       }
     });
+
+    effect(() => {
+      const status = this.listResource.status();
+      const requestedNew = this.route.snapshot.queryParamMap.get('nuevo') === 'true';
+      if (status !== 'resolved' || !requestedNew || this.initialNewRequestHandled) return;
+
+      this.initialNewRequestHandled = true;
+      const response = this.listResource.value();
+      const rows = Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : [];
+      const hasTodayCuadre = rows.some(item => this.dateKey(item?.closing_date || item?.fecha) === this.today());
+      if (!hasTodayCuadre && !this.isCreando()) this.nuevoRegistro();
+    });
   }
 
   ngOnInit(): void {
@@ -320,7 +333,6 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.ensureDivisasLoaded();
     this.loadConfigCuadre();
     this.loadArchivedCuadreOnEntry().catch(() => fun.toastWarning('No se pudo leer el cuadre archivado localmente.', 'AVISO'));
-    if (this.route.snapshot.queryParamMap.get('nuevo') === 'true' && !this.isCreando()) this.nuevoRegistro();
   }
 
   ngOnDestroy(): void {
@@ -554,7 +566,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   runStateAction(action: string) {
     const status = this.selectedCuadre()?.status || this.selectedCuadre()?.estado;
-    const canProcessHistoricalReview = ['approve', 'reject'].includes(action) || (action === 'submit' && ['reopened', 'rejected'].includes(status)) || (action === 'reopen' && ['submitted', 'approved', 'rejected', 'cancelled'].includes(status));
+    const canProcessHistoricalReview = ['approve', 'reject'].includes(action) || (action === 'submit' && status === 'reopened') || (action === 'reopen' && ['submitted', 'approved', 'rejected', 'cancelled'].includes(status));
     if ((!this.isCurrentClosingDate() && !canProcessHistoricalReview) || !this.selectedIsNewFlow()) return;
     const id = Number(this.selectedCuadre()?.id);
     if (!id) return;
@@ -604,26 +616,31 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   setBills(items: CuadreDenominacion[]) {
+    if (this.readOnly()) return;
     this.bills.set(items);
     this.markDirty();
   }
 
   setCoins(items: CuadreDenominacion[]) {
+    if (this.readOnly()) return;
     this.coins.set(items);
     this.markDirty();
   }
 
   setForeignCurrency(items: CuadreDenominacion[]) {
+    if (this.readOnly()) return;
     this.foreignCurrency.set(items);
     this.markDirty();
   }
 
   setOtherPaymentMethods(items: CuadreMovimiento[]) {
+    if (this.readOnly()) return;
     this.otherPaymentMethods.set(items.filter(item => item.payment_method !== 'card').map((item): CuadreMovimiento => ({ ...item, movement_group: 'other_payment_methods' })));
     this.markDirty();
   }
 
   setCardPaymentMethods(items: CuadreMovimiento[]) {
+    if (this.readOnly()) return;
     const normalized: CuadreMovimiento[] = items.map((item): CuadreMovimiento => ({ ...item, movement_group: 'other_payment_methods' }));
     const movedToOther = normalized.filter(item => item.payment_method !== 'card');
     this.cardPaymentMethods.set(normalized.filter(item => item.payment_method === 'card'));
@@ -634,26 +651,31 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   setAdditionalTransfers(items: CuadreMovimiento[]) {
+    if (this.readOnly()) return;
     this.additionalTransfers.set(items.map(item => ({ ...item, movement_group: 'additional_transfers' })));
     this.markDirty();
   }
 
   setNotes(value: string) {
+    if (this.readOnly()) return;
     this.notes.set(value || '');
     this.markDirty();
   }
 
   setReconciliationTolerance(value: string) {
+    if (this.readOnly()) return;
     this.reconciliationTolerance.set(value || '0.00');
     this.markDirty();
   }
 
   setNextDayCashFund(value: string) {
+    if (this.readOnly()) return;
     this.nextDayCashFund.set(value || '0.00');
     this.markDirty();
   }
 
   applyDifferenceToFondo() {
+    if (this.readOnly()) return;
     const current = Number(fun.desformatearStNumber(this.nextDayCashFund()));
     const diff = Number(fun.desformatearStNumber(this.differenceAmount()));
     this.nextDayCashFund.set(this.formatAmount(current + diff));
@@ -667,7 +689,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
 
   canSubmit() {
     const status = this.selectedCuadre()?.status || this.selectedCuadre()?.estado;
-    return this.selectedIsNewFlow() && Number(this.selectedCuadre()?.id) && ['reopened', 'rejected'].includes(status);
+    return this.selectedIsNewFlow() && Number(this.selectedCuadre()?.id) && status === 'reopened';
   }
 
   canApproveReject() {
@@ -757,7 +779,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     return response?.data?.exists_cuadre !== undefined ? response.data : response;
   }
 
-  private afterSave(response: any) {
+  private async afterSave(response: any) {
     const cuadre = response?.data || response?.cuadre || response;
     if (cuadre) this.selectedCuadre.set(cuadre);
     this.existsCuadre.set(true);
@@ -766,6 +788,17 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.loadCuadres(this.tServ.getPaginationById('lista_cuadres') || this.listRequest());
     Ss.layServ.nextCheckCuadreToday(true);
     this.markPristine();
+
+    const archived = this.archivedCuadre();
+    const savedDate = cuadre?.closing_date || cuadre?.fecha || cuadre?.cuadre_caja?.closing_date || this.closingDate();
+    if (archived && this.dateKey(savedDate) === this.dateKey(archived.form?.closingDate)) {
+      try {
+        await this.deleteArchivedCuadre();
+        this.pendingArchivedMerge = null;
+      } catch {
+        // El guardado ya fue exitoso; se conserva el estado visible si falla la limpieza local.
+      }
+    }
   }
 
   private afterAction(response: any) {
@@ -844,7 +877,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   private normalizePreparedData(response: CuadrePrepareResponse, stored: any) {
     const denominaciones = stored?.denominaciones || stored?.denominations || [];
     const movimientos = stored?.movimientos || stored?.movements || [];
-    const movimientosArray = Array.isArray(movimientos) ? movimientos : [];
+    const storedOtherMovements = this.movementsByGroup(movimientos, 'other_payment_methods');
     const responseMovements = response.movements || {};
     const isNewFlow = this.resolvePrepareIsNewFlow(response, stored);
     const storedSystemIncome = stored?.system_income || stored?.system_income_details || {};
@@ -871,8 +904,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       bills: isNewFlow ? this.normalizeDenominations([], denominaciones, 'bill', this.defaultBills()) : [],
       coins: isNewFlow ? this.normalizeDenominations([], denominaciones, 'coin', this.defaultCoins()) : [],
       foreignCurrency: isNewFlow ? this.normalizeDenominations([], denominaciones, 'foreign_currency', []) : [],
-      otherPaymentMethods: isNewFlow ? this.normalizeMovements((stored ? [] : suggested).filter(item => item.payment_method !== 'card'), movimientosArray.filter(item => (item.payment_method || item.method || item.forma_pago) !== 'card'), 'other_payment_methods') : [],
-      cardPaymentMethods: isNewFlow ? this.normalizeMovements((stored ? [] : suggested).filter(item => item.payment_method === 'card'), movimientosArray.filter(item => (item.payment_method || item.method || item.forma_pago) === 'card'), 'other_payment_methods') : [],
+      otherPaymentMethods: isNewFlow ? this.normalizeMovements((stored ? [] : suggested).filter(item => item.payment_method !== 'card'), storedOtherMovements.filter(item => (item.payment_method || (item as any).method || (item as any).forma_pago) !== 'card'), 'other_payment_methods') : [],
+      cardPaymentMethods: isNewFlow ? this.normalizeMovements((stored ? [] : suggested).filter(item => item.payment_method === 'card'), storedOtherMovements.filter(item => (item.payment_method || (item as any).method || (item as any).forma_pago) === 'card'), 'other_payment_methods') : [],
       additionalTransfers: isNewFlow ? this.normalizeMovements([], movimientos, 'additional_transfers') : [],
     };
   }

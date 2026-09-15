@@ -98,7 +98,7 @@
                         Observaciones
                         <i class="fas fa-info-circle field-info" pTooltip="Comentario opcional para documentar cualquier detalle del cuadre." tooltipPosition="top"></i>
                       </label>
-                      <textarea class="form-control" rows="3" [value]="notes()" [readonly]="readOnly()" (input)="setNotes($any($event.target).value)"></textarea>
+                      <textarea class="form-control" rows="3" [value]="notes()" [readonly]="readOnly()" [disabled]="readOnly()" (input)="setNotes($any($event.target).value)"></textarea>
                     </div>
                     <div class="form-group">
                       <div class="mb-1">
@@ -112,6 +112,7 @@
                         appNumeroFormato
                         [value]="reconciliationTolerance()"
                         [readonly]="readOnly()"
+                        [disabled]="readOnly()"
                         (input)="setReconciliationTolerance($any($event.target).value)"
                         (appNumeroFormatoBlur)="setReconciliationTolerance($event)" />
                     </div>
@@ -126,7 +127,7 @@
                           <button type="button" class="btn btn-sm btn-text" (click)="applyDifferenceToFondo()">Aplicar diferencia</button>
                         }
                       </div>
-                      <input class="form-control text-end" appNumeroFormato [value]="nextDayCashFund()" [readonly]="readOnly()" (input)="setNextDayCashFund($any($event.target).value || '0.00')" (appNumeroFormatoBlur)="setNextDayCashFund($event)" />
+                      <input class="form-control text-end" appNumeroFormato [value]="nextDayCashFund()" [readonly]="readOnly()" [disabled]="readOnly()" (input)="setNextDayCashFund($any($event.target).value || '0.00')" (appNumeroFormatoBlur)="setNextDayCashFund($event)" />
                     </div>
                   </div>
 
