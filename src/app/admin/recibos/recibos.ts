@@ -15,6 +15,7 @@ export interface ReciboI {
   cliente_id?: number;
   total?: number;
   forma_pago?: string;
+  metodos_de_pago?: Array<{ id?: number; forma_pago: string; monto: number }>;
   numero_recibo?: number;
   incidencia?: null;
   devuelta?: number;

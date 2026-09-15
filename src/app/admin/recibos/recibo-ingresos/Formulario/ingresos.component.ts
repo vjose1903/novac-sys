@@ -107,6 +107,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
   detalleYtotal: any;
   devuelta: any;
   forma_pago: any;
+  metodos_de_pago: Array<{ forma_pago: string; monto: number }> = [];
 
   totalFacturado: number;
   totalPagado: number;
@@ -355,6 +356,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   resetVariables() {
     this.forma_pago = null;
+    this.metodos_de_pago = [];
     this.devuelta = null;
     this.detalleYtotal = undefined;
     this.facturasSelected.set([]);
@@ -680,6 +682,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
     this.devuelta = obj.devuelta;
     this.forma_pago = obj.forma_pago;
+    this.metodos_de_pago = obj.metodos_de_pago;
     this.is_print = is_print;
 
     await this.sendIngreso();
@@ -701,6 +704,7 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
           cliente_id: this.clienteAdepositar().id,
           detalleYtotal: this.detalleYtotal,
           forma_pago: this.forma_pago,
+          metodos_de_pago: this.metodos_de_pago,
           devuelta: this.devuelta,
           balance_cliente: this.restando(),
         })

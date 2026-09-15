@@ -14,7 +14,7 @@
 
     <!-- ----- SERIE -----  -->
     @if (verifyConditionalRender(reportField.serieField) && reportTypeHasfield(reportField.serieField)) {
-      <div class="col-12 p-0 mb-2">
+      <div class="col-12 p-0 mb-2 report-series-field">
         <label class="control-label mb-0">Serie: <span style="color: red">*</span> </label>
         <p-selectButton [options]="facturasSerieOptions" formControlName="serie" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" [disabled]="is_external" />
       </div>

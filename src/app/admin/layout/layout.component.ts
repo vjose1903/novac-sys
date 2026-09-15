@@ -23,6 +23,7 @@ import { ConfiguracionesComponent } from '../../login/extra/configuraciones/conf
 import { ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { Environment } from '@environments/environment';
+import { getDevelopmentServerMode } from '@core/typescript/url-server.utils';
 import { DesktopUpdateState } from '@electron/shared-electron-angular';
 import { DivisaService } from '@registros/divisa/divisa.service';
 import { CuadreTodayStateService } from '@admin/cuadres/services/cuadre-today-state.service';
@@ -65,6 +66,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   fun = fun;
 
   my_capitalize = fun.capitalice;
+
+  isUsingRemoteDevelopmentServer(): boolean {
+    return !Environment.production && getDevelopmentServerMode() === 'remote';
+  }
 
   copyToClipboardServ = inject(CopyToClipboardService);
   themeServ = inject(ThemeService);

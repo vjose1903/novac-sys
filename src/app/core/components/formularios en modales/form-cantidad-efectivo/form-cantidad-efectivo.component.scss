@@ -91,7 +91,25 @@
 .cash-input-grid {
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: minmax(0, 1fr) minmax(11rem, 0.75fr);
+}
+
+.cash-payment-row {
+  align-items: end;
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1fr) min-content;
+}
+
+.cash-add-payment {
+  justify-self: start;
+}
+
+.cash-remove-payment {
+  height: 2.5rem !important;
+  min-height: 2.5rem !important;
+  min-width: 2.5rem !important;
+  padding: 0 !important;
+  width: 2.5rem;
 }
 
 .cash-field {
@@ -178,7 +196,7 @@
   padding: 0.65rem 0.75rem;
 
   span {
-    color: var(--app-text-muted);
+    color: var(--primary10);
     font-size: 0.82rem;
     font-weight: 800;
   }
@@ -263,8 +281,8 @@
 
 .print-option-card {
   align-items: center;
-  background: color-mix(in srgb, var(--primary06) 10%, var(--app-surface));
-  border: 1px solid color-mix(in srgb, var(--primary08) 22%, var(--app-card-border));
+  background: var(--app-bg-soft);
+  border: 1px solid var(--app-border);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -285,6 +303,19 @@
   }
 }
 
+.cash-return-card.cash-change-card {
+  background: var(--app-bg-soft);
+  border-color: var(--app-border);
+
+  span {
+    color: color-mix(in srgb, var(--app-text) 80%, var(--app-text-muted));
+  }
+
+  strong {
+    color: var(--app-text-muted);
+  }
+}
+
 :host-context(html[data-theme-mode='dark']) {
   .cash-total-icon,
   .print-option-card span i {
@@ -293,6 +324,10 @@
 
   .cash-return-card strong {
     color: #86efac;
+  }
+
+  .cash-return-card.cash-change-card strong {
+    color: var(--app-text);
   }
 
   .cost-change-card {
@@ -321,7 +356,7 @@
 }
 
 @media (max-width: 575px) {
-  .cash-input-grid {
+  .cash-payment-row {
     grid-template-columns: 1fr;
   }
 }

@@ -18,6 +18,10 @@
 
     <div class="content">
       <div class="navBar">
+        @if (isUsingRemoteDevelopmentServer()) {
+          <span class="remote-server-tag">Usando servidor remoto</span>
+        }
+
         <div class="right">
           <div class="btn-group dropCuenta" id="dropCuenta">
             <span class="popover-toggle button-basic" (click)="dropdownCuenta.toggle($event)">

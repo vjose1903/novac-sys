@@ -67,7 +67,7 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
   facturaLoadingKey: string | null = null;
   movimientoLoadingKey: string | null = null;
   detalles: ModalDetalleFacturaI[] = [
-    { label: 'Forma de pago', key: 'forma_pago', tipo: 'string', div_clase: 'col-12 col-md-6 p-0 ' },
+    { label: 'Forma de pago', key: 'forma_pago', tipo: 'payment_methods', div_clase: 'col-12 col-md-6 p-0 ' },
     { label: 'Fecha', key: 'fecha_equivalente', tipo: 'date', div_clase: 'col-12 col-md-6 p-0 ps-md-3' },
     { label: 'Comprobante', key: 'numero_comprobante', tipo: 'tag', div_clase: 'col-12 p-0', clase_string: 'text-black mb-0', bg_tag: '#bfbfbf' },
   ];
@@ -648,6 +648,14 @@ export class DetalleFacturaComponent implements OnInit, IDynamicModal {
 
     if (config.transform) value = config.transform(value);
     return value;
+  }
+
+  getMetodosDePago() {
+    return Array.isArray(this.data?.metodos_de_pago) ? this.data.metodos_de_pago : [];
+  }
+
+  formatMontoPago(monto: number) {
+    return fun.roundNumberToDecimal(monto);
   }
 
   submit() {

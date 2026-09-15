@@ -32,6 +32,19 @@
                 </span>
               }
             }
+            @case ('payment_methods') {
+              <span class="detalle-text-value">{{ getValue(item) }}</span>
+              @if (getMetodosDePago().length > 0) {
+                <ul class="payment-methods-list">
+                  @for (metodo of getMetodosDePago(); track metodo.id || $index) {
+                    <li>
+                      <span class="payment-method-name">{{ metodo.forma_pago }}:</span>
+                      <span class="payment-method-amount"> {{ formatMontoPago(metodo.monto) }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+            }
             @default {
               <span class="detalle-text-value">{{ getValue(item) }}</span>
             }

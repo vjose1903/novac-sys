@@ -308,6 +308,7 @@ export class FacturaC extends CrudG<FacturasI> {
       const pick_factura2 = [
         'fecha_viaje',
         'forma_pago',
+        'metodos_de_pago',
         'id',
         'is_viaje',
         'monto',
@@ -511,6 +512,7 @@ export interface FacturasI {
   numero_factura: number;
   condicion: string;
   forma_pago: string;
+  metodos_de_pago?: Array<{ id?: number; forma_pago: string; monto: number }>;
   total_factura: number;
   itbis: number;
   descuento: number;
