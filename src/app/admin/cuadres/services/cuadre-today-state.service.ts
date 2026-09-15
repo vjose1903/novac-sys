@@ -13,6 +13,7 @@ export class CuadreTodayStateService extends SharedResourceState<boolean> {
       requestParams: [{ key: 'spinner', value: 'no_show' }],
     };
     const res = await this.cuadreClass.getAll(extra);
-    return Boolean(res?.data?.existe_cuadre_hoy);
+    const payload = res?.data?.data || res?.data || res;
+    return Boolean(payload?.existe_cuadre_hoy ?? payload?.exists_cuadre_hoy);
   }
 }

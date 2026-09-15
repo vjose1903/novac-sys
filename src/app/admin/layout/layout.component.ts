@@ -115,6 +115,7 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   ngOnInit() {
     this.initVariables();
     this._init_mixin({ component: 'layout', is_routing: false });
+    this.checkCuadre();
 
     this.layServ.CHECKCUADRETODAY.pipe(takeUntil(this.destroy$)).subscribe(res => {
       if (res) {
