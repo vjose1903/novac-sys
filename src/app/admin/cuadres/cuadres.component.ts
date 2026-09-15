@@ -74,12 +74,14 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   coins = signal<CuadreDenominacion[]>(this.defaultCoins());
   foreignCurrency = signal<CuadreDenominacion[]>([]);
   otherPaymentMethods = signal<CuadreMovimiento[]>([]);
+  cardPaymentMethods = signal<CuadreMovimiento[]>([]);
   additionalTransfers = signal<CuadreMovimiento[]>([]);
   archivedCuadre = signal<ArchivedCuadreSnapshot | null>(null);
   archivedCuadreRestored = signal(false);
   formPristine = signal(true);
   configCuadre = signal<ConfigCuadreValues>({ target_fondo: 0 });
   autoApplyDifference = signal(false);
+  private pendingArchivedMerge: any = null;
 
   private configCuadresClass = new ConfigCuadresC();
 
@@ -141,7 +143,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     return this.formatAmount(all.reduce((total, item) => total + this.denominationTotal(item), 0));
   });
 
-  readonly otherPaymentMethodsTotal = computed(() => (this.useStoredTotals() ? this.formatAmount(this.totals()?.other_payment_methods_total || '0.00') : this.sumMovements(this.otherPaymentMethods())));
+  readonly otherPaymentMethodsTotal = computed(() => (this.useStoredTotals() ? this.formatAmount(this.totals()?.other_payment_methods_total || '0.00') : this.sumMovements([...this.otherPaymentMethods(), ...this.cardPaymentMethods()])));
+  readonly cardPaymentMethodsTotal = computed(() => this.sumMovements(this.cardPaymentMethods()));
   readonly additionalTransfersTotal = computed(() => (this.useStoredTotals() ? this.formatAmount(this.totals()?.additional_transfers_total || '0.00') : this.sumMovements(this.additionalTransfers())));
   readonly summaryTotals = computed(() => ({
     ...this.totals(),
@@ -567,6 +570,11 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.markDirty();
   }
 
+  setCardPaymentMethods(items: CuadreMovimiento[]) {
+    this.cardPaymentMethods.set(items.map(item => ({ ...item, movement_group: 'other_payment_methods' })));
+    this.markDirty();
+  }
+
   setAdditionalTransfers(items: CuadreMovimiento[]) {
     this.additionalTransfers.set(items.map(item => ({ ...item, movement_group: 'additional_transfers' })));
     this.markDirty();
@@ -648,7 +656,22 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     const stored = prepareResponse.exists_cuadre ? prepareResponse.cuadre : null;
     this.divisaPrincipal.set(prepareResponse.divisa_principal || stored?.divisa_principal || null);
     this.divisas.set(prepareResponse.divisas || stored?.divisas || []);
+    const archivedMerge = this.pendingArchivedMerge;
+    this.pendingArchivedMerge = null;
     const normalized = this.normalizePreparedData(prepareResponse, stored);
+    if (archivedMerge) {
+      const archivedMovements = [...(archivedMerge.otherPaymentMethods || []), ...(archivedMerge.cardPaymentMethods || [])];
+      const freshMovements = [...normalized.otherPaymentMethods, ...normalized.cardPaymentMethods];
+      const merged = this.mergePreparedMovements(archivedMovements, freshMovements);
+      normalized.otherPaymentMethods = merged.filter(item => item.payment_method !== 'card');
+      normalized.cardPaymentMethods = merged.filter(item => item.payment_method === 'card');
+      normalized.bills = archivedMerge.bills || normalized.bills;
+      normalized.coins = archivedMerge.coins || normalized.coins;
+      normalized.foreignCurrency = archivedMerge.foreignCurrency || normalized.foreignCurrency;
+      normalized.notes = archivedMerge.notes || normalized.notes;
+      normalized.reconciliationTolerance = archivedMerge.reconciliationTolerance || normalized.reconciliationTolerance;
+      normalized.nextDayCashFund = archivedMerge.nextDayCashFund || normalized.nextDayCashFund;
+    }
 
     this.existsCuadre.set(prepareResponse.exists_cuadre);
     this.source.set(prepareResponse.source);
@@ -663,6 +686,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.coins.set(normalized.coins);
     this.foreignCurrency.set(normalized.foreignCurrency);
     this.otherPaymentMethods.set(normalized.otherPaymentMethods);
+    this.cardPaymentMethods.set(normalized.cardPaymentMethods);
     this.additionalTransfers.set(normalized.additionalTransfers);
     this.step.set(3);
     this.markPristine();
@@ -700,7 +724,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
           foreign_currency: this.foreignCurrency().map(item => this.mapDenominationLine(item)),
         },
         movements: {
-          other_payment_methods: this.otherPaymentMethods().map(item => this.mapMovementLine(item)),
+          other_payment_methods: [...this.otherPaymentMethods(), ...this.cardPaymentMethods()].map(item => this.mapMovementLine(item)),
           additional_transfers: this.additionalTransfers().map(item => this.mapMovementLine(item)),
         },
         next_day_cash_fund: this.toNumber(this.nextDayCashFund()),
@@ -721,7 +745,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
           foreign_currency: this.foreignCurrency().map(item => this.mapDenominationLine(item)),
         },
         movements: {
-          other_payment_methods: this.otherPaymentMethods().map(item => this.mapMovementLine(item)),
+          other_payment_methods: [...this.otherPaymentMethods(), ...this.cardPaymentMethods()].map(item => this.mapMovementLine(item)),
           additional_transfers: this.additionalTransfers().map(item => this.mapMovementLine(item)),
         },
         next_day_cash_fund: this.toNumber(this.nextDayCashFund()),
@@ -743,7 +767,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   private mapMovementLine(item: CuadreMovimiento) {
     return {
       payment_method: item.payment_method,
-      description: item.description || '',
+      description: this.cleanMovementDescription(item.description || ''),
       reference: item.reference || '',
       amount: this.toNumber(item.amount),
     };
@@ -759,6 +783,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   private normalizePreparedData(response: CuadrePrepareResponse, stored: any) {
     const denominaciones = stored?.denominaciones || stored?.denominations || [];
     const movimientos = stored?.movimientos || stored?.movements || [];
+    const movimientosArray = Array.isArray(movimientos) ? movimientos : [];
     const responseMovements = response.movements || {};
     const isNewFlow = this.resolvePrepareIsNewFlow(response, stored);
     const storedSystemIncome = stored?.system_income || stored?.system_income_details || {};
@@ -785,7 +810,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       bills: isNewFlow ? this.normalizeDenominations([], denominaciones, 'bill', this.defaultBills()) : [],
       coins: isNewFlow ? this.normalizeDenominations([], denominaciones, 'coin', this.defaultCoins()) : [],
       foreignCurrency: isNewFlow ? this.normalizeDenominations([], denominaciones, 'foreign_currency', []) : [],
-      otherPaymentMethods: isNewFlow ? this.normalizeMovements(stored ? [] : suggested, movimientos, 'other_payment_methods') : [],
+      otherPaymentMethods: isNewFlow ? this.normalizeMovements((stored ? [] : suggested).filter(item => item.payment_method !== 'card'), movimientosArray.filter(item => (item.payment_method || item.method || item.forma_pago) !== 'card'), 'other_payment_methods') : [],
+      cardPaymentMethods: isNewFlow ? this.normalizeMovements((stored ? [] : suggested).filter(item => item.payment_method === 'card'), movimientosArray.filter(item => (item.payment_method || item.method || item.forma_pago) === 'card'), 'other_payment_methods') : [],
       additionalTransfers: isNewFlow ? this.normalizeMovements([], movimientos, 'additional_transfers') : [],
     };
   }
@@ -852,6 +878,20 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     if (value.includes('transf') || value === 'bank_transfer') return 'bank_transfer';
     if (value.includes('dep') || value === 'deposit') return 'deposit';
     return value || 'other';
+  }
+
+  private mergePreparedMovements(archived: CuadreMovimiento[], fresh: CuadreMovimiento[]) {
+    const merged = [...archived];
+    const keys = new Set(archived.map(item => `${item.payment_method}|${item.reference || ''}|${item.description || ''}|${item.amount || ''}`));
+    fresh.forEach(item => {
+      const key = `${item.payment_method}|${item.reference || ''}|${item.description || ''}|${item.amount || ''}`;
+      if (!keys.has(key)) merged.push(item);
+    });
+    return merged;
+  }
+
+  private cleanMovementDescription(description: string) {
+    return String(description || '').replace(/^(factura|recibo(?: de ingreso)?)\s+(?:de\s+)?/i, '').trim();
   }
 
   private denominationsByType(items: any, type): CuadreDenominacion[] {
@@ -953,6 +993,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.coins.set(this.defaultCoins());
     this.foreignCurrency.set([]);
     this.otherPaymentMethods.set([]);
+    this.cardPaymentMethods.set([]);
     this.additionalTransfers.set([]);
   }
 
@@ -1005,11 +1046,15 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     this.coins.set(form.coins || this.defaultCoins());
     this.foreignCurrency.set(form.foreignCurrency || []);
     this.otherPaymentMethods.set(form.otherPaymentMethods || []);
+    this.cardPaymentMethods.set(form.cardPaymentMethods || []);
     this.additionalTransfers.set(form.additionalTransfers || []);
     this.isCreando.set(true);
     this.archivedCuadre.set(archived);
     this.archivedCuadreRestored.set(true);
     this.markDirty();
+    this.pendingArchivedMerge = form;
+    this.prepareClosingDate.set(this.closingDate());
+    this.step.set(Math.max(form.step || 1, 2));
   }
 
   private async deleteArchivedCuadre(options: { clearForm?: boolean } = {}) {
@@ -1044,6 +1089,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       coins: this.coins(),
       foreignCurrency: this.foreignCurrency(),
       otherPaymentMethods: this.otherPaymentMethods(),
+      cardPaymentMethods: this.cardPaymentMethods(),
       additionalTransfers: this.additionalTransfers(),
     });
   }

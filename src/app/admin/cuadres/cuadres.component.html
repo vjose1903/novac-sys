@@ -85,7 +85,10 @@
                     <app-cuadre-denomination-input title="Billetes" type="bill" [items]="bills()" [divisas]="principalDivisaOptions()" [readonly]="readOnly()" [fixedRows]="true" (itemsChange)="setBills($event)" />
                     <app-cuadre-denomination-input title="Monedas" type="coin" [items]="coins()" [divisas]="principalDivisaOptions()" [readonly]="readOnly()" [fixedRows]="true" (itemsChange)="setCoins($event)" />
                     <app-cuadre-denomination-input class="foreign-currency" title="Divisas" type="foreign_currency" [items]="foreignCurrency()" [divisas]="foreignDivisaOptions()" [readonly]="readOnly()" (itemsChange)="setForeignCurrency($event)" />
-                    <app-cuadre-movements-editor title="Tarjetas, cheques, depósitos y transferencias" group="other_payment_methods" [items]="otherPaymentMethods()" [readonly]="readOnly()" (itemsChange)="setOtherPaymentMethods($event)" />
+                    @if (cardPaymentMethods().length > 0) {
+                      <app-cuadre-movements-editor title="Tarjetas" group="other_payment_methods" [items]="cardPaymentMethods()" [readonly]="readOnly()" (itemsChange)="setCardPaymentMethods($event)" />
+                    }
+                    <app-cuadre-movements-editor title="Cheques, depósitos y transferencias" group="other_payment_methods" [items]="otherPaymentMethods()" [readonly]="readOnly()" (itemsChange)="setOtherPaymentMethods($event)" />
                     <app-cuadre-movements-editor title="Transferencias adicionales" group="additional_transfers" [items]="additionalTransfers()" [readonly]="readOnly()" (itemsChange)="setAdditionalTransfers($event)" />
                   </div>
 

@@ -40,8 +40,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   handleMetodoPagoShortcut(event: KeyboardEvent) {
     if (this.metodo == tipoDocFacturacion.compra || !this.isLoaded || event.ctrlKey || event.metaKey || event.altKey) return;
 
-    const agregar = event.key === '+' || event.code === 'NumpadAdd';
-    const eliminar = event.key === '-' || event.code === 'NumpadSubtract';
+    const agregar = event.key === '+' || event.code === 'NumpadAdd' || (event.code === 'Equal' && event.shiftKey) || event.keyCode === 107;
+    const eliminar = event.key === '-' || event.code === 'NumpadSubtract' || event.code === 'Minus' || event.keyCode === 109;
     if (!agregar && !eliminar) return;
 
     event.preventDefault();
@@ -53,9 +53,19 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     this.restaurarFoco(focoActivoId);
   }
 
+  @HostListener('window:keydown', ['$event'])
+  blockEnterWhileLoading(event: KeyboardEvent) {
+    if (!this.isLoaded && event.key === 'Enter') {
+      this.pendingInitialEnter = true;
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
+
   element: any;
   devuelta = '0.00';
   isLoaded = false;
+  private pendingInitialEnter = false;
   private hasUserTyped = false;
   @Output() getDevuelta = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<any>();
@@ -102,7 +112,13 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       this.isLoaded = true;
 
       requestAnimationFrame(() => {
-        if (this.metodo != tipoDocFacturacion.compra) this.enfocarFormaPago(0);
+        if (this.metodo != tipoDocFacturacion.compra) {
+          this.enfocarFormaPago(0);
+          if (this.pendingInitialEnter) {
+            this.pendingInitialEnter = false;
+            this.enfocarMontoRecibido(0);
+          }
+        }
       });
     });
   }
@@ -223,12 +239,27 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     }
 
     if (this.validarForm()) {
-      fun.toastWarning('Efectivo no cubre el total del documento', 'AVISO');
+      fun.toastWarning(this.mensajeValidacion(), 'AVISO');
       this.enfocarMontoRecibido(index);
       return;
     }
 
     this.focusConfirmButton();
+  }
+
+  handleMontoRecibidoKeydown(event: KeyboardEvent) {
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+    const agregar = event.key === '+' || event.code === 'NumpadAdd' || (event.code === 'Equal' && event.shiftKey) || event.keyCode === 107;
+    const eliminar = event.key === '-' || event.code === 'NumpadSubtract' || event.code === 'Minus' || event.keyCode === 109;
+    if (!agregar && !eliminar) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    const focoActivoId = (document.activeElement as HTMLElement | null)?.id;
+    if (agregar) this.agregarMetodoPago();
+    if (eliminar) this.eliminarMetodoPago(this.metodosDePago.length - 1);
+    this.restaurarFoco(focoActivoId);
   }
 
   private enfocarFormaPago(index: number): void {
@@ -337,7 +368,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       if (!res.error) input.value = res.number;
 
       if (this.validarForm()) {
-        fun.toastWarning('Efectivo no cubre el total del documento', 'AVISO');
+        fun.toastWarning(this.mensajeValidacion(), 'AVISO');
         fun.enfocarInput('inputEfectivo');
       }
     });
@@ -374,7 +405,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       }
     } else {
       if (this.validarForm()) {
-        fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
+        fun.toastError(this.mensajeValidacion(), 'ERROR');
       } else {
         this.modalConfig.close({ obj, is_print: this.is_print, modal_id: this.modalConfig.id });
       }
@@ -408,6 +439,29 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     if (!btnConfirmar) return;
 
     btnConfirmar.disable = validate;
-    btnConfirmar.tooltip = validate ? `El monto ingresado no cubre el valor ${this.metodo == tipoDocFacturacion.recibo_ingreso ? 'del recibo.' : 'de la factura.'}` : '';
+    btnConfirmar.tooltip = validate ? this.mensajeValidacion() : '';
+  }
+
+  private mensajeValidacion(): string {
+    const documento = this.metodo == tipoDocFacturacion.recibo_ingreso ? 'del recibo.' : 'de la factura.';
+    if (this.excedenteSinEfectivo()) {
+      return 'El excedente solo puede devolverse en efectivo.';
+    }
+
+    return `El monto ingresado no cubre el valor ${documento}`;
+  }
+
+  private excedenteSinEfectivo(): boolean {
+    if (this.metodo == tipoDocFacturacion.compra) return false;
+
+    const total = fun.desformatearStNumber(this.total_factura);
+    const recibido = this.totalRecibido();
+    if (isNaN(total) || isNaN(recibido) || recibido <= total) return false;
+
+    const efectivoDisponible = this.metodosDePago
+      .filter(pago => pago.forma_pago === 'Efectivo')
+      .reduce((sum, pago) => sum + fun.desformatearStNumber(pago.monto || 0), 0);
+
+    return recibido - total > efectivoDisponible;
   }
 }
