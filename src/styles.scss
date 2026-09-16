@@ -448,6 +448,27 @@ select:not(:focus):hover,
   z-index: 99999999 !important;
 }
 
+.p-tooltip.cash-payment-tooltip .p-tooltip-text {
+  background: #f1f2f4 !important;
+  color: #111111 !important;
+  font-size: 0.75rem !important;
+}
+
+.p-tooltip-right.cash-payment-tooltip .p-tooltip-arrow {
+  border-right-color: #f1f2f4 !important;
+}
+
+:root[data-theme-mode='dark'] {
+  .p-tooltip.cash-payment-tooltip .p-tooltip-text {
+    background: #242629 !important;
+    color: #ffffff !important;
+  }
+
+  .p-tooltip-right.cash-payment-tooltip .p-tooltip-arrow {
+    border-right-color: #242629 !important;
+  }
+}
+
 .dashboard-filter-popover {
   z-index: 99999920 !important;
 }

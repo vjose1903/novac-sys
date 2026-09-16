@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Output, EventEmitter, HostListener, inject, Input, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Output, EventEmitter, HostListener, inject, Input, QueryList, ViewChildren } from '@angular/core';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { fun } from '@core/services/functions.service';
 import { SharedService } from '@core/services/shared.service';
@@ -17,7 +17,7 @@ import { DivisaService } from '@admin/registros/divisa/divisa.service';
   styleUrls: ['./form-cantidad-efectivo.component.scss'],
   standalone: false,
 })
-export class FormCantidadEfectivoComponent extends MixinClass implements OnInit, AfterViewInit, IDynamicModal {
+export class FormCantidadEfectivoComponent extends MixinClass implements OnInit, AfterViewInit, OnDestroy, IDynamicModal {
   @ViewChildren('formaPagoInput') formaPagoInputs!: QueryList<any>;
 
   readonly opcionesDeFormaPago = [
@@ -36,9 +36,10 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     if (key == teclasCode._p || key == teclasCode._P) this.is_print = !this.is_print;
   }
 
-  @HostListener('window:keydown', ['$event'])
+  private readonly metodoPagoShortcutListener = (event: KeyboardEvent) => this.handleMetodoPagoShortcut(event);
+
   handleMetodoPagoShortcut(event: KeyboardEvent) {
-    if (this.metodo == tipoDocFacturacion.compra || !this.isLoaded || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (this.metodo == tipoDocFacturacion.compra || event.ctrlKey || event.metaKey || event.altKey) return;
 
     const agregar = event.key === '+' || event.code === 'NumpadAdd' || (event.code === 'Equal' && event.shiftKey) || event.keyCode === 107;
     const eliminar = event.key === '-' || event.code === 'NumpadSubtract' || event.code === 'Minus' || event.keyCode === 109;
@@ -105,6 +106,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   ngAfterViewInit(): void {
+    document.addEventListener('keydown', this.metodoPagoShortcutListener, true);
     Promise.all([
       this.cargarDivisaPrincipal(),
       this.cargarConfig(),
@@ -121,6 +123,10 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
         }
       });
     });
+  }
+
+  ngOnDestroy(): void {
+    document.removeEventListener('keydown', this.metodoPagoShortcutListener, true);
   }
 
   private cargarConfig(): Promise<void> {
@@ -245,21 +251,6 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     }
 
     this.focusConfirmButton();
-  }
-
-  handleMontoRecibidoKeydown(event: KeyboardEvent) {
-    if (event.ctrlKey || event.metaKey || event.altKey) return;
-
-    const agregar = event.key === '+' || event.code === 'NumpadAdd' || (event.code === 'Equal' && event.shiftKey) || event.keyCode === 107;
-    const eliminar = event.key === '-' || event.code === 'NumpadSubtract' || event.code === 'Minus' || event.keyCode === 109;
-    if (!agregar && !eliminar) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    const focoActivoId = (document.activeElement as HTMLElement | null)?.id;
-    if (agregar) this.agregarMetodoPago();
-    if (eliminar) this.eliminarMetodoPago(this.metodosDePago.length - 1);
-    this.restaurarFoco(focoActivoId);
   }
 
   private enfocarFormaPago(index: number): void {

@@ -43,13 +43,13 @@
             </div>
             <div class="cash-field main-field">
               <label>Monto recibido</label>
-              <div class="currency-input"><span>{{ divisaPrincipalSimbolo }}</span><input [id]="'montoRecibido-' + $index" type="text" class="form-control inputEfectivo" (focus)="htmlServ.selectValue($event)" [(ngModel)]="pago.monto" (ngModelChange)="calcularDevueta(); validarForm('input')" (keydown)="handleMontoRecibidoKeydown($event)" (keydown.enter)="handleMontoRecibidoEnter($event, $index)" (blur)="onMetodoPagoBlur(pago)" /></div>
+              <div class="currency-input"><span>{{ divisaPrincipalSimbolo }}</span><input [id]="'montoRecibido-' + $index" type="text" class="form-control inputEfectivo" (focus)="htmlServ.selectValue($event)" [(ngModel)]="pago.monto" (ngModelChange)="calcularDevueta(); validarForm('input')" (keydown.enter)="handleMontoRecibidoEnter($event, $index)" (blur)="onMetodoPagoBlur(pago)" /></div>
             </div>
             <button type="button" class="btn btn-text-danger cash-remove-payment" [disabled]="metodosDePago.length === 1" (click)="eliminarMetodoPago($index)" aria-label="Eliminar forma de pago"><i class="fa-solid fa-trash"></i></button>
           </div>
         }
 
-        <button type="button" class="btn btn-text-success cash-add-payment" [disabled]="!puedeAgregarMetodoPago()" (click)="agregarMetodoPago()"><i class="fa-solid fa-plus"></i> Agregar forma de pago</button>
+        <button type="button" class="btn btn-text-success cash-add-payment" [disabled]="!puedeAgregarMetodoPago()" pTooltip="También puede agregar y/o remover formas de pago con las teclas + y - del teclado." tooltipPosition="right" tooltipStyleClass="cash-payment-tooltip" (click)="agregarMetodoPago()"><i class="fa-solid fa-plus"></i> Agregar forma de pago</button>
 
         <div class="cash-return-card">
           <span>Total recibido</span>
