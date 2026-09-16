@@ -202,21 +202,31 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
       });
   }
 
-  changeThemeMode() {
-    const previous_config = { ...this.configApp };
+  async changeThemeMode() {
     const mode_app: ThemeMode = this.configApp.mode_app === 'dark' ? 'light' : 'dark';
-    const new_config = { ...this.configApp, mode_app };
+    const empresaId = this.configApp.firebase_empresa_id;
+    const machineId = this.configApp.machineId;
 
-    this.themeServ.applyTheme(new_config.color_app, mode_app);
-    this.configServ.config = new_config;
+    if (!empresaId || !machineId) {
+      fun.toastError('No se encontró la empresa o máquina para guardar el tema.', 'ERROR');
+      return;
+    }
 
-    this._ipc.setAppConfig(new_config).catch(err => {
-      this.themeServ.applyTheme(previous_config.color_app, previous_config.mode_app);
-      this.configServ.config = previous_config;
-      console.error(err);
-      if (err.msg) fun.toastError(err.msg, 'ERROR');
-      else fun.toastError('Error al cambiar el tema de la aplicación', 'ERROR');
-    });
+    try {
+      const response = await this.requestClass.createOne(
+        { empresa_id: empresaId, machine_id: machineId, config: { mode_app } },
+        { afterPath: 'firebase/configuration' }
+      );
+      const configParaGuardar = { ...this.configApp, ...(response?.data || {}), mode_app, firebase_sync_done: true };
+      const configGuardada = await this._ipc.setAppConfig(configParaGuardar);
+
+      this.themeServ.applyTheme(configGuardada.color_app || this.configApp.color_app, configGuardada.mode_app || mode_app);
+      this.configServ.config = configGuardada;
+      this.configApp = configGuardada;
+    } catch (error) {
+      console.error(error);
+      fun.toastError(error?.msg || error?.message || 'Error al cambiar el tema de la aplicación', 'ERROR');
+    }
   }
 
   verificarActualizaciones() {

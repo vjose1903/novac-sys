@@ -326,6 +326,10 @@
     color: #86efac;
   }
 
+  .cash-return-card:not(.cash-change-card) span {
+    color: #a7f3d0;
+  }
+
   .cash-return-card.cash-change-card strong {
     color: var(--app-text);
   }
