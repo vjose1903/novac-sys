@@ -13,6 +13,7 @@ const setup_ = {
     DOCKER_NAME: 'demo',
     NAME_UPDATE_REPO: 'novac-system-demo',
     DGII_DATE: '',
+    RAMA: 'demo'
   },
   agrodemi: {
     TITLE_APP: 'Novac System - AGRODEMI',
@@ -22,6 +23,7 @@ const setup_ = {
     DOCKER_NAME: 'agrodemi',
     NAME_UPDATE_REPO: 'novac-system-agrodemi',
     DGII_DATE: '2025-05-15',
+    RAMA: 'actualizaciones'
   },
   brendy: {
     TITLE_APP: 'Novac System - Panaderia Brendy',
@@ -31,6 +33,7 @@ const setup_ = {
     DOCKER_NAME: 'brendy',
     NAME_UPDATE_REPO: 'novac-system-brendy',
     DGII_DATE: '',
+    RAMA: 'panaderia_brendy'
   },
   vasquez: {
     TITLE_APP: 'Novac System - D` Vásquez Services',
@@ -40,6 +43,7 @@ const setup_ = {
     DOCKER_NAME: 'vasquez',
     NAME_UPDATE_REPO: 'novac-system-vasquez',
     DGII_DATE: '',
+    RAMA: 'vasquez_services'
   },
 };
 
