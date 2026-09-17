@@ -71,6 +71,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   @Input() tipo_reporte!: any;
   @Input() dynamic_selections!: any;
   @Input() dynamic_switches!: any;
+  @Input() simpleSwitchAfterType = false;
   @Input() conditionalRender!: any;
   @Input() switchGroup!: switchGroup;
   @Input() advanced_filters!: dynamicFieldConfig[];
@@ -379,7 +380,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
         }
         return baseArray;
       },
-      [reportField.simpleSwitchField]: ['cuentas_cobrar_ant_saldo', 'cuentas_pagar_ant_saldo', 'cuentas_cobrar_cliente'],
+      [reportField.simpleSwitchField]: ['cuentas_cobrar_ant_saldo', 'cuentas_pagar_ant_saldo', 'cuentas_cobrar_cliente', 'ventas_diarias', 'ventas_rango', 'recibos'],
       [reportField.switchGroupField]: () => {
         const hasSwitchGroup = fun.hasValue(this.switchGroup) && Array.isArray(this.switchGroup.array) && this.switchGroup.array.length > 0;
 
@@ -423,6 +424,10 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
 
   changeTipo() {
     const control = this.form.controls;
+
+    if (this.tipo_reporte === 'recibos' && control.tipo.value === ReportGroupTypeE.agrupado) {
+      this.form.controls.mostrar_forma_pago?.setValue(false, { emitEvent: false });
+    }
 
     if (this.tipo_reporte == 'ventas_productos') {
       ['fecha', 'desde', 'hasta'].forEach(control => this.removeValidator(control));
@@ -477,6 +482,10 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
 
   showExternalReportButton() {
     return this.externalReportTypes.includes(this.tipo_reporte) && Ss.configServ.config?.usa_facturas_externas === true;
+  }
+
+  showPaymentMethodSwitch() {
+    return ['ventas_diarias', 'ventas_rango'].includes(this.tipo_reporte);
   }
 
   activarReporteFacturasExternas() {

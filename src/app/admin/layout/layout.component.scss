@@ -150,7 +150,7 @@
         background: var(--app-surface);
         box-shadow: var(--app-shadow);
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         align-items: center;
         color: var(--app-text);
       }
@@ -310,12 +310,24 @@
 /* ============================================== */
 
 .right {
-  float: right;
+  margin-left: auto;
   margin-right: 1rem;
   z-index: 99;
   .dropCuenta {
     cursor: pointer;
   }
+}
+
+.remote-server-tag {
+  background: #dc3545;
+  border-radius: 0.35rem;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-left: 0.75rem;
+  padding: 0.32rem 0.55rem;
+  white-space: nowrap;
 }
 
 /*----- imagen cuenta ------*/

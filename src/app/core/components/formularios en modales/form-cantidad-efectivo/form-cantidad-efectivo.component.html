@@ -35,45 +35,28 @@
 
     @if (metodo != tipoDocFacturacion.compra) {
       <section class="cash-input-grid">
-        <div class="cash-field main-field">
-          <label for="inputEfectivo">Efectivo recibido</label>
-          <div class="currency-input">
-            <span (click)="focusInputEfectivo()">{{ divisaPrincipalSimbolo }}</span>
-            <input
-              type="text"
-              class="form-control inputEfectivo"
-              (focus)="htmlServ.selectValue($event)"
-              (input)="onEfectivoInput()"
-              (keyup)="calcularDevueta()"
-              (keydown.enter)="$event.preventDefault(); $event.stopPropagation()"
-              (keyup.enter)="focusFormaPago($event)"
-              [(ngModel)]="efectivo"
-              (ngModelChange)="validarForm('input')"
-              (blur)="onEfectivoBlur($event.target)"
-              id="inputEfectivo" />
+        @for (pago of metodosDePago; track $index) {
+          <div class="cash-payment-row">
+            <div class="cash-field">
+              <label>Forma de pago</label>
+              <p-select #formaPagoInput [inputId]="'formaPago-' + $index" styleClass="field-lg" [(ngModel)]="pago.forma_pago" [options]="opcionesFormaPago($index)" optionLabel="label" optionValue="value" optionDisabled="disabled" appendTo="body" (ngModelChange)="validarForm('input')" (keydown.enter)="handleFormaPagoEnter($event, $index)"></p-select>
+            </div>
+            <div class="cash-field main-field">
+              <label>Monto recibido</label>
+              <div class="currency-input"><span>{{ divisaPrincipalSimbolo }}</span><input [id]="'montoRecibido-' + $index" type="text" class="form-control inputEfectivo" (focus)="htmlServ.selectValue($event)" [(ngModel)]="pago.monto" (ngModelChange)="calcularDevueta(); validarForm('input')" (keydown.enter)="handleMontoRecibidoEnter($event, $index)" (blur)="onMetodoPagoBlur(pago)" /></div>
+            </div>
+            <button type="button" class="btn btn-text-danger cash-remove-payment" [disabled]="metodosDePago.length === 1" (click)="eliminarMetodoPago($index)" aria-label="Eliminar forma de pago"><i class="fa-solid fa-trash"></i></button>
           </div>
-        </div>
+        }
 
-        <div class="cash-field">
-          <label for="formaPago">Forma de pago</label>
-          <p-select
-            #formaPagoInput
-            inputId="formaPago"
-            styleClass="field-lg"
-            [(ngModel)]="formaPago"
-            [options]="[
-              { label: 'Efectivo', value: 'Efectivo' },
-              { label: 'Tarjeta', value: 'Tarjeta' },
-              { label: 'Transferencia Bancaria', value: 'Transferencia' },
-              { label: 'Cheque', value: 'Cheque' }
-            ]"
-            optionLabel="label"
-            optionValue="value"
-            appendTo="body"
-            (keydown.enter)="handleFormaPagoEnter($event)"></p-select>
-        </div>
+        <button type="button" class="btn btn-text-success cash-add-payment" [disabled]="!puedeAgregarMetodoPago()" pTooltip="También puede agregar y/o remover formas de pago con las teclas + y - del teclado." tooltipPosition="right" tooltipStyleClass="cash-payment-tooltip" (click)="agregarMetodoPago()"><i class="fa-solid fa-plus"></i> Agregar forma de pago</button>
 
         <div class="cash-return-card">
+          <span>Total recibido</span>
+          <strong>{{ divisaPrincipalSimbolo }} {{ formatoNumero(totalRecibido()) }}</strong>
+        </div>
+
+        <div class="cash-return-card cash-change-card">
           <span>Devuelta</span>
           <strong>{{ divisaPrincipalSimbolo }} {{ devuelta || '0.00' }}</strong>
         </div>

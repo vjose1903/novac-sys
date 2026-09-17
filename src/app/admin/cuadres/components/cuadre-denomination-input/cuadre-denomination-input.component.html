@@ -23,9 +23,9 @@
       @if (fixedRows) {
         <span class="cuadre-denomination-value">{{ denominationLabel(item) }}</span>
       } @else {
-        <input class="form-control form-control-sm text-end" appNumeroFormato [decimals]="2" [value]="item.denomination_value" [readonly]="readonly" (input)="patchItem($index, 'denomination_value', $any($event.target).value)" (appNumeroFormatoBlur)="patchItem($index, 'denomination_value', $event)" />
+        <input class="form-control form-control-sm text-end" appNumeroFormato [decimals]="2" [value]="item.denomination_value" [readonly]="readonly" [disabled]="readonly" (input)="patchItem($index, 'denomination_value', $any($event.target).value)" (appNumeroFormatoBlur)="patchItem($index, 'denomination_value', $event)" />
       }
-      <input class="form-control form-control-sm text-end" appNumeroFormato [decimals]="0" [value]="item.quantity" [readonly]="readonly" (input)="patchItem($index, 'quantity', $any($event.target).value)" (appNumeroFormatoBlur)="patchItem($index, 'quantity', $event)" />
+      <input class="form-control form-control-sm text-end" appNumeroFormato [decimals]="0" [value]="item.quantity" [readonly]="readonly" [disabled]="readonly" (input)="patchItem($index, 'quantity', $any($event.target).value)" (appNumeroFormatoBlur)="patchItem($index, 'quantity', $event)" />
       @if (type === 'foreign_currency') {
         <span class="cuadre-denomination-value">{{ exchangeRateLabel(item) }}</span>
       }

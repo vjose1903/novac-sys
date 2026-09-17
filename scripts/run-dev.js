@@ -55,7 +55,7 @@ async function main() {
   const electronCli = path.join(rootPath, 'node_modules', 'electron', 'cli.js');
 
   if (mode === 'ng') {
-    run(process.execPath, [ngCli, 'serve', '--host', '0.0.0.0', '--port', String(port), '-c', 'dev', '--live-reload', '--hmr']);
+    run(process.execPath, [ngCli, 'serve', '--host', '0.0.0.0', '--port', String(port), '-c', 'dev', '--live-reload']);
     return;
   }
 

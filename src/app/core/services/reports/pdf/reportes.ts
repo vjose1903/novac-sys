@@ -65,7 +65,8 @@ export function makeReporte(data) {
   const configApp: ConfigI = Ss.configServ.config;
   const configuration = getReporteConfiguration(data, configApp);
 
-  const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
+  const isPaymentMethodReport = ['recibos', 'recibos_cliente', 'ventas_diarias', 'ventas_rango'].includes(data.tipo_reporte) && data.mostrar_forma_pago === true;
+  const pageO = isPaymentMethodReport ? 'landscape' : configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
 
   const margin_top = data.mostrar_sub_titulo ? 125 : 111.5;
   const dd = {
@@ -97,6 +98,8 @@ function getReporteConfiguration(data, configApp: ConfigI) {
     configuration = filterCxcAntConfiguration(configuration, normalizeColumnasAntiguedad(data.columnas_antiguedad));
   }
 
+  configuration = applyPaymentMethodColumn(configuration, data);
+
   if (configApp?.usa_mora === true || !configuration?.info?.some(info => ['mora', 'total_mora'].includes(info.key))) return configuration;
 
   const moraIndexes = configuration.info.reduce((indexes, info, index) => {
@@ -110,6 +113,44 @@ function getReporteConfiguration(data, configApp: ConfigI) {
     info: configuration.info.filter(info => !['mora', 'total_mora'].includes(info.key)),
     customTotalizacion: configuration.customTotalizacion?.filter(item => item.key !== 'mora'),
     mostrar_mora: false,
+  };
+}
+
+function applyPaymentMethodColumn(configuration, data) {
+  if (!configuration?.info) return configuration;
+
+  const tipoReporte = data.tipo_reporte?.replace(/_itbis$/, '');
+  const isDetailedSales = ['ventas_diarias', 'ventas_rango'].includes(tipoReporte) && data.tipo !== 'agrupado';
+  const isDetailedReceipts = ['recibos', 'recibos_cliente'].includes(tipoReporte) && data.tipo !== 'agrupado';
+  const showPaymentMethod = data.mostrar_forma_pago === true && (isDetailedSales || isDetailedReceipts);
+  const paymentIndex = configuration.info.findIndex(info => info.key === 'forma_pago');
+
+  if (!showPaymentMethod) {
+    if (paymentIndex < 0) return configuration;
+    return {
+      ...configuration,
+      info: configuration.info.filter(info => info.key !== 'forma_pago'),
+      widths: configuration.widths?.filter((_width, index) => index !== paymentIndex),
+    };
+  }
+
+  if (paymentIndex >= 0) return configuration;
+
+  const info = configuration.info.findIndex(item => item.key === 'cliente_nombre') + 1;
+  const paymentColumn = {
+    text: 'Forma de pago',
+    alignment_titulo: 'left',
+    noWrap: false,
+    style: 'letra10',
+    style_body: 'letra10',
+    key: 'forma_pago',
+    alignment_body: 'left',
+  };
+
+  return {
+    ...configuration,
+    info: [...configuration.info.slice(0, info), paymentColumn, ...configuration.info.slice(info)],
+    widths: [...(configuration.widths || []).slice(0, info), 80, ...(configuration.widths || []).slice(info)],
   };
 }
 

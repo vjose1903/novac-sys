@@ -260,6 +260,11 @@ export default class FirebaseConfigHandler {
     }, {} as T);
   }
 
+  private withoutDocumentId(source: Partial<ConfigI>): Partial<ConfigI> {
+    const { id: _id, ...values } = source || {};
+    return values;
+  }
+
   private makeDefaultGeneralConfig(): Partial<ConfigI> {
     return {
       usa_facturas_externas: false,
@@ -274,10 +279,11 @@ export default class FirebaseConfigHandler {
     };
   }
 
-  private mergeConfig(generalConfig: Partial<ConfigI>, machineConfig: Partial<ConfigI>): ConfigI {
+  private mergeConfig(generalConfig: Partial<ConfigI>, machineConfig: Partial<ConfigI>, localConfig: Partial<ConfigI> = {}): ConfigI {
     return this.removeUndefinedValues({
       ...this.handlerConfigFile.default_config,
       usa_facturas_externas: false,
+      ...localConfig,
       ...generalConfig,
       ...machineConfig,
       machineId: this.machineId,
@@ -320,6 +326,8 @@ export default class FirebaseConfigHandler {
     return {
       data: {
         ...this.makeDefaultMachineConfig(),
+        ...this.pickConfigValues(seedConfig || {}, MACHINE_CONFIG_KEYS),
+        ...this.withoutDocumentId(data),
         ...this.pickConfigValues(data, MACHINE_CONFIG_KEYS),
         machineId: this.machineId,
       },
@@ -330,25 +338,33 @@ export default class FirebaseConfigHandler {
     };
   }
 
-  private async getOrCreateGeneralConfig(legacyConfig: Partial<ConfigI>): Promise<Partial<ConfigI>> {
+  private async getOrCreateGeneralConfig(legacyConfig: Partial<ConfigI>, localConfig: Partial<ConfigI> = {}): Promise<{ data: Partial<ConfigI>; needsSync: boolean }> {
     const generalConfigRef = this.getGeneralConfigRef();
     const defaultGeneralConfig = this.makeDefaultGeneralConfig();
     const generalSnapshot = await getDoc(generalConfigRef);
     if (!generalSnapshot.exists()) {
       writeLogs('----- Configuración general no encontrada; usando valores locales -----');
       return {
-        ...defaultGeneralConfig,
-        ...this.pickConfigValues(legacyConfig, GENERAL_CONFIG_KEYS),
+        data: {
+          ...defaultGeneralConfig,
+          ...this.pickConfigValues(localConfig, GENERAL_CONFIG_KEYS),
+          ...this.pickConfigValues(legacyConfig, GENERAL_CONFIG_KEYS),
+        },
+        needsSync: true,
       };
     }
 
     const currentGeneralConfig = this.mapDocumentToObject<ConfigI>(generalSnapshot);
+    const missingKeys = GENERAL_CONFIG_KEYS.filter(key => currentGeneralConfig[key] === undefined && defaultGeneralConfig[key] !== undefined);
     const normalizedGeneralConfig = {
       ...defaultGeneralConfig,
+      ...this.pickConfigValues(localConfig, GENERAL_CONFIG_KEYS),
+      ...this.pickConfigValues(legacyConfig, GENERAL_CONFIG_KEYS),
+      ...this.withoutDocumentId(currentGeneralConfig),
       ...this.pickConfigValues(currentGeneralConfig, GENERAL_CONFIG_KEYS),
     };
 
-    return normalizedGeneralConfig;
+    return { data: normalizedGeneralConfig, needsSync: missingKeys.length > 0 };
   }
 
   /**
@@ -361,13 +377,15 @@ export default class FirebaseConfigHandler {
 
     try {
       const machineConfigResult = await this.getMachineConfig(seedConfig);
-      const generalConfig = await this.getOrCreateGeneralConfig(machineConfigResult.legacyData);
+      const generalConfigResult = await this.getOrCreateGeneralConfig(machineConfigResult.legacyData, seedConfig);
+      const generalConfig = generalConfigResult.data;
 
       writeLogs('----- Configuración mergeada encontrada en Firebase -----');
-      const config = this.mergeConfig(generalConfig, machineConfigResult.data);
+      const config = this.mergeConfig(generalConfig, machineConfigResult.data, seedConfig);
       return {
-        ...this.mergeConfig(await this.loadStoredLogos(config), machineConfigResult.data),
+        ...this.mergeConfig(await this.loadStoredLogos(config), machineConfigResult.data, seedConfig),
         firebase_config_missing: machineConfigResult.missing,
+        firebase_config_needs_sync: machineConfigResult.needsSave || generalConfigResult.needsSync,
       };
     } catch (error) {
       writeLogs(error, 'ERROR al obtener configuración desde Firebase');

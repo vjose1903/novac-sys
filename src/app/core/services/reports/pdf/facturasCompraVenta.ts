@@ -45,7 +45,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
     },
     styles: styles_,
-    defaultStyle
+    defaultStyle,
   };
 
   const obj = { doc: dd, file: file_name, type: 'file', pageOrientation: 'portrait' };
@@ -194,7 +194,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
 // =========================================================~=================================================================================================
 function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
   const tempBody = [];
-  const _break = is_contado ? 9 : 18;
+  const _break = is_contado ? 9 : 17;
 
   data.contenido_reporte.forEach((detalle, i) => {
     const row = [];
@@ -206,7 +206,7 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
 
     row.push(
       { text: i + 1, style: 'letra11', alignment: 'center', pageBreak: br_ ? 'before' : 'none' },
-      { text: descripcion, style: 'monospace10', margin: [0, -1, 0, 0],  pageBreak: br_ ? 'before' : 'none' },
+      { text: descripcion, style: 'monospace10', margin: [0, -1, 0, 0], pageBreak: br_ ? 'before' : 'none' },
       { text: detalle.cantidad, style: 'letra11', alignment: 'right', margin: [0, 0, 0, 0], pageBreak: br_ ? 'before' : 'none' },
       {
         text: fun_.roundNumberToDecimal(is_venta ? detalle.precio : detalle.costo),
@@ -216,7 +216,7 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
         pageBreak: br_ ? 'before' : 'none',
       },
       { text: fun_.roundNumberToDecimal(detalle.itbis), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
-      { text: fun_.roundNumberToDecimal(detalle.total), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' },
+      { text: fun_.roundNumberToDecimal(detalle.total), style: 'letra11', alignment: 'right', margin: [0, 0, 15, 0], pageBreak: br_ ? 'before' : 'none' }
     );
     tempBody.push(row);
   });
@@ -398,6 +398,18 @@ function contenidoFacturaVenta(data, is_contado, is_venta, configApp: ConfigI) {
       ],
       unbreakable: true,
     },
+    is_venta && !is_contado
+      ? {
+          text: [
+            { text: 'Nota: El cliente acepta que para ', style: 'letra11' },
+            { text: 'Litis Judicial', style: 'letra11', bold: true },
+            { text: ' la Jurisdicción competente es la ', style: 'letra11' },
+            { text: 'Provincia de La Vega', style: 'letra11', bold: true },
+            { text: '.', style: 'letra11' },
+          ],
+          margin: [0, 4, 0, 0],
+        }
+      : { text: '' },
     // -----------------------
   ];
   return content;
@@ -408,7 +420,7 @@ function formatMovimientosViajes(data) {
 
   const movimientosRows = [];
 
-  data.movimientos_viaje.forEach((movimiento) => {
+  data.movimientos_viaje.forEach(movimiento => {
     movimientosRows.push([
       {
         // camión

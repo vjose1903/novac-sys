@@ -146,6 +146,10 @@ export class FacturaC extends CrudG<FacturasI> {
             { label: 'Transferencia', value: false },
           ],
         };
+
+        if (['ventas_diarias', 'ventas_rango', 'recibos'].includes(tipo)) {
+          inputs['dynamic_switches'] = [{ label: 'Mostrar forma de pago', formControl: 'mostrar_forma_pago', defaultValue: false }];
+        }
       } else {
         inputs['dynamic_selections'] = FacturaC.inputsMovimientosViaje;
       }
@@ -217,9 +221,11 @@ export class FacturaC extends CrudG<FacturasI> {
       requestParams.parameters['tipo_factura_id'] = params.reporte.data.tipo_factura_id;
       requestParams.parameters['tipo'] = params.reporte.data.tipo;
       requestParams.parameters['condicion'] = params.reporte.data.condicion;
-      requestParams.parameters['desde'] = fun.my_dateFormater(params.reporte.data.desde, false);
-      requestParams.parameters['hasta'] = fun.my_dateFormater(params.reporte.data.hasta, false);
+      const fechaReporte = params.pdf.tipo === 'ventas_diarias' ? new Date() : null;
+      requestParams.parameters['desde'] = fun.my_dateFormater(fechaReporte || params.reporte.data.desde, false);
+      requestParams.parameters['hasta'] = fun.my_dateFormater(fechaReporte || params.reporte.data.hasta, false);
       requestParams.parameters['serie'] = params.reporte.data.serie;
+      requestParams.parameters['mostrar_forma_pago'] = params.reporte.data.mostrar_forma_pago === true;
       if (params.reporte.data.is_external === true) requestParams.parameters['is_external'] = true;
 
       for (let index = 0; index < FacturaC.inputsMovimientosViaje.length; index++) {
@@ -240,7 +246,8 @@ export class FacturaC extends CrudG<FacturasI> {
       const configApp = Ss.configServ.config;
 
       requestResponse.contenido_reporte = requestResponse.contenido_reporte.map(item => {
-        const largo_nombre = configApp.calcular_itbis && params.pdf.tipo != 'movimientos_vehiculo' ? 58 : 48;
+        const largo_nombre_base = configApp.calcular_itbis && params.pdf.tipo != 'movimientos_vehiculo' ? 58 : 48;
+        const largo_nombre = params.reporte.data.mostrar_forma_pago === true ? largo_nombre_base + 20 : largo_nombre_base;
 
         if (fun.objHas(item, 'cliente_nombre') && item.cliente_nombre.length > largo_nombre) item.cliente_nombre = `${item.cliente_nombre.substring(0, largo_nombre)} ...`;
 
@@ -252,6 +259,8 @@ export class FacturaC extends CrudG<FacturasI> {
           requestResponse.tipo_reporte += '_itbis';
         }
       }
+
+      requestResponse.mostrar_forma_pago = params.reporte.data.mostrar_forma_pago === true;
 
       return requestResponse;
     }
@@ -308,6 +317,7 @@ export class FacturaC extends CrudG<FacturasI> {
       const pick_factura2 = [
         'fecha_viaje',
         'forma_pago',
+        'metodos_de_pago',
         'id',
         'is_viaje',
         'monto',
@@ -511,6 +521,7 @@ export interface FacturasI {
   numero_factura: number;
   condicion: string;
   forma_pago: string;
+  metodos_de_pago?: Array<{ id?: number; forma_pago: string; monto: number }>;
   total_factura: number;
   itbis: number;
   descuento: number;

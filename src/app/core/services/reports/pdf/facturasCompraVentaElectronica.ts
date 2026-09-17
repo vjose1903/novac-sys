@@ -111,10 +111,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
         },
 
         {
-          text: [
-            { text: `RNC ${is_venta ? 'cliente' : 'suplidor'} : `, style: 'letra10' },
-            is_venta ? { text: data.cliente?.rnc ?? data.NoCliente_rnc ?? '----------', style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' },
-          ],
+          text: [{ text: `RNC ${is_venta ? 'cliente' : 'suplidor'} : `, style: 'letra10' }, is_venta ? { text: data.cliente?.rnc ?? data.NoCliente_rnc ?? '----------', style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
           margin: [0, 4, 0, 0],
         },
 
@@ -215,7 +212,7 @@ function pieFacturaVenta(data) {
 // =========================================================~=================================================================================================
 function processContenidoFactura(data, is_contado, is_venta, configApp: ConfigI) {
   const contenido = [];
-  const _break = is_contado ? 5 : 14;
+  const _break = is_contado ? 5 : 13;
   const articulosAgrupados = agruparArticulosPorPagina(data.detalle_facturas, _break);
 
   articulosAgrupados.forEach((detalles_per_page, index) => {
@@ -456,6 +453,19 @@ function afterContent(data, is_contado, is_venta, configApp: ConfigI) {
       ],
       unbreakable: true,
     },
+    is_venta && !is_contado
+      ? {
+          text: [
+            { text: 'Nota: ', style: 'letra11', bold: true },
+            { text: 'El cliente acepta que para ', style: 'letra11' },
+            { text: 'Litis Judicial', style: 'letra11', bold: true },
+            { text: ' la Jurisdicción competente es la ', style: 'letra11' },
+            { text: 'Provincia de La Vega', style: 'letra11', bold: true },
+            { text: '.', style: 'letra11' },
+          ],
+          margin: [0, 4, 0, 0],
+        }
+      : { text: '' },
     // -----------------------
   ];
   return content;

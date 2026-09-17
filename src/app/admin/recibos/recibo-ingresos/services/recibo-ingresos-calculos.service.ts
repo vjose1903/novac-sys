@@ -58,13 +58,14 @@ export class ReciboIngresosCalculosService {
     return `${fact.pagoT ? 'Saldo' : 'Abono'} ${fact.numero_comprobante} ${moment(fact.fecha_equivalente).format('YYYY-MM-DD HH:mm:ss')}`;
   }
 
-  getReciboPayload(params: { cliente_id: number; detalleYtotal: any; forma_pago: any; devuelta: any; balance_cliente: number }) {
+  getReciboPayload(params: { cliente_id: number; detalleYtotal: any; forma_pago: any; metodos_de_pago: Array<{ forma_pago: string; monto: number }>; devuelta: any; balance_cliente: number }) {
     return {
       cliente_id: params.cliente_id,
       bruto: params.detalleYtotal.bruto,
       mora: params.detalleYtotal.mora,
       total: params.detalleYtotal.total_recibo,
       forma_pago: params.forma_pago,
+      metodos_de_pago: params.metodos_de_pago,
       tipo_factura_id: 17,
       devuelta: params.devuelta,
       numero_recibo: null,

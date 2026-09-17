@@ -2,6 +2,12 @@
   font-weight: 500 !important;
 }
 
+.report-series-field {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
 :host ::ng-deep .advanced-filters-accordion .p-accordioncontent .p-accordioncontent-content {
   padding: 0.85rem 0.9rem;
 }

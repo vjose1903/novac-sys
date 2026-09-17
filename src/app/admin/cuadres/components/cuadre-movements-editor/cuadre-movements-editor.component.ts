@@ -13,6 +13,9 @@ export class CuadreMovementsEditorComponent {
   @Input() group: MovementGroup = 'other_payment_methods';
   @Input() items: CuadreMovimiento[] = [];
   @Input() readonly = false;
+  @Input() cardSection = false;
+  @Input() hideCard = false;
+  @Input() disableSystemItems = false;
   @Output() itemsChange = new EventEmitter<CuadreMovimiento[]>();
 
   paymentMethods = [
@@ -29,10 +32,11 @@ export class CuadreMovementsEditorComponent {
       ...this.items,
       {
         movement_group: this.group,
-        payment_method: this.group === 'additional_transfers' ? 'bank_transfer' : 'card',
+        payment_method: this.group === 'additional_transfers' || this.hideCard ? 'bank_transfer' : 'card',
         description: '',
         reference: '',
         amount: '0.00',
+        source: 'manual',
       },
     ]);
   }
@@ -48,5 +52,13 @@ export class CuadreMovementsEditorComponent {
 
   sectionTotal() {
     return fun.roundNumberToDecimal(this.items.reduce((total, item) => total + Number(fun.desformatearStNumber(item.amount || 0)), 0));
+  }
+
+  availablePaymentMethods() {
+    return this.hideCard ? this.paymentMethods.filter(method => method.value !== 'card') : this.paymentMethods;
+  }
+
+  isSystemItem(item: CuadreMovimiento) {
+    return this.disableSystemItems && item.source !== 'manual';
   }
 }

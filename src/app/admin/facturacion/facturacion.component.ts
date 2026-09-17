@@ -136,6 +136,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   ITBIS;
   condicion_fact;
   forma_pago;
+  metodos_de_pago = [];
 
   cuerpoFactura = [];
   DESCUENTO;
@@ -263,6 +264,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       const enabled = config?.usa_modulo_viajes !== false;
       if (enabled === this.travelFeatureState) return;
       this.travelFeatureState = enabled;
+      if (!enabled) {
+        this.is_viaje = false;
+        this.movimientosSelected = [];
+      }
       this.validatePermisos();
     });
   }
@@ -1639,6 +1644,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       efectivo: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.devuelta + this.factura_a_rellenar.total_factura : 0,
       total_factura: this.TOTAL,
       formaPago: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.forma_pago : 'Efectivo',
+      metodosDePago: this.factServ.action == actionFacturacion.update ? this.factura_a_rellenar.metodos_de_pago || [] : [],
       cambios_articulos: articulos_a_cambiar,
       condicion_fact: this.condicion_fact,
     };
@@ -1672,6 +1678,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     this.is_print = is_print;
     this.Devuelta = obj.devuelta;
     this.forma_pago = obj.forma_pago;
+    this.metodos_de_pago = obj.metodos_de_pago;
 
     // Procesar cambios específicos para compras
     if (this.factServ.isCompra()) {
@@ -1812,6 +1819,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     cabecera_fact['id_documento'] = this.id_documento;
     cabecera_fact['condicion'] = this.condicion_fact;
     cabecera_fact['forma_pago'] = this.forma_pago;
+    cabecera_fact['metodos_de_pago'] = this.metodos_de_pago;
 
     let fecha_equi;
     if (this.factura_pendiente) fecha_equi = moment(this.fechaFactura['front']).format();
