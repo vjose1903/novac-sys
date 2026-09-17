@@ -29,7 +29,8 @@
     "macos": "npm run build:prod && electron-builder build --mac",
     "release": "node scripts/release.js",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
-    "bundle-report": "npx esbuild-visualizer --metadata=dist/stats.json --open"
+    "bundle-report": "npx esbuild-visualizer --metadata=dist/stats.json --open",
+    "release": "node scripts/release.js"
   },
   "dependencies": {
     "@angular/animations": "^21.0.6",
