@@ -1,7 +1,7 @@
 {
   "name": "novac-system",
   "productName": "Novac-System",
-  "version": "10.3.7",
+  "version": "10.3.8",
   "description": "Sistema facturación e inventario NOVAC.",
   "author": {
     "name": "Victor José Vásquez Santos",
@@ -27,6 +27,7 @@
     "windows:dev": "npm run build:prod && npm run electron:builder-windows",
     "windows:prod": "npm run build:prod && npm run electron:builder-windows -- -p always",
     "macos": "npm run build:prod && electron-builder build --mac",
+    "release": "node scripts/release.js",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
     "bundle-report": "npx esbuild-visualizer --metadata=dist/stats.json --open"
   },
