@@ -27,7 +27,6 @@
     "windows:dev": "npm run build:prod && npm run electron:builder-windows",
     "windows:prod": "npm run build:prod && npm run electron:builder-windows -- -p always",
     "macos": "npm run build:prod && electron-builder build --mac",
-    "release": "node scripts/release.js",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
     "bundle-report": "npx esbuild-visualizer --metadata=dist/stats.json --open",
     "release": "node scripts/release.js"
