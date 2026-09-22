@@ -39,11 +39,11 @@
           <div class="cash-payment-row">
             <div class="cash-field">
               <label>Forma de pago</label>
-              <p-select #formaPagoInput [inputId]="'formaPago-' + $index" styleClass="field-lg" [(ngModel)]="pago.forma_pago" [options]="opcionesFormaPago($index)" optionLabel="label" optionValue="value" optionDisabled="disabled" appendTo="body" (ngModelChange)="validarForm('input')" (keydown.enter)="handleFormaPagoEnter($event, $index)"></p-select>
+              <p-select #formaPagoInput [inputId]="'formaPago-' + $index" styleClass="field-lg" [ngModel]="pago.forma_pago" (ngModelChange)="actualizarFormaPago($index, $event)" [options]="opcionesFormaPago($index)" optionLabel="label" optionValue="value" optionDisabled="disabled" appendTo="body" (keydown.enter)="handleFormaPagoEnter($event, $index)"></p-select>
             </div>
             <div class="cash-field main-field">
               <label>Monto recibido</label>
-              <div class="currency-input"><span>{{ divisaPrincipalSimbolo }}</span><input [id]="'montoRecibido-' + $index" type="text" class="form-control inputEfectivo" (focus)="htmlServ.selectValue($event)" [(ngModel)]="pago.monto" (ngModelChange)="calcularDevueta(); validarForm('input')" (keydown.enter)="handleMontoRecibidoEnter($event, $index)" (blur)="onMetodoPagoBlur(pago)" /></div>
+              <div class="currency-input"><span>{{ divisaPrincipalSimbolo }}</span><input [id]="'montoRecibido-' + $index" type="text" class="form-control inputEfectivo" (focus)="htmlServ.selectValue($event)" [ngModel]="pago.monto" (ngModelChange)="actualizarMontoRecibido($index, $event)" (keydown.enter)="handleMontoRecibidoEnter($event, $index)" (blur)="onMetodoPagoBlur($index, $event)" /></div>
             </div>
             <button type="button" class="btn btn-text-danger cash-remove-payment" [disabled]="metodosDePago.length === 1" (click)="eliminarMetodoPago($index)" aria-label="Eliminar forma de pago"><i class="fa-solid fa-trash"></i></button>
           </div>
