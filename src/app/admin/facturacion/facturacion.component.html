@@ -540,11 +540,11 @@
     </div>
 
     <div class="cuerpoContenidoSidar w-100">
-      <p-tabs styleClass="archived-doc-tabs" [(value)]="index_fact_archivada">
+      <p-tabs class="archived-doc-tabs panel-padding-0 panel-overflow-hidden" styleClass="archived-doc-tabs panel-padding-0 panel-overflow-hidden" [(value)]="index_fact_archivada">
         <p-tablist>
           @for (docTab of sideBarTabs; track $index) {
-            <p-tab [value]="$index" [disabled]="countCantFactSaved(docTab.key).disable">
-              <div class="archived-tab-title" pTooltip="No tiene {{ docTab.label }} guardadas" [tooltipDisabled]="!countCantFactSaved(docTab.key).disable">
+            <p-tab [value]="$index">
+              <div class="archived-tab-title">
                 <span>{{ docTab.title }}</span>
                 @if (!countCantFactSaved(docTab.key).disable) {
                   <strong>{{ countCantFactSaved(docTab.key).cant }}</strong>
@@ -569,8 +569,8 @@
                 <div class="archived-doc-list h-100">
                   @for (fact of facturas_localStorage(); track $index) {
                     <div class="factura_guardada" (click)="rellenarFacturaArchivada(fact)">
-                      <div class="colorsito bg-raya-{{ docTab.color }}{{ fact?.action == 'update' ? '-orange' : '' }}"></div>
                       <div class="info_fact h-100 {{ factura_guardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
+                        <div class="colorsito bg-raya-{{ docTab.color }}{{ fact?.action == 'update' ? '-orange' : '' }}"></div>
                         <div class="archived-card-header">
                           <div>
                             <span class="doc-type text-mayuscula text-separado-2 texto-borde-{{ docTab.color }} texto-{{ docTab.color }}">{{ my_capitalize(fact?.tipo) }} </span>

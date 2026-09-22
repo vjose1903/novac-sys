@@ -9,6 +9,35 @@
 
   grid-template-rows: min-content auto;
 
+  &.archived-doc-tabs {
+    min-height: 0;
+    overflow: hidden;
+    grid-template-rows: min-content minmax(0, 1fr) !important;
+
+    > .p-tabpanels {
+      display: flex;
+      min-height: 0;
+      overflow: hidden;
+      padding: 0 !important;
+
+      > p-tabpanel {
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+
+        > .archived-doc-list {
+          flex: 1 1 0;
+          height: auto !important;
+          min-height: 0;
+          overflow-x: hidden;
+          overflow-y: auto;
+        }
+      }
+    }
+  }
+
   .p-tablist {
     grid-area: p-tablist;
     background: var(--app-surface) !important;
@@ -130,4 +159,9 @@
       }
     }
   }
+}
+
+p-tabs.archived-doc-tabs > p-tabpanels {
+  min-height: 0;
+  padding: 0 !important;
 }
