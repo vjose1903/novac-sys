@@ -10,9 +10,8 @@
 
   .titulo {
     grid-area: titulo;
-    align-items: end;
+    align-items: flex-start;
     display: flex;
-    justify-content: space-between;
     gap: 1rem;
     padding: 0 0.25rem;
 
@@ -39,6 +38,7 @@
 
   .botonNuevo {
     flex: 0 0 auto;
+    margin-top: 0.7rem;
 
     .btn {
       border-radius: 0.55rem !important;
