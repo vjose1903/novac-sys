@@ -19,6 +19,7 @@ import {
   DESKTOP_COMMAND_PRINT_BASE64,
   DESKTOP_COMMAND_RELOAD_APP,
   DESKTOP_COMMAND_SET_APP_CONFIG,
+  DESKTOP_COMMAND_SET_LOCAL_APP_CONFIG,
   DESKTOP_COMMAND_UPDATE_CHECK,
   DESKTOP_COMMAND_UPDATE_DOWNLOAD,
   DESKTOP_COMMAND_UPDATE_GET_STATE,
@@ -422,6 +423,8 @@ async function handleDesktopCommand(_event: Electron.IpcMainInvokeEvent, request
         return await getAppConfig();
       case DESKTOP_COMMAND_SET_APP_CONFIG:
         return await setAppConfig(payload as ConfigI);
+      case DESKTOP_COMMAND_SET_LOCAL_APP_CONFIG:
+        return await setLocalAppConfig(payload as ConfigI);
       case DESKTOP_COMMAND_CONFIRM_CLOSE:
         writeLogs(' ----- CLOSE CONFIRMATION -----');
         sharedState.closingReason = 'user-confirmed';
@@ -549,6 +552,19 @@ async function setAppConfig(config: ConfigI): Promise<ConfigI> {
 
   return {
     ...configResponse,
+    operative_system: isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows,
+    printersList: ['Ninguna', ...printer_list],
+    app_version: app.getVersion(),
+  };
+}
+
+async function setLocalAppConfig(config: ConfigI): Promise<ConfigI> {
+  await Functions.setConfigFile(JSON.stringify(config));
+
+  const printer_list = await pdf_printer.getPrinters();
+
+  return {
+    ...config,
     operative_system: isMacOs() ? operativeSystemE.macOs : operativeSystemE.windows,
     printersList: ['Ninguna', ...printer_list],
     app_version: app.getVersion(),

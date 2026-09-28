@@ -238,6 +238,17 @@ export default class FirebaseConfigHandler {
    * Obtiene el snapshot de configuración actual
    */
   private async getCurrentConfigSnapShot() {
+    // La configuración de cada equipo se guarda con el machineId como ID del
+    // documento. Buscar por campo y usar el primer resultado puede devolver un
+    // documento legado duplicado, dejando que reaparezcan valores antiguos al
+    // reiniciar la aplicación.
+    const machineConfigRef = doc(this.db, `${this.empresaCollection}/${this._empresa.id}/${this.configsCollection}/${this.machineId}`);
+    const machineConfig = await getDoc(machineConfigRef);
+
+    if (machineConfig.exists()) {
+      return { empty: false, docs: [machineConfig] };
+    }
+
     const configCollectionRef = this.getCurrentConfigCollection();
     const q = this.createQuery(configCollectionRef, 'machineId', this.machineId, 1);
     return await getDocs(q);
@@ -265,6 +276,57 @@ export default class FirebaseConfigHandler {
     return values;
   }
 
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return !!value && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  /**
+   * Combina configuraciones dando prioridad a las fuentes posteriores.
+   * La combinación recursiva evita reemplazar un objeto remoto completo por
+  * una versión local que solo contiene algunas de sus propiedades.
+  */
+  private deepMerge<T extends Record<string, any>>(...sources: Partial<T>[]): T {
+    const result: Record<string, any> = {};
+
+    sources.forEach(source => {
+      Object.entries(source || {}).forEach(([key, value]) => {
+        if (value === undefined) return;
+
+        if (this.isRecord(result[key]) && this.isRecord(value)) {
+          result[key] = this.deepMerge(result[key] as T, value as Partial<T>);
+        } else {
+          result[key] = value;
+        }
+      });
+    });
+
+    return result as T;
+  }
+
+  /**
+   * Devuelve únicamente las propiedades que no existen en la configuración
+   * remota. Se usa para sincronizar nuevas claves sin reenviar valores locales
+   * antiguos y sobrescribir la configuración remota.
+   */
+  private collectMissingValues(local: unknown, remote: unknown): any {
+    if (!this.isRecord(local)) return remote === undefined ? local : undefined;
+
+    const missing: Record<string, unknown> = {};
+    Object.entries(local).forEach(([key, value]) => {
+      const remoteHasKey = this.isRecord(remote) && Object.prototype.hasOwnProperty.call(remote, key);
+
+      if (!remoteHasKey) {
+        missing[key] = value;
+        return;
+      }
+
+      const nested = this.collectMissingValues(value, (remote as Record<string, unknown>)[key]);
+      if (this.isRecord(nested) && Object.keys(nested).length > 0) missing[key] = nested;
+    });
+
+    return missing;
+  }
+
   private makeDefaultGeneralConfig(): Partial<ConfigI> {
     return {
       usa_facturas_externas: false,
@@ -280,15 +342,15 @@ export default class FirebaseConfigHandler {
   }
 
   private mergeConfig(generalConfig: Partial<ConfigI>, machineConfig: Partial<ConfigI>, localConfig: Partial<ConfigI> = {}): ConfigI {
-    return this.removeUndefinedValues({
-      ...this.handlerConfigFile.default_config,
-      usa_facturas_externas: false,
-      ...localConfig,
-      ...generalConfig,
-      ...machineConfig,
-      machineId: this.machineId,
-      firebase_empresa_id: this._empresa.id,
-    }) as ConfigI;
+    return this.removeUndefinedValues(
+      this.deepMerge(
+        { ...this.handlerConfigFile.default_config, usa_facturas_externas: false },
+        localConfig,
+        generalConfig,
+        machineConfig,
+        { machineId: this.machineId, firebase_empresa_id: this._empresa.id }
+      )
+    ) as ConfigI;
   }
 
   private hasMissingKeys(source: Partial<ConfigI>, keys: Array<keyof ConfigI>): boolean {
@@ -302,69 +364,66 @@ export default class FirebaseConfigHandler {
       .every(key => allowedKeys.has(key));
   }
 
-  private async getMachineConfig(seedConfig?: Partial<ConfigI>): Promise<{ data: Partial<ConfigI>; legacyData: Partial<ConfigI>; needsSave: boolean; missing: boolean; docRef?: any }> {
+  private async getMachineConfig(seedConfig?: Partial<ConfigI>): Promise<{ data: Partial<ConfigI>; legacyData: Partial<ConfigI>; syncPatch: Partial<ConfigI>; needsSave: boolean; missing: boolean; docRef?: any }> {
     const configSnapshot = await this.getCurrentConfigSnapShot();
 
     if (configSnapshot.empty) {
       const legacyData = seedConfig || this.handlerConfigFile.default_config;
+      const localData = this.deepMerge(this.makeDefaultMachineConfig(), this.pickConfigValues(legacyData, MACHINE_CONFIG_KEYS));
       return {
-        data: {
-          ...this.makeDefaultMachineConfig(),
-          ...this.pickConfigValues(legacyData, MACHINE_CONFIG_KEYS),
-          machineId: this.machineId,
-        },
+        data: { ...localData, machineId: this.machineId },
         legacyData,
-        needsSave: true,
+        syncPatch: localData,
+        needsSave: Object.keys(localData).length > 0,
         missing: true,
       };
     }
 
     const docSnapshot = configSnapshot.docs[0];
     const data = this.mapDocumentToObject<ConfigI>(docSnapshot);
-    const needsSave = this.hasMissingKeys(data, MACHINE_CONFIG_KEYS) || !this.hasOnlyKeys(data, MACHINE_CONFIG_KEYS);
+    const remoteData = this.pickConfigValues(data, MACHINE_CONFIG_KEYS);
+    const localData = this.deepMerge(this.makeDefaultMachineConfig(), this.pickConfigValues(seedConfig || {}, MACHINE_CONFIG_KEYS));
+    const syncPatch = this.collectMissingValues(localData, remoteData) as Partial<ConfigI>;
 
     return {
-      data: {
-        ...this.makeDefaultMachineConfig(),
-        ...this.pickConfigValues(seedConfig || {}, MACHINE_CONFIG_KEYS),
-        ...this.withoutDocumentId(data),
-        ...this.pickConfigValues(data, MACHINE_CONFIG_KEYS),
-        machineId: this.machineId,
-      },
+      data: { ...this.deepMerge(this.makeDefaultMachineConfig(), localData, remoteData), machineId: this.machineId },
       legacyData: data,
-      needsSave,
+      syncPatch,
+      needsSave: Object.keys(syncPatch).length > 0,
       missing: false,
       docRef: docSnapshot.ref,
     };
   }
 
-  private async getOrCreateGeneralConfig(legacyConfig: Partial<ConfigI>, localConfig: Partial<ConfigI> = {}): Promise<{ data: Partial<ConfigI>; needsSync: boolean }> {
+  private async getOrCreateGeneralConfig(legacyConfig: Partial<ConfigI>, localConfig: Partial<ConfigI> = {}): Promise<{ data: Partial<ConfigI>; syncPatch: Partial<ConfigI>; logoSyncKeys: Array<'logo_empresa' | 'logo_impresion'>; needsSync: boolean }> {
     const generalConfigRef = this.getGeneralConfigRef();
     const defaultGeneralConfig = this.makeDefaultGeneralConfig();
+    const localData = this.deepMerge(
+      defaultGeneralConfig,
+      this.pickConfigValues(localConfig, GENERAL_CONFIG_KEYS),
+      this.pickConfigValues(legacyConfig, GENERAL_CONFIG_KEYS)
+    );
     const generalSnapshot = await getDoc(generalConfigRef);
     if (!generalSnapshot.exists()) {
       writeLogs('----- Configuración general no encontrada; usando valores locales -----');
+      const logoSyncKeys = (['logo_empresa', 'logo_impresion'] as const).filter(key => !!localConfig[key]);
       return {
-        data: {
-          ...defaultGeneralConfig,
-          ...this.pickConfigValues(localConfig, GENERAL_CONFIG_KEYS),
-          ...this.pickConfigValues(legacyConfig, GENERAL_CONFIG_KEYS),
-        },
-        needsSync: true,
+        data: localData,
+        syncPatch: localData,
+        logoSyncKeys: [...logoSyncKeys],
+        needsSync: Object.keys(localData).length > 0,
       };
     }
 
     const currentGeneralConfig = this.mapDocumentToObject<ConfigI>(generalSnapshot);
-    const missingKeys = GENERAL_CONFIG_KEYS.filter(key => currentGeneralConfig[key] === undefined && defaultGeneralConfig[key] !== undefined);
-    const normalizedGeneralConfig = {
-      ...defaultGeneralConfig,
-      ...this.pickConfigValues(localConfig, GENERAL_CONFIG_KEYS),
-      ...this.pickConfigValues(legacyConfig, GENERAL_CONFIG_KEYS),
-      ...this.withoutDocumentId(currentGeneralConfig),
-      ...this.pickConfigValues(currentGeneralConfig, GENERAL_CONFIG_KEYS),
-    };
+    const remoteData = this.pickConfigValues(currentGeneralConfig, GENERAL_CONFIG_KEYS);
+    const syncPatch = this.collectMissingValues(localData, remoteData) as Partial<ConfigI>;
+    const normalizedGeneralConfig = this.deepMerge(localData, remoteData);
+    const logoSyncKeys = (['logo_empresa', 'logo_impresion'] as const).filter(
+      key => !(currentGeneralConfig as any)[`${key}_path`] && !!localConfig[key]
+    );
 
-    return { data: normalizedGeneralConfig, needsSync: missingKeys.length > 0 };
+    return { data: normalizedGeneralConfig, syncPatch, logoSyncKeys: [...logoSyncKeys], needsSync: Object.keys(syncPatch).length > 0 || logoSyncKeys.length > 0 };
   }
 
   /**
@@ -382,10 +441,13 @@ export default class FirebaseConfigHandler {
 
       writeLogs('----- Configuración mergeada encontrada en Firebase -----');
       const config = this.mergeConfig(generalConfig, machineConfigResult.data, seedConfig);
+      const syncPatch = this.deepMerge(generalConfigResult.syncPatch, machineConfigResult.syncPatch);
       return {
         ...this.mergeConfig(await this.loadStoredLogos(config), machineConfigResult.data, seedConfig),
         firebase_config_missing: machineConfigResult.missing,
         firebase_config_needs_sync: machineConfigResult.needsSave || generalConfigResult.needsSync,
+        firebase_config_sync_patch: syncPatch,
+        firebase_logo_sync_keys: generalConfigResult.logoSyncKeys,
       };
     } catch (error) {
       writeLogs(error, 'ERROR al obtener configuración desde Firebase');

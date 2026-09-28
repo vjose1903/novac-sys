@@ -3,6 +3,7 @@ export const DESKTOP_EVENT_CHANNEL = 'desktop:event';
 
 export const DESKTOP_COMMAND_GET_APP_CONFIG = 'app:get-config';
 export const DESKTOP_COMMAND_SET_APP_CONFIG = 'app:set-config';
+export const DESKTOP_COMMAND_SET_LOCAL_APP_CONFIG = 'app:set-local-config';
 export const DESKTOP_COMMAND_RELOAD_APP = 'app:reload';
 export const DESKTOP_COMMAND_FOCUS_WINDOW = 'window:focus';
 export const DESKTOP_COMMAND_CONFIRM_CLOSE = 'window:confirm-close';
@@ -19,6 +20,7 @@ export const DESKTOP_EVENT_APP_CLOSE_REQUESTED = 'app:close-requested';
 export type DesktopCommandName =
   | typeof DESKTOP_COMMAND_GET_APP_CONFIG
   | typeof DESKTOP_COMMAND_SET_APP_CONFIG
+  | typeof DESKTOP_COMMAND_SET_LOCAL_APP_CONFIG
   | typeof DESKTOP_COMMAND_RELOAD_APP
   | typeof DESKTOP_COMMAND_FOCUS_WINDOW
   | typeof DESKTOP_COMMAND_CONFIRM_CLOSE
@@ -34,6 +36,7 @@ export type DesktopEventName = typeof DESKTOP_EVENT_UPDATE_STATE | typeof DESKTO
 export interface DesktopCommandPayloadMap {
   [DESKTOP_COMMAND_GET_APP_CONFIG]: undefined;
   [DESKTOP_COMMAND_SET_APP_CONFIG]: any;
+  [DESKTOP_COMMAND_SET_LOCAL_APP_CONFIG]: any;
   [DESKTOP_COMMAND_RELOAD_APP]: undefined;
   [DESKTOP_COMMAND_FOCUS_WINDOW]: undefined;
   [DESKTOP_COMMAND_CONFIRM_CLOSE]: undefined;
@@ -48,6 +51,7 @@ export interface DesktopCommandPayloadMap {
 export interface DesktopCommandResponseMap {
   [DESKTOP_COMMAND_GET_APP_CONFIG]: any;
   [DESKTOP_COMMAND_SET_APP_CONFIG]: any;
+  [DESKTOP_COMMAND_SET_LOCAL_APP_CONFIG]: any;
   [DESKTOP_COMMAND_RELOAD_APP]: void;
   [DESKTOP_COMMAND_FOCUS_WINDOW]: { ok: true };
   [DESKTOP_COMMAND_CONFIRM_CLOSE]: { ok: true };

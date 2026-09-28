@@ -44,6 +44,10 @@ export class IpcService {
     return this.app.setAppConfig(config);
   }
 
+  setLocalAppConfig(config: any) {
+    return this.app.setLocalAppConfig(config);
+  }
+
   reloadApp() {
     return this.app.reloadApp();
   }

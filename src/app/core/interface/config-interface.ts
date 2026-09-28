@@ -22,6 +22,8 @@ export interface ConfigI {
   firebase_empresa_id?:        string;
   firebase_config_missing?:     boolean;
   firebase_config_needs_sync?:  boolean;
+  firebase_config_sync_patch?:  Partial<ConfigI>;
+  firebase_logo_sync_keys?:     Array<'logo_empresa' | 'logo_impresion'>;
   operative_system?:           operativeSystemE;
   url_servidor:                string;
   url_servidor_respaldo:       string;
