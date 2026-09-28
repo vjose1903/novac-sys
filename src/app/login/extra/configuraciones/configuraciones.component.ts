@@ -334,16 +334,20 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       }
 
       this.configApp.firebase_empresa_id = empresaId;
+      const isLoggedIn = !!fun.getAuthToken();
+      const configurationPath = isLoggedIn ? 'firebase/configuration' : 'firebase/configuration/prelogin';
+      const preloginCredentials = isLoggedIn ? {} : { config_password: this.configCopy.config_password };
 
       const logoResponse = await this.requestClass.createOne(
         {
           empresa_id: empresaId,
+          ...preloginCredentials,
           logos: {
             logo_empresa: this.toImageDataUrl(formulario.logo_empresa),
             logo_impresion: this.toImageDataUrl(formulario.logo_impresion),
           },
         },
-        { afterPath: 'firebase/logos' }
+        { afterPath: isLoggedIn ? 'firebase/logos' : 'firebase/logos/prelogin' }
       );
 
       Object.assign(formulario, logoResponse?.data || {});
@@ -352,9 +356,10 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
         {
           empresa_id: empresaId,
           machine_id: this.configApp.machineId,
+          ...preloginCredentials,
           config: formulario,
         },
-        { afterPath: 'firebase/configuration' }
+        { afterPath: configurationPath }
       );
 
       Object.assign(formulario, configurationResponse?.data || {}, { firebase_sync_done: true });
