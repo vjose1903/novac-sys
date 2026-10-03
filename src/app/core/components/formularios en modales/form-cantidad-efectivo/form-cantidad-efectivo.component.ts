@@ -250,7 +250,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     return this.metodosDePago
       .map(pago => {
         const monto = this.montoBig(pago.monto || 0) || Big(0);
-        const descuento = pago.forma_pago === 'Efectivo' ? (monto.lt(pendienteDevuelta) ? monto : pendienteDevuelta) : Big(0);
+        const descuento = pago.forma_pago !== 'Tarjeta' ? (monto.lt(pendienteDevuelta) ? monto : pendienteDevuelta) : Big(0);
         pendienteDevuelta = pendienteDevuelta.minus(descuento);
         return { forma_pago: pago.forma_pago, monto: monto.minus(descuento).toNumber() };
       })
@@ -456,6 +456,15 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
     let isInvalid = !total || !efectivo || total.gt(efectivo);
 
+    if (!isInvalid && this.metodo != tipoDocFacturacion.compra) {
+      const totalTarjeta = this.metodosDePago
+        .filter(pago => pago.forma_pago === 'Tarjeta')
+        .reduce((suma, pago) => suma.plus(this.montoBig(pago.monto || 0) || Big(0)), Big(0));
+      const tieneOtroMetodo = this.metodosDePago.some(pago => pago.forma_pago !== 'Tarjeta');
+
+      isInvalid = totalTarjeta.gt(total) || (efectivo.gt(total) && !tieneOtroMetodo);
+    }
+
     if (this.metodo == tipoDocFacturacion.compra) isInvalid = false;
 
     if (from == 'input' || from == 'init') this.disableBtnConfirm(isInvalid);
@@ -472,6 +481,16 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   private mensajeValidacion(): string {
+    const total = this.montoBig(this.total_factura);
+    const totalRecibido = this.totalRecibidoBig();
+    const totalTarjeta = this.metodosDePago
+      .filter(pago => pago.forma_pago === 'Tarjeta')
+      .reduce((suma, pago) => suma.plus(this.montoBig(pago.monto || 0) || Big(0)), Big(0));
+    const tieneOtroMetodo = this.metodosDePago.some(pago => pago.forma_pago !== 'Tarjeta');
+
+    if (total && totalTarjeta.gt(total)) return 'El monto pagado con tarjeta no puede superar el total del documento.';
+    if (total && totalRecibido?.gt(total) && !tieneOtroMetodo) return 'La devuelta debe corresponder a un método de pago distinto a tarjeta.';
+
     const documento = this.metodo == tipoDocFacturacion.recibo_ingreso ? 'del recibo.' : 'de la factura.';
     return `El monto ingresado no cubre el valor ${documento}`;
   }
