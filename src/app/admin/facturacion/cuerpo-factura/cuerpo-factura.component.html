@@ -106,6 +106,7 @@
                           id="cantidad-{{ index_cuerpo }}"
                           (keyup.enter)="saltar('unidad-', index_cuerpo)"
                           formControlName="cantidad"
+                          (input)="limitarDecimalesCantidad($event, index_cuerpo)"
                           (focus)="verificarSecuencia(index_cuerpo)"
                           (blur)="calcularMontosRow(index_cuerpo)"
                           tabindex="-1" />

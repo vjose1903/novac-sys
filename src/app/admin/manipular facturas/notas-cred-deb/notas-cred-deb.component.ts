@@ -168,6 +168,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
         key: 'cant_nota',
         tipo: 'input',
         inputType: 'number',
+        numberDecimals: 2,
         // interactWithMouse: true,
         textAlign: 'end',
         disable: [

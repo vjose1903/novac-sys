@@ -496,6 +496,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
     }
   }
 
+  limitarDecimales(event, column) {
+    if (column.numberDecimals == null) return;
+
+    const input = event.target as HTMLInputElement;
+    const check = fun.checkLongDecimales(input.value, column.numberDecimals);
+    if (check.error) input.value = check.value;
+  }
+
   handleInputsEvents(type, input, column, index_body, data) {
     if (fun.objHas(column, 'inputEvents') && fun.hasValue(column.inputEvents)) {
       if (column.inputEvents == 'formatoNumero') {

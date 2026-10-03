@@ -537,6 +537,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     return excede;
   }
 
+  limitarDecimalesCantidad(event: Event, index: number) {
+    const input = event.target as HTMLInputElement;
+    const check = fun.checkLongDecimales(input.value, 2);
+    if (!check.error) return;
+
+    input.value = check.value;
+    (this.factServ.filasDetalle.at(index) as FormGroup).controls['cantidad'].setValue(Number(check.value), { emitEvent: false });
+  }
+
   async checkCantidadExcede(index, lugar) {
     return new Promise<boolean>(async resolve => {
       let sumCantidad = 0;
