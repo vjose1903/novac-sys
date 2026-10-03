@@ -176,7 +176,7 @@
                     <!--  ::::::::::::  PRECIO \ COSTO ::::::::::::  -->
                     <td class="column-precio p-0">
                       <div class="position-relative" [pTooltip]="item_cuerpo.controls.is_bad_price.value ? getInfoBadPrice(index_cuerpo).tooltip : ''" tooltipPosition="right">
-                        <div class="precio-div">
+                        <div class="precio-div" [class.warning-price]="item_cuerpo.controls.is_bad_price.value">
                           @if (item_cuerpo.controls.is_bad_price.value) {
                             <i class="fa-solid {{ getInfoBadPrice(index_cuerpo).icon }} iconArrow"></i>
                           }
