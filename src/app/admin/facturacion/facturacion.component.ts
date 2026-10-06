@@ -556,9 +556,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
       let productos_devueltos = original_factura?.productos_devueltos || [];
       this.factServ.propietario_factura = {};
-      // Una cotización usada para crear una factura solo aporta los datos
-      // de la plantilla; el documento que se está creando sigue siendo una venta.
-      const documentoTipo = original_factura.action === actionFacturacion.bill_from_cotizacion
+      // Una cotización o pre-venta usada para crear una factura solo aporta
+      // los datos de la plantilla; el documento nuevo sigue siendo una venta.
+      const esFacturaDesdeDocumento = [actionFacturacion.bill_from_cotizacion, actionFacturacion.bill_from_pre_venta].includes(original_factura.action);
+      const documentoTipo = esFacturaDesdeDocumento
         ? tipoDocFacturacion.venta
         : (factura.tipo as tipoDocFacturacion);
       this.factServ.tipoDocumento.set(documentoTipo);
@@ -592,9 +593,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
           metodo: this.factServ.tipoDocumento(),
           serie: currentSerie,
           equivalentSerie,
-          // El tipo de la cotización no debe reutilizarse como comprobante:
-          // seleccionar una cotización siempre inicia una factura de consumo.
-          tipoFacturaId: original_factura.action === actionFacturacion.bill_from_cotizacion ? undefined : factura.tipo_factura_id,
+          // El tipo de la cotización o pre-venta no debe reutilizarse como comprobante.
+          tipoFacturaId: esFacturaDesdeDocumento ? undefined : factura.tipo_factura_id,
         })
         .then(async result => {
           if (shouldActivateExternalFlow) await this.externalFlowServ.activateExternalState(this);
