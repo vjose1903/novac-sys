@@ -1,24 +1,24 @@
 <div class="remove-confirmation" [class.prefactura]="is_prefactura_selected">
   <div class="remove-confirmation-head">
-    <div class="remove-confirmation-icon">
+    <div class="remove-confirmation-icon" [class.remove-confirmation-icon--defective]="data_detalle?.is_defectuoso">
       <i class="fa-solid fa-trash-can"></i>
     </div>
 
     <div class="remove-confirmation-copy">
       @if (!is_prefactura_selected) {
-        <span>Seguro que desea remover el artículo</span>
+        <span class="remove-confirmation-eyebrow">Quitar del documento</span>
         <strong>{{ nombre }}</strong>
       }
 
       @if (is_prefactura_selected && data_detalle.is_defectuoso) {
-        <span>Seguro que desea retirar el artículo defectuoso</span>
+        <span class="remove-confirmation-eyebrow">Artículo defectuoso</span>
         <strong>{{ nombre }}</strong>
       }
 
       @if (is_prefactura_selected && !data_detalle.is_defectuoso) {
-        <span>Artículo</span>
+        <span class="remove-confirmation-eyebrow">Retirar de la pre-factura</span>
         <strong>{{ nombre }}</strong>
-        <small>Especifique la razón de quitar este artículo de la pre-factura.</small>
+        <small>Indique la cantidad y cómo debe registrarse la devolución.</small>
       }
     </div>
   </div>
@@ -26,39 +26,45 @@
   @if (is_prefactura_selected && !data_detalle.is_defectuoso) {
     <form class="remove-confirmation-form" [formGroup]="form">
       <label class="remove-switch-row">
-        <span>Devolver todo</span>
+        <span class="remove-switch-copy">
+          <strong>Devolver todo</strong>
+          <small>Reintegrar la cantidad completa al inventario</small>
+        </span>
         <input class="apple-switch" type="checkbox" formControlName="all" (change)="changeValorCheck()" />
       </label>
 
-      <div class="form-group">
-        <label class="control-label">Cantidad: </label>
-        <input
-          id="cantidad"
-          min="1"
-          [max]="cantidad"
-          (keydown.enter)="saltar('razon')"
-          (focus)="htmlServ.selectValue($event)"
-          (blur)="checkCantidad()"
-          type="number"
-          class="form-control input_cantidad"
-          formControlName="cantidad"
-          placeholder="Introduzca la cantidad"
-          autocomplete="off" />
-      </div>
+      <div class="remove-confirmation-fields">
+        <div class="form-group">
+          <label class="control-label" for="cantidad">Cantidad</label>
+          <input
+            id="cantidad"
+            min="1"
+            [max]="cantidad"
+            (keydown.enter)="saltar('razon')"
+            (focus)="htmlServ.selectValue($event)"
+            (blur)="checkCantidad()"
+            type="number"
+            class="form-control input_cantidad"
+            formControlName="cantidad"
+            placeholder="Introduzca la cantidad"
+            autocomplete="off" />
+          <small class="remove-field-hint">Disponible: {{ cantidad }}</small>
+        </div>
 
-      <div class="form-group">
-        <label class="control-label">Razón: </label>
-        <p-select
-          inputId="razon"
-          formControlName="razon"
-          [options]="[
-            { label: 'Solo devolver', value: 'no_venta' },
-            { label: 'Producto defectuoso', value: 'producto_defectuoso' }
-          ]"
-          optionLabel="label"
-          optionValue="value"
-          appendTo="body"
-          (keydown.enter)="saltar('send')"></p-select>
+        <div class="form-group">
+          <label class="control-label" for="razon">Razón</label>
+          <p-select
+            inputId="razon"
+            formControlName="razon"
+            [options]="[
+              { label: 'Solo devolver', value: 'no_venta' },
+              { label: 'Producto defectuoso', value: 'producto_defectuoso' }
+            ]"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            (keydown.enter)="saltar('send')"></p-select>
+        </div>
       </div>
     </form>
   }

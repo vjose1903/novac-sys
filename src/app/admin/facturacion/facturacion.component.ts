@@ -412,6 +412,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         modalConfig.height = '40rem';
         modalConfig.botones.push({ id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: false });
         modalConfig.inputs = { data: null, articulo_defectuoso: null, articulo_solo_devuelto: null, tipo: null, nombre: null, is_articulo_selected: false, devueltos_list: this.getDevueltos() };
+        modalConfig.styleClass = 'confirmation-dialog';
+        modalConfig.contentStyleClass = 'confirmation-modal-content';
 
         modalConfig.setCallback(this.processRetornarDevueltoModal.bind(this));
       }
@@ -423,6 +425,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   }
 
   processRetornarDevueltoModal(arg) {
+    if (arg.type !== modalCloseType.returnData) return;
+
     const { data } = arg;
     this.cuerpo.retornarDevuelto(data);
   }

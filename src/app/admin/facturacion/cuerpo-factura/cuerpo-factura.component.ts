@@ -880,19 +880,23 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     inputs['nombre'] = unidad ? `${name} (${unidad})` : name;
 
     const modalConfig = new DynamicModalClass();
-    modalConfig.width = '57rem';
-    modalConfig.height = '32rem';
+    modalConfig.width = inputs.is_articulo_selected ? '42rem' : '57rem';
+    modalConfig.height = inputs.is_articulo_selected ? 'auto' : '32rem';
     modalConfig.component = RetornarDevueltoComponent;
     modalConfig.inputs = inputs;
     modalConfig.id = 'retornarDevuelto';
     modalConfig.header = 'Retornar Articulos Devueltos';
+    modalConfig.styleClass = 'confirmation-dialog';
+    modalConfig.contentStyleClass = 'confirmation-modal-content';
 
     modalConfig.botones = [
       { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
       { id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: false },
     ];
 
-    modalConfig.setCallback((arg: ICallbackModal) => this.retornarDevuelto(arg.data));
+    modalConfig.setCallback((arg: ICallbackModal) => {
+      if (arg.type == modalCloseType.returnData) this.retornarDevuelto(arg.data);
+    });
     modalConfig.show();
 
     if (this.dropRowMenu) this.dropRowMenu.hide();
@@ -1023,6 +1027,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   retornarDevuelto(arg: { key: string; retorno: { solo_devuelto: any; defectuoso: any } }) {
+    if (!arg?.retorno) return;
+
     const infoRetorno = [
       { tipo: 'defectuoso', data: arg.retorno?.defectuoso, contenedor_retorno: this.factServ.filasDetalle.controls },
       { tipo: 'solo_devuelto', data: arg.retorno?.solo_devuelto, contenedor_retorno: this.factServ.productos_devueltos || [] },
@@ -1034,6 +1040,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           const entidad = itemRetorno.tipo == 'defectuoso' ? item.value : item;
           return entidad.key == itemRetorno?.data?.key;
         });
+
+        if (!articulo_devuelto) return;
 
         const articulo_devuelto_index = _.findIndex(itemRetorno.contenedor_retorno, articulo_devuelto);
         const FormGroup_devuelto = articulo_devuelto as FormGroup;
@@ -1054,7 +1062,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
             detalle_devuelto['cantidad'] = articulo_devuelto.cantidad - retornar_info['cantidad'];
             detalle_devuelto['cantidad_en_unidades'] = articulo_devuelto.cantidad_en_unidades - retornar_info['cantidad_en_unidades'];
             detalle_devuelto['descuento_valor'] = fun.roundNumberToDecimal(articulo_devuelto.descuento_valor - retornar_info['descuento_valor']);
-            this.calcularMontosRow(articulo_devuelto_index);
           } else {
             articulo_devuelto['cantidad'] -= retornar_info['cantidad'];
             articulo_devuelto['cantidad_en_unidades'] -= retornar_info['cantidad_en_unidades'];
@@ -1062,7 +1069,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
             articulo_devuelto['total'] = articulo_devuelto['cantidad'] * fun.desformatearStNumber(articulo_devuelto['precio']) - articulo_devuelto['descuento_valor'];
           }
-          FormGroup_devuelto.patchValue(detalle_devuelto);
+          if (itemRetorno.tipo == 'defectuoso') {
+            FormGroup_devuelto.patchValue(detalle_devuelto);
+            this.calcularMontosRow(articulo_devuelto_index);
+          }
         }
 
         // ----- CAMBIO DEL ARTICULO ORIGEN -----
