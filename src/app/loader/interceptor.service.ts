@@ -1,17 +1,20 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 
 import { catchError, map, finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
-import * as _ from 'lodash';
-import { Ss } from '../core/services/singleton.service';
-import { fun } from '../core/services/functions.service';
-import { SharedService } from '../core/services/shared.service';
+import { Ss } from '@core/services/singleton.service';
+import { fun } from '@core/services/functions.service';
+import { SharedService } from '@core/services/shared.service';
 
 @Injectable()
 export class InterceptorService implements HttpInterceptor {
-  constructor(public loadServ: LoaderService, public sharedServ: SharedService) {}
+  constructor(
+    public loadServ: LoaderService,
+    public sharedServ: SharedService,
+    private zone: NgZone
+  ) {}
   requestCount: number = 0;
 
   private startRequest(args?): void {
@@ -26,7 +29,7 @@ export class InterceptorService implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    this.sharedServ.nextCanToast(false);
+    this.zone.runOutsideAngular(() => this.sharedServ.nextCanToast(false));
     const token = fun.getAuthToken();
 
     let spinner = request.params.get('spinner');
@@ -44,53 +47,77 @@ export class InterceptorService implements HttpInterceptor {
           expiry: `${localStorage.getItem('expiry')}`,
           uid: `${localStorage.getItem('uid')}`,
           'token-type': `${localStorage.getItem('token-type')}`,
+          'X-Empresa-Id': `${Ss.configServ?.config?.firebase_empresa_id || ''}`,
         },
         params: sendParams,
       });
     }
 
+
     return next.handle(request).pipe(
-      map((event) => {
+      map(event => {
         if (event instanceof HttpResponse) {
+
           if (fun.objHas(event, 'body.msg')) this.handler_msg(event.body.msg, 'success');
 
-          ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach((header) => {
-            const headerValue = event.headers.get(header);
-            if (fun.hasValue(headerValue) && fun.isEmpty(localStorage.getItem(header))) localStorage.setItem(header, headerValue);
+          this.zone.runOutsideAngular(() => {
+            ['access-token', 'client', 'expiry', 'token-type', 'uid'].forEach(header => {
+              const headerValue = event.headers.get(header);
+              if (fun.hasValue(headerValue) && fun.isEmpty(localStorage.getItem(header))) localStorage.setItem(header, headerValue);
+            });
           });
         }
 
-        this.sharedServ.nextCanToast(true);
+        this.zone.runOutsideAngular(() => this.sharedServ.nextCanToast(true));
         return event;
       }),
 
       catchError((response: HttpErrorResponse) => {
-        console.log(' ');
-        console.log('response ', response);
-        console.log(' ');
-        if (fun.isEmpty(response.error)) {
-          fun.toastError('Error desconocido favor de comunicarse con Víctor José Vásquez Santos.', 'ERROR');
-        } else if (response.error && fun.objHas(response.error, 'action') && response.error.action == 'close_session') {
-          fun.toastError(response.error.msg, 'ERROR');
-          this.sharedServ.nextCanToast(false);
-          Ss.layServ.nextLogOut({ bool: true, quien: 'close_session' });
-        } else {
-          if (fun.objHas(response, 'status') && response.status == 404) this.handler_msg(response.error.msg, 'warning');
 
-          if (fun.objHas(response, 'error.msg')) this.handler_msg(response.error.msg, 'error');
+
+        if (response.status == 401) {
+          const token = fun.getAuthToken();
+
+          fun.logout();
+
+          if (token) {
+            fun.toastError('Su sesión ha expirado, por favor inicie sesión nuevamente', 'SESIÓN EXPIRADA');
+            return;
+          }
+        }
+        const errorDesconocido = () => fun.toastError('Error <strong>desconocido</strong>, favor llamar a soporte de<br/><strong>Novac System</strong>', 'ERROR');
+        const esErrorDeViajesDeshabilitado = response?.error?.msg?.some?.(mensaje => typeof mensaje === 'string' && mensaje.toLowerCase().includes('módulo de viajes'));
+
+        if (esErrorDeViajesDeshabilitado) return throwError(() => response);
+
+        if (fun.isEmpty(response.error)) {
+          errorDesconocido();
+        } else if (response.error && fun.objHas(response.error, 'action') && response.error.action == 'close_session') {
+
+          fun.toastError(response.error.msg, 'ERROR');
+          this.zone.runOutsideAngular(() => this.sharedServ.nextCanToast(false));
+          fun.logout();
+        } else {
+          if (fun.objHas(response, 'status') && response.status == 404 && fun.hasValue(response?.error?.msg)) {
+
+            this.handler_msg(response.error.msg, 'warning');
+          } else if (fun.objHas(response, 'error.msg')) {
+            this.handler_msg(response.error.msg, 'error');
+          } else {
+            errorDesconocido();
+          }
         }
 
         return throwError(response);
       }),
       finalize(() => {
         this.endRequest(spinner);
-      }),
+      })
     );
   }
 
+
   handler_msg(menssages, tipo_) {
-    // console.warn('MENSAJE DESDE EL INTERCEPTOR');
-    // console.warn('menssages ', menssages);
 
     if (menssages && Array.isArray(menssages)) {
       for (let i = 0; i < menssages.length; i++) {

@@ -1,0 +1,267 @@
+@use './forms' as *;
+
+.p-datepicker {
+  width: 100% !important;
+
+  .p-datepicker-input {
+    @include formField;
+    padding: var(--app-field-padding-y-md, 0.38rem) var(--app-field-padding-x-md, 0.72rem) !important;
+
+    &.minSize {
+      min-height: var(--app-field-height-sm, 2.05rem) !important;
+      padding: 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+
+  &.p-disabled,
+  &:has(.p-datepicker-input:disabled),
+  &:has(.p-datepicker-input[disabled]) {
+    .p-datepicker-input {
+      @include formFieldDisabled;
+    }
+  }
+
+  .p-datepicker-input:disabled,
+  .p-datepicker-input[disabled] {
+    @include formFieldDisabled;
+  }
+
+  &:hover:not(.p-disabled):not(:has(.p-datepicker-input:disabled)):not(:has(.p-datepicker-input[disabled])):not(:focus-within) {
+    .p-datepicker-input {
+      border-color: var(--app-input-hover-border) !important;
+      box-shadow: var(--app-field-hover-shadow, 0 0.45rem 0.9rem -0.75rem #0000008a) !important;
+    }
+  }
+
+  &:focus-within {
+    .p-datepicker-input {
+      @include formFieldFocus;
+    }
+  }
+
+  &.ng-invalid.ng-touched,
+  &.ng-invalid.ng-dirty,
+  &.is-invalid {
+    .p-datepicker-input {
+      @include formFieldInvalid;
+    }
+  }
+
+  &.field-sm,
+  &.form-field-sm,
+  &.input-sm {
+    .p-datepicker-input {
+      min-height: var(--app-field-height-sm, 2.05rem) !important;
+      padding: 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+
+  &.field-lg,
+  &.form-field-lg,
+  &.input-lg {
+    .p-datepicker-input {
+      min-height: var(--app-field-height-lg, 3rem) !important;
+      padding: 0.55rem 0.9rem !important;
+      font-size: 1.05rem !important;
+    }
+  }
+}
+
+.field-sm,
+.form-field-sm,
+.input-sm {
+  .p-datepicker {
+    .p-datepicker-input {
+      min-height: var(--app-field-height-sm, 2.05rem) !important;
+      padding: 0.18rem 0.5rem !important;
+      font-size: 0.82rem !important;
+    }
+  }
+}
+
+.field-lg,
+.form-field-lg,
+.input-lg {
+  .p-datepicker {
+    .p-datepicker-input {
+      min-height: var(--app-field-height-lg, 3rem) !important;
+      padding: 0.55rem 0.9rem !important;
+      font-size: 1.05rem !important;
+    }
+  }
+}
+
+.p-datepicker-weekday {
+  color: var(--app-text) !important;
+}
+
+.p-datepicker-panel {
+  margin-top: 0.3rem !important;
+  padding: 0rem !important;
+  border-radius: var(--app-field-overlay-radius, 0.85rem) !important;
+  box-shadow: var(--app-overlay-shadow) !important;
+  overflow: hidden;
+  z-index: 999999 !important;
+
+  .p-datepicker-calendar-container {
+    .p-datepicker-calendar {
+      .p-datepicker-header {
+        background: var(--primary02) !important;
+        padding: 0.3rem !important;
+        border-radius: var(--app-field-overlay-radius, 0.85rem) var(--app-field-overlay-radius, 0.85rem) 0 0 !important;
+
+        .p-datepicker-prev-button,
+        .p-datepicker-next-button {
+          color: var(--app-text) !important;
+          border-radius: 100%;
+
+          &:hover {
+            background-color: var(--primary03) !important;
+          }
+
+          &:focus {
+            @include formFieldFocus;
+          }
+        }
+
+        .p-datepicker-title {
+          .p-datepicker-select-month,
+          .p-datepicker-select-year {
+            color: var(--app-text) !important;
+            border-radius: 10rem;
+            padding: 0.3rem 0.6rem !important;
+
+            &:hover {
+              background-color: var(--primary03) !important;
+            }
+          }
+        }
+      }
+
+      .p-datepicker-day-view {
+        margin: 0.3rem;
+        tr {
+          th {
+            color: var(--app-text) !important;
+            padding: 0.2rem 0.5rem !important;
+          }
+        }
+
+        tbody {
+          tr {
+            .p-datepicker-day-cell {
+              padding: 0.5rem !important;
+
+              .p-datepicker-day {
+                color: var(--app-text) !important;
+                border-radius: 100%;
+
+                &.p-datepicker-day-other-month,
+                &[aria-disabled='true'] {
+                  color: var(--app-text-muted) !important;
+                }
+
+                &.p-datepicker-day-selected {
+                  background: var(--primary07) !important;
+                  color: var(--app-text) !important;
+                }
+
+                &:focus {
+                  @include formFieldFocus;
+                }
+              }
+
+              &.p-datepicker-today {
+                .p-datepicker-day {
+                  position: relative;
+                  overflow: visible;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+
+                  background: var(--transparente03) !important;
+                  &:hover {
+                    background: var(--transparente04) !important;
+                    &::after {
+                      display: block;
+                    }
+                  }
+
+                  &::after {
+                    content: 'Hoy';
+                    color: var(--app-text) !important;
+                    position: absolute;
+                    top: -1.3rem;
+                    display: none;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .p-datepicker-month-view {
+    margin: 0.3rem;
+    min-width: 20rem !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.3rem !important;
+
+    .p-datepicker-month {
+      border-radius: 0.3rem;
+      width: 100% !important;
+
+      &.p-datepicker-month-selected {
+        background: var(--primary07) !important;
+        @include formFieldFocus;
+      }
+
+      &:focus {
+        @include formFieldFocus;
+      }
+    }
+  }
+
+  .p-datepicker-year-view {
+    margin: 0.3rem;
+    min-width: 20rem !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.3rem !important;
+
+    .p-datepicker-year {
+      border-radius: 0.3rem;
+      width: 100% !important;
+      &.p-datepicker-year-selected {
+        background: var(--primary07) !important;
+        @include formFieldFocus;
+      }
+      &:focus {
+        @include formFieldFocus;
+      }
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}

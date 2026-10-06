@@ -1,0 +1,73 @@
+<div class="row">
+  <div class="col-12">
+    <h2>
+      Producto: {{ ' ' }}<span class="negrita">{{ data.nombre }}</span>
+    </h2>
+  </div>
+
+  <div class="col-12">
+    <div class="form-group">
+      <label class="control-label">Tipo movimiento: </label>
+      <p-select
+        inputId="tipo_movimiento"
+        [(ngModel)]="tipo_movimiento"
+        [options]="[
+          { label: 'Entrada', value: 'entrada' },
+          { label: 'Salida', value: 'salida' }
+        ]"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        (keydown.enter)="saltar(tipo_movimiento === 'entrada' ? 'medida' : 'tipo_salida')"
+        (onChange)="selectTipoMov()"></p-select>
+    </div>
+  </div>
+
+  @if (tipo_movimiento === 'salida') {
+    <div class="col-12">
+      <div class="form-group">
+        <label class="control-label">Tipo de salida: </label>
+        <p-select
+          inputId="tipo_salida"
+          [(ngModel)]="tipo_salida"
+          [options]="[
+            { label: 'Perdida', value: 'perdida' },
+            { label: 'Caducó', value: 'caduco' },
+            { label: 'Producto defectuoso', value: 'producto_defectuoso' }
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          (keydown.enter)="saltar('medida')"></p-select>
+      </div>
+    </div>
+  }
+
+  <div class="col-12">
+    <div class="form-group">
+      <label class="control-label {{ tipo_movimiento === 'salida' ? 'mt-3' : '' }}">Medida: </label>
+      <p-select inputId="medida" [(ngModel)]="medida" [options]="medidas || []" appendTo="body" (keydown.enter)="saltar('cantidad')"></p-select>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="form-group">
+      <label class="control-label mt-3">cantidad: </label>
+      <input id="cantidad" min="1" (keydown.enter)="saltar('motivo')" (focus)="htmlServ.selectValue($event)" type="number" class="form-control input_cantidad" [(ngModel)]="cantidad" placeholder="Introduzca la cantidad" autocomplete="off" />
+    </div>
+  </div>
+
+  @if (medida && cantidad) {
+    <div class="col-12 mb-3">
+      <div class="contenedorAvisosMov">
+        {{ mostrarExistencia('mov') }} <br />
+        {{ mostrarExistencia('stock') }}
+      </div>
+    </div>
+  }
+
+  <div class="col-12">
+    <label class="control-label">Motivo {{ tipo_movimiento }}</label>
+    <textarea id="motivo" [(ngModel)]="motivo" class="form-control" cols="30" rows="3"></textarea>
+  </div>
+</div>

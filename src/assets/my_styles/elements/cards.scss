@@ -1,0 +1,16 @@
+.card {
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
+  border-color: var(--app-card-border) !important;
+}
+
+.card-header,
+.card-footer {
+  background-color: var(--app-surface-soft) !important;
+  color: var(--app-text) !important;
+  border-color: var(--app-border) !important;
+}
+
+.card.sombra {
+  box-shadow: var(--app-overlay-shadow) !important;
+}

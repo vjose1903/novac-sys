@@ -1,39 +1,54 @@
 {
-  "appId":"com.inspot-technology.novac",
+  "appId": "com.inspot-technology.novac",
   "productName": "Novac-System",
   "directories": {
     "output": "actualizacion/"
   },
+  "extraMetadata": {
+    "main": "dist/electron/main.js"
+  },
   "files": [
-    "./*",
-    "**/*",
-    "!**/*.ts",
-    "!*.code-workspace",
-    "!./LICENSE.md",
-    "!./package.json",
-    "!./package-lock.json",
-    "!./e2e/",
-    "!./config_setup/",
-    "!./angular.json",
-    "!./_config.yml",
-    "!./tsconfig.json",
-    "!./tslint.json",
-    "!./actualizacion/",
-    "!./actualizacion.zip",
-    "!./log/"
+    {
+      "from": ".",
+      "to": ".",
+      "filter": [
+        "package.json",
+        "dist/browser/**/*",
+        "dist/electron/**/*",
+        "actual_cliente.json",
+        "fb.config",
+        "app_config.config"
+      ]
+    },
+    {
+      "from": ".",
+      "to": "dist/electron",
+      "filter": ["logos.json"]
+    },
+    {
+      "from": "electron",
+      "to": "dist/electron/electron",
+      "filter": ["*.json"]
+    }
   ],
   "extraFiles": [
     {
       "from": "./print/",
       "to": "resources/print/",
-      "filter": [ "**/*" ]
+      "filter": ["**/*"]
     }
   ],
-
   "win": {
     "icon": "./src/assets/icons/win/icon.ico",
     "asarUnpack": [],
-    "publish": ["github"],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "vjose1903",
+        "repo": "novac-system-agrodemi",
+        "releaseType": "release"
+      }
+    ],
     "target": ["NSIS"]
   },
   "nsis": {

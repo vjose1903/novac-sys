@@ -1,0 +1,47 @@
+<div class="w-100 position-relative">
+  <div class="form-group" [id]="'section-' + fieldName()" [appMsgError]="fieldName()" [form]="formGroup()">
+    @if (showLabel()) {
+      <label class="control-label" requiredFieldLabel>{{ label() }}: </label>
+    }
+    <p-select
+      #divisaDropdown
+      [inputId]="inputId()"
+      [disabled]="disabled() || isDisabled()"
+      [options]="options().length ? options() : divisaServ.listaDivisas"
+      appendTo="body"
+      [ngModel]="valueSignal()"
+      (ngModelChange)="this.returnValue($event); this.onTouched()"
+      optionLabel="nombre"
+      optionValue="id"
+      placeholder="Selecciona la divisa"
+      class="{{ getControlClass() }}"
+      (keydown.enter)="emitKeydown($event)"
+      (onFocus)="htmlServ.showPSelectPanel($event, divisaDropdown)">
+      <ng-template pTemplate="selectedItem">
+        @if (selectedCodeVariant()) {
+          <div class="divisa-selected-code" *ngIf="fun.hasValue(valueSignal()) && selectedDivisa()">
+            <img-component class="divisa-image" [imagenSrc]="imgServ.getImgUrlServer(divisaImageFile(selectedDivisa()))"></img-component>
+            <span class="puntos-suspensivos">{{ divisaCode(selectedDivisa()) }}</span>
+          </div>
+        } @else {
+          <div class="d-flex align-items-center gap-1" *ngIf="fun.hasValue(valueSignal()) && selectedDivisa()">
+            <div class="d-flex align-items-center" style="width: 2rem">
+              <img-component [imagenSrc]="imgServ.getImgUrlServer(divisaImageFile(selectedDivisa()))"></img-component>
+            </div>
+            <div class="puntos-suspensivos">{{ divisaDisplayName(selectedDivisa()) }}</div>
+          </div>
+        }
+      </ng-template>
+      <ng-template let-divisa pTemplate="item">
+        <div class="divisa-option-code">
+          <img-component class="divisa-image" [imagenSrc]="imgServ.getImgUrlServer(divisaImageFile(divisa))"></img-component>
+          <div class="divisa-option-text">
+            <span class="puntos-suspensivos">{{ divisa.nombre || divisaCode(divisa) }}</span>
+            <small class="puntos-suspensivos">{{ divisaCode(divisa) }}</small>
+          </div>
+        </div>
+      </ng-template>
+    </p-select>
+    <span id="msgContainer"></span>
+  </div>
+</div>

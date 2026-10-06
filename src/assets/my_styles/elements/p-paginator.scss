@@ -1,0 +1,75 @@
+@use './forms.scss' as *;
+
+.p-paginator {
+  border: 0px solid transparent !important;
+  background: transparent !important;
+  padding: 0.3rem !important;
+  flex-wrap: nowrap !important;
+
+  .p-paginator-first,
+  .p-paginator-prev,
+  .p-paginator-pages .p-paginator-page,
+  .p-paginator-next,
+  .p-paginator-last {
+    min-width: 2rem !important;
+    height: 2rem !important;
+    border-radius: 0.4rem !important;
+    color: var(--app-paginator-button-text) !important;
+
+    &:hover {
+      background: var(--app-hover) !important;
+      color: var(--app-text) !important;
+    }
+
+    &.p-disabled {
+      cursor: not-allowed !important;
+    }
+  }
+
+  .p-paginator-pages {
+    .p-paginator-page {
+      color: var(--app-text) !important;
+      font-size: 0.75rem;
+      &.p-paginator-page-selected {
+        background-color: var(--primary07) !important;
+        color: #ffffff !important;
+        
+        &:hover {
+          background-color: var(--primary08) !important;
+        }
+      }
+    }
+  }
+
+  &.no-show-dropdown {
+    .p-select {
+      display: none !important;
+    }
+  }
+
+  .p-select {
+    max-width: 4.5rem !important;
+    background: var(--app-input-bg) !important;
+    color: var(--app-text) !important;
+    border: 1px solid var(--app-border) !important;
+    padding: 0.25rem 0.3rem;
+    border-radius: 0.3rem;
+
+    .p-select-dropdown {
+      width: fit-content !important;
+      margin-left: 0.5rem;
+    }
+
+    .p-select-label {
+      width: 2rem;
+      color: var(--app-text) !important;
+      padding: 0 !important;
+      background-color: transparent !important;
+      border: 0px solid transparent !important;
+    }
+
+    .p-select-dropdown {
+      color: var(--app-text) !important;
+    }
+  }
+}

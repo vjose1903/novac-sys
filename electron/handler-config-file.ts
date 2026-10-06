@@ -1,90 +1,113 @@
+import { ConfigI } from '../src/app/core/interface/config-interface.js';
 import * as fs from 'fs';
-import { pathAdd, puts } from '../main';
+import * as path from 'path';
+import { pathAdd, writeLogs } from '../main.js';
 import Functions from './functions.js';
-import { BrowserWindow } from 'electron';
+import MachineId from './machine-id.js';
 
-const logos = require('../logos.json');
+function resolveRuntimeFile(packagedPath: string, sourcePath: string): string {
+  return fs.existsSync(packagedPath) ? packagedPath : sourcePath;
+}
+
+const logosPath = resolveRuntimeFile(path.join(__dirname, '..', 'logos.json'), path.join(process.cwd(), 'logos.json'));
+const logos = JSON.parse(fs.readFileSync(logosPath, 'utf-8'));
 
 export default class HandlerConfigFile {
-  static default_config: any = {
-    cliente: 'brendy',
-    color_app: 'red',
-    config_password: 'SW4kcDB0Z3VAcmQVMj$pt30r=',
-    direccion_empresa: 'El higuerito, frente a la escuela, La Vega Rep. Dom.',
-    logo_empresa: logos.logo_empresa,
-    logo_impresion: logos.logo_impresion,
-    nombre_empresa: 'Panaderia & Reposteria Brendy',
-    rnc_empresa: '132-35083-9',
-    telefono_empresa: '(829)-423-1678',
-    url_servidor: 'http://novac-brendy.ddns.net:9091',
-    url_servidor_descargas: 'http://novac-brendy.ddns.net:9091',
-    url_servidor_respaldo: 'http://localhost:9091',
-    usa_url_principal: false,
-    is_db_local: true,
-    calcular_itbis: false,
-    se_calcula_saco: false,
-    is_produccion: true,
-    facturacion_editar_precio: true,
-    vende_sin_inventario: true,
-    medida_producto_terminado: 'Producto',
+  private static instance: HandlerConfigFile;
+  private static initPromise: Promise<HandlerConfigFile>;
+  private _default_config: ConfigI;
 
-    printer_selected: {
-      venta_contado: 'Ninguna',
-      venta_credito: 'Ninguna',
-      pre_venta: 'Ninguna',
-      cotizacion: 'Ninguna',
-      compra: 'Ninguna',
-      recibo_ingreso: 'Ninguna',
-      conduce: 'Ninguna',
-      nota: 'Ninguna',
-      cuadre_caja: 'Ninguna',
-      reporte: 'Ninguna',
-    },
+  get default_config() {
+    return this._default_config;
+  }
 
-    pages_sizes: {
-      venta_contado: '80mm_roll',
-      venta_credito: '80mm_roll',
-      pre_venta: '80mm_roll',
-      cotizacion: '80mm_roll',
-      compra: '80mm_roll',
-      recibo_ingreso: '80mm_roll',
-      conduce: '80mm_roll',
-      nota: '80mm_roll',
-      cuadre_caja: '80mm_roll',
-      reporte: '8.5x11',
-    },
+  private constructor() {}
 
-    plantillas_impresion: {
-      nota: 'Agrupada',
-    },
+  static getInstance(machineId: MachineId): Promise<HandlerConfigFile> {
+    if (!HandlerConfigFile.initPromise) {
+      HandlerConfigFile.initPromise = HandlerConfigFile.createInstance(machineId);
+    }
+    return HandlerConfigFile.initPromise;
+  }
 
-    documentos_a_imprimir: 'nota,venta_credito,pre_venta,recibo_ingreso,conduce,cotizacion',
-  };
+  private static async createInstance(machineId: MachineId): Promise<HandlerConfigFile> {
+    if (!HandlerConfigFile.instance) {
+      HandlerConfigFile.instance = new HandlerConfigFile();
+      await HandlerConfigFile.instance.initialize(machineId);
+    }
+    return HandlerConfigFile.instance;
+  }
 
-  static checkConfigFile(win: BrowserWindow): Promise<any> {
-    return new Promise<any>(async (resolve, reject) => {
-      const config_path = await pathAdd('/app_config.config');
+  private async initialize(machineId: MachineId): Promise<void> {
+    try {
+      const config = await this.getDefaultConfig();
 
-      const existe_archivo_config = fs.existsSync(config_path);
+      this._default_config = config;
+      this._default_config.logo_empresa = logos.logo_empresa;
+      this._default_config.logo_impresion = logos.logo_impresion;
 
-      setTimeout(() => {
-        puts(existe_archivo_config, ':::::::: existe_archivo_config');
+      this._default_config.machineId = machineId.value;
+    } catch (error) {
+      writeLogs('ERROR al leer archivo de configuración por defecto:', error);
+      throw error;
+    }
+  }
 
-        if (!existe_archivo_config) {
-          Functions.setConfigFile(JSON.stringify(this.default_config))
-            .then(() => {
-              console.log(' ');
-              console.log('------ ARCHIVO DE CONFIGURACION CREADO ------ ');
-              console.log(' ');
-              puts('------ ARCHIVO DE CONFIGURACION CREADO ------');
+  getDefaultConfig() {
+    return new Promise<ConfigI>((resolve, reject) => {
+      try {
+        const configPath = resolveRuntimeFile(path.join(__dirname, 'default_config.json'), path.join(process.cwd(), 'electron', 'default_config.json'));
 
-              setTimeout(() => resolve(true), 500);
-            })
-            .catch((err) => reject(false));
+        if (fs.existsSync(configPath)) {
+          const configData = fs.readFileSync(configPath, 'utf-8');
+          resolve(JSON.parse(configData));
         } else {
-          setTimeout(() => resolve(true), 500);
+          writeLogs('ADVERTENCIA: No se encuentra el archivo de configuración por defecto.');
+          reject(new Error('No se encuentra el archivo de configuración por defecto'));
         }
-      }, 500);
+      } catch (error) {
+        writeLogs('ERROR al leer archivo de configuración por defecto:', error);
+        reject(error);
+      }
     });
   }
+
+  configFileExists(args?: { create_if_not_exists: boolean }): Promise<boolean> {
+    return new Promise<boolean>(async (resolve, reject) => {
+      const config_path = await pathAdd('/app_config.config');
+
+      const file_exists = fs.existsSync(config_path);
+
+      if (args?.create_if_not_exists && !file_exists) {
+        try {
+          await Functions.setConfigFile(JSON.stringify(this._default_config));
+          resolve(true);
+        } catch (error) {
+          reject(false);
+        }
+      }
+
+      resolve(file_exists);
+    });
+  }
+
+  // checkConfigFile(): Promise<any> {
+  //   return new Promise<any>(async (resolve, reject) => {
+  //     const existe_archivo_config = await this.configFileExists();
+
+  //     writeLogs(existe_archivo_config, ':::::::: existe_archivo_config');
+
+  //     if (!existe_archivo_config) {
+  //       Functions.setConfigFile(JSON.stringify(this.default_config))
+  //         .then(() => {
+  //           writeLogs('------ ARCHIVO DE CONFIGURACION CREADO ------');
+
+  //           setTimeout(() => resolve(true), 500);
+  //         })
+  //         .catch(err => reject(false));
+  //     } else {
+  //       setTimeout(() => resolve(true), 500);
+  //     }
+  //   });
+  // }
 }

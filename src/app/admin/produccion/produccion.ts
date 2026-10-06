@@ -1,5 +1,4 @@
-import { CrudG } from '../../core/typescript/crud-g';
-import * as _ from 'lodash';
+import { CrudG } from '@core/typescript/crud-g';
 
 export class ProduccionC extends CrudG<any> {
   constructor() {

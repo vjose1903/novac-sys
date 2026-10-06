@@ -1,121 +1,534 @@
-@import url("https://fonts.googleapis.com/css?family=Orbitron&display=swap");
-
-.cardNota {
+.rowNotas {
   display: grid;
-
   grid-template-areas:
-    "titulo"
-    "cabezaNota"
-    "cuerpoNota"
-    "pieNota";
+    "colTitulo"
+    "colCard";
+  grid-template-rows: min-content minmax(0, 1fr);
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  row-gap: 0.75rem;
 
-  grid-template-rows: min-content min-content auto min-content;
+  .colTitulo {
+    grid-area: colTitulo;
+    margin-bottom: 0 !important;
+    padding: 0 0.25rem;
 
-  .titulo {
-    grid-area: titulo;
-  }
+    .screen-module-kicker {
+      color: var(--app-text-muted);
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      margin-bottom: 0.18rem;
+      text-transform: uppercase;
+    }
 
-  .cabezaNota {
-    grid-area: cabezaNota;
-    background-color: var(--primary01);
-    // border-radius: 1rem 1rem 0rem 0rem !important;
-    border-bottom: 1px solid var(--transparente01);
-    padding: 0.6rem;
-  }
+    .screen-title-row {
+      align-items: center;
+      display: flex;
+      gap: 0.65rem;
+    }
 
-  .cuerpoNota {
-    grid-area: cuerpoNota;
+    h4 {
+      color: var(--app-text);
+      font-size: 1.65rem;
+      font-weight: 800 !important;
+      letter-spacing: 0;
+      line-height: 1.12;
+      margin: 0;
 
-    width: 100%;
-    position: relative;
-    .fantasma-cuerpo {
-      position: absolute;
-      height: 100%;
-      width: 100%;
+      span {
+        font-weight: 700;
+      }
+
+      strong {
+        font-weight: 800;
+      }
     }
   }
 
-  .pieNota {
-    grid-area: pieNota;
-    width: 100%;
+  .colCard {
+    grid-area: colCard;
+    min-height: 0;
+
+    .cardNota {
+      background: var(--app-surface) !important;
+      border: 1px solid var(--app-card-border) !important;
+      border-radius: 1rem !important;
+      box-shadow: var(--app-overlay-shadow) !important;
+      color: var(--app-text);
+      display: grid;
+      grid-template-areas:
+        "cabezaNota"
+        "cuerpoNota"
+        "pieNota";
+      grid-template-rows: min-content minmax(0, 1fr) min-content;
+      min-height: 0;
+      overflow: hidden;
+
+      .cabezaNota {
+        background: var(--primary03);
+        border-bottom: 1px solid color-mix(in srgb, var(--primary06) 34%, var(--app-card-border));
+        grid-area: cabezaNota;
+        padding: 0.8rem 0.9rem;
+
+        :host-context(html[data-theme-mode='dark']) & {
+          background: var(--primary05);
+        }
+
+        .nota-header-grid {
+          align-items: stretch;
+          display: grid;
+          gap: 0.8rem;
+          grid-template-columns: minmax(0, 1.75fr) minmax(20rem, 0.75fr);
+        }
+
+        .nota-info-panel {
+          background: var(--transparente-mode-00);
+          border-radius: 0.85rem;
+          min-height: 10rem;
+          padding: 0.7rem;
+        }
+
+        .nota-panel-heading {
+          align-items: center;
+          color: color-mix(in srgb, var(--primary10) 76%, var(--app-text));
+          display: flex;
+          font-size: 0.78rem;
+          font-weight: 800;
+          gap: 0.55rem;
+          letter-spacing: 0.05em;
+          line-height: 1;
+          margin-bottom: 0.65rem;
+          text-transform: uppercase;
+
+          :host-context(html[data-theme-mode='dark']) & {
+            color: rgba(255, 255, 255, 0.72);
+          }
+
+          div {
+            display: grid;
+            gap: 0.22rem;
+          }
+
+          strong {
+            color: var(--app-text);
+            font-size: 0.95rem;
+            letter-spacing: 0;
+            text-transform: none;
+          }
+        }
+
+        .nota-panel-icon,
+        .nota-metric-icon {
+          align-items: center;
+          background: color-mix(in srgb, var(--primary06) 22%, var(--app-surface));
+          border-radius: 0.55rem;
+          color: color-mix(in srgb, var(--primary10) 82%, var(--app-text));
+          display: inline-flex;
+          flex: 0 0 1.75rem;
+          height: 1.75rem;
+          justify-content: center;
+          width: 1.75rem;
+
+          :host-context(html[data-theme-mode='dark']) & {
+            background: color-mix(in srgb, var(--primary06) 18%, var(--app-surface));
+            color: #86efac;
+          }
+        }
+
+        .nota-applied-content {
+          display: grid;
+          gap: 0.7rem;
+          grid-template-columns: minmax(16rem, 1fr) minmax(18rem, 1.05fr);
+        }
+
+        .nota-owner-card {
+          align-content: start;
+          background: var(--transparente-mode-00);
+          border-radius: 0.75rem;
+          display: grid;
+          gap: 0.55rem;
+          min-height: 100%;
+          padding: 0.65rem;
+        }
+
+        .nota-owner-row {
+          display: grid;
+          gap: 0.18rem;
+
+          span {
+            color: color-mix(in srgb, var(--primary10) 64%, var(--app-text-muted));
+            font-size: 0.78rem;
+            font-weight: 800;
+            line-height: 1;
+
+            :host-context(html[data-theme-mode='dark']) & {
+              color: rgba(255, 255, 255, 0.62);
+            }
+          }
+
+          strong {
+            color: var(--app-text);
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.25;
+          }
+        }
+
+        .nota-metrics-grid {
+          display: grid;
+          gap: 0.55rem;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .nota-metric-card,
+        .nota-selection-card,
+        .nota-date-card {
+          background: var(--transparente-mode-00);
+          border-radius: 0.75rem;
+          color: var(--app-text);
+        }
+
+        .nota-metric-card {
+          align-items: center;
+          column-gap: 0.55rem;
+          display: grid;
+          grid-template-areas:
+            "icon label"
+            "icon value";
+          grid-template-columns: min-content minmax(0, 1fr);
+          min-height: 3.25rem;
+          padding: 0.45rem 0.55rem;
+
+          .nota-metric-icon {
+            grid-area: icon;
+          }
+
+          span:not(.nota-metric-icon) {
+            color: color-mix(in srgb, var(--primary10) 64%, var(--app-text-muted));
+            font-size: 0.72rem;
+            font-weight: 800;
+            grid-area: label;
+            line-height: 1;
+
+            :host-context(html[data-theme-mode='dark']) & {
+              color: rgba(255, 255, 255, 0.62);
+            }
+          }
+
+          strong {
+            color: var(--app-text);
+            font-size: 0.9rem;
+            font-weight: 800;
+            grid-area: value;
+            line-height: 1.1;
+          }
+
+          &.total {
+            background: var(--transparente-mode-00);
+          }
+        }
+
+        .nota-total-panel {
+          display: grid;
+          gap: 0.65rem;
+          grid-template-rows: min-content minmax(0, 1fr);
+
+          .nota-date-card {
+            align-items: center;
+            display: flex;
+            gap: 0.5rem;
+            min-height: 2.65rem;
+            padding: 0.45rem 0.55rem;
+
+            span:not(.nota-panel-icon) {
+              font-weight: 700;
+
+              :host-context(html[data-theme-mode='dark']) & {
+                color: rgba(255, 255, 255, 0.86);
+              }
+            }
+          }
+
+          .cuadroTotal {
+            align-items: center;
+            align-self: center;
+            background: linear-gradient(135deg, color-mix(in srgb, var(--primary10) 88%, #022c22), color-mix(in srgb, var(--primary10) 70%, #020617)), var(--primary10);
+            border: 1px solid color-mix(in srgb, var(--primary08) 30%, transparent);
+            border-radius: 0.75rem;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+            color: white;
+            display: grid;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.1rem;
+            gap: 0.15rem;
+            min-height: 5.15rem;
+            padding: 0.65rem 0.75rem;
+            width: 100%;
+
+            .nota-total-label {
+              color: color-mix(in srgb, white 72%, var(--primary01));
+              font-family: 'Poppins', sans-serif;
+              font-size: 0.72rem;
+              font-weight: 800;
+              letter-spacing: 0.12em;
+              line-height: 1;
+              text-transform: uppercase;
+            }
+          }
+
+          .nota-selection-card {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+            min-height: 2.65rem;
+            padding: 0.45rem 0.65rem;
+
+            span {
+              color: color-mix(in srgb, var(--primary10) 64%, var(--app-text-muted));
+              font-size: 0.78rem;
+              font-weight: 800;
+            }
+
+            strong {
+              color: var(--app-text);
+              font-size: 1rem;
+              font-weight: 800;
+            }
+          }
+        }
+      }
+
+      .cuerpoNota {
+        background: var(--app-surface);
+        grid-area: cuerpoNota;
+        min-height: 0;
+        position: relative;
+        width: 100%;
+
+        .fantasma-cuerpo {
+          height: 100%;
+          position: absolute;
+          width: 100%;
+        }
+
+        ::ng-deep dinamic-table .divTable {
+          box-shadow: none !important;
+        }
+      }
+
+      .pieNota {
+        background: var(--app-surface-soft);
+        border-top: 1px solid var(--app-card-border);
+        grid-area: pieNota;
+        width: 100%;
+
+        .nota-footer-layout {
+          display: grid;
+          gap: 0.5rem 1rem;
+          grid-template-areas:
+            "summary totals"
+            "actions totals";
+          grid-template-columns: minmax(0, 1fr) minmax(16rem, 22%);
+          grid-template-rows: min-content minmax(0, 1fr);
+          min-height: 9.25rem;
+          overflow: visible;
+          padding: 0.85rem 1rem 0.6rem;
+          width: 100%;
+        }
+
+        .nota-footer-summary {
+          align-items: center;
+          display: flex;
+          grid-area: summary;
+          justify-content: flex-start;
+
+          .titulos {
+            align-items: center;
+            background: color-mix(in srgb, var(--primary06) 12%, var(--app-surface));
+            border: 1px solid color-mix(in srgb, var(--primary08) 34%, var(--app-card-border));
+            border-radius: 0.75rem;
+            color: var(--app-text);
+            display: inline-flex;
+            gap: 0.5rem;
+            min-height: 2.35rem;
+            padding: 0.2rem 0.5rem;
+
+            i {
+              color: var(--primary08);
+            }
+
+            span {
+              font-weight: 400;
+            }
+
+            strong {
+              font-weight: 800;
+            }
+          }
+        }
+
+        .nota-footer-actions {
+          align-items: center;
+          display: flex;
+          gap: 2.5rem;
+          grid-area: actions;
+          justify-content: flex-start;
+          min-height: 6rem;
+          overflow: visible;
+          padding-left: 2rem;
+
+          > div {
+            display: block;
+            flex: 0 0 6.35rem;
+            height: 6.35rem;
+            overflow: visible;
+            position: relative;
+            width: 6.35rem;
+          }
+
+          app-btncircular {
+            display: block;
+            height: 6.35rem;
+            position: relative;
+            width: 6.35rem;
+          }
+
+          ::ng-deep {
+            .contenedor {
+              height: 6.35rem;
+              overflow: visible;
+              position: relative;
+            }
+
+            .imgBtn {
+              left: 50%;
+              transform: translateX(-50%);
+            }
+
+            .labelBtn {
+              color: var(--app-text);
+              font-size: 0.82rem;
+              left: 50%;
+              opacity: 0;
+              pointer-events: none;
+              position: absolute;
+              top: 5.35rem;
+              transform: translateX(-50%) translateY(0.35rem) scale(0.96);
+              transition:
+                opacity 180ms cubic-bezier(0.23, 1, 0.32, 1),
+                transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+              white-space: nowrap;
+              width: max-content;
+            }
+          }
+
+          @media (hover: hover) and (pointer: fine) {
+            ::ng-deep {
+              .imgBtn.active {
+                transition:
+                  filter 160ms ease,
+                  transform 160ms ease;
+
+                &:hover {
+                  transform: translateX(-50%) translateY(-0.2rem) scale(1.03);
+                }
+              }
+
+              .imgBtn:hover ~ .labelBtn {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+              }
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            ::ng-deep {
+              .imgBtn.active,
+              .imgBtn.active:hover,
+              .labelBtn,
+              .imgBtn:hover ~ .labelBtn {
+                transform: translateX(-50%);
+                transition: opacity 180ms ease;
+              }
+
+              .imgBtn:hover ~ .labelBtn {
+                opacity: 1;
+              }
+            }
+          }
+        }
+
+        .nota-footer-totals {
+          align-items: center;
+          display: flex;
+          grid-area: totals;
+          min-width: 0;
+
+          .mostrarNumeros {
+            display: flex;
+            justify-content: flex-end;
+            margin-right: 0;
+            width: 100%;
+
+            .cuadroResumenTotal {
+              align-items: center;
+              background: color-mix(in srgb, var(--primary06) 14%, var(--app-surface));
+              border: 1px solid color-mix(in srgb, var(--primary08) 26%, var(--app-card-border));
+              border-radius: 0.65rem;
+              color: var(--app-text);
+              display: grid;
+              gap: 0.25rem;
+              min-height: 3.1rem;
+              padding: 0.42rem 0.55rem;
+              width: 100%;
+
+              > .label {
+                color: color-mix(in srgb, var(--primary08) 72%, var(--app-text));
+                font-size: 0.8rem;
+                font-weight: 700;
+                line-height: 1;
+              }
+
+              h5 {
+                color: #15803d;
+                font-variant-numeric: tabular-nums;
+                font-weight: 800;
+                line-height: 1;
+                text-align: right;
+
+                :host-context(html[data-theme-mode='dark']) & {
+                  color: #86efac;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
-.divRight {
-  border-right: 1px solid var(--transparente01);
-}
-.infoFactuApli {
-  text-decoration: underline;
-  font-weight: 500;
-  text-transform: uppercase;
-}
-.cuadroTotal {
-  display: -webkit-box;
-  display: flex;
-  padding: 0.5rem;
-  -webkit-box-align: center;
-  align-items: center;
-  margin: auto;
-  height: 5rem;
-  width: 100%;
-  background-color: var(--primary10);
-  border-radius: 0.5rem;
-  font-family: "Orbitron", sans-serif;
-  font-size: 2rem;
-  color: white;
-  margin: 3rem 3rem 0rem auto !important;
-}
+@media (max-width: 1200px) {
+  .rowNotas {
+    .colCard .cardNota {
+      .cabezaNota {
+        .nota-header-grid,
+        .nota-applied-content {
+          grid-template-columns: 1fr;
+        }
+      }
 
-.encabezadoRight {
-  position: absolute;
-  right: 4rem;
-}
-
-.cuadroResumenTotal {
-  background-color: var(--transparente05);
-  display: flex;
-  position: relative;
-  color: black;
-  border-radius: 0.5rem;
-  padding: 0.4rem 0.5rem;
-  > .label {
-    font-size: 0.8rem;
-    font-weight: 500;
+      .pieNota .nota-footer-layout {
+        grid-template-areas:
+          "summary"
+          "actions"
+          "totals";
+        grid-template-columns: 1fr;
+      }
+    }
   }
-}
-
-.mostrarNumeros {
-  margin-right: 2rem;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-
-  > .cuadroResumenTotal {
-    margin-right: 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-}
-
-.fecha {
-  top: 0.2rem;
-  font-size: 1rem;
-}
-
-.numerosCalculos {
-  justify-content: flex-end;
-}
-
-::ng-deep .anularPadding {
-  & .p-tabview-panels {
-    padding: 0 !important;
-  }
-}
-
-::ng-deep .notaVaciaStyle {
-  background: #efc2c2 !important;
 }

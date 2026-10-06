@@ -1,114 +1,90 @@
 import { Injectable } from '@angular/core';
-import { ipcRenderer, webFrame } from 'electron';
-import * as childProcess from 'child_process';
-import { BehaviorSubject, lastValueFrom, skip, take } from 'rxjs';
-import * as fs from 'fs';
-import { KEYWORD_ELECTRON_RESPONSE, KEYWORD_ELECTRON_SENDER, MessageTaskInterface } from '../../../../electron/shared-electron-angular';
-import { MessageTask } from '../models/message-task';
-import { ELECTRON_EVENTS_OBSERVER } from '../typescript/GLOBAL';
+
+import { ElectronAppService } from './electron/electron-app.service';
+import { ElectronBrowserService } from './electron/electron-browser.service';
+import { ElectronBridgeService } from './electron/electron-bridge.service';
+import { ElectronDocumentsService } from './electron/electron-documents.service';
+import { ElectronUpdateService } from './electron/electron-update.service';
+import { ElectronWindowService } from './electron/electron-window.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class IpcService {
-  private _ipc: typeof ipcRenderer;
-  webFrame: typeof webFrame;
-
-  childProcess: typeof childProcess;
-  fs: typeof fs;
-
-  objPercent = {
-    transferred: 0,
-    total: 0,
-    percent: 0,
-    bytesPerSecond: 0,
-  };
-
-  colaDeMensajes = new BehaviorSubject<any>({});
+  constructor(
+    public readonly bridge: ElectronBridgeService,
+    public readonly app: ElectronAppService,
+    public readonly browser: ElectronBrowserService,
+    public readonly documents: ElectronDocumentsService,
+    public readonly update: ElectronUpdateService,
+    public readonly window: ElectronWindowService
+  ) {}
 
   get isElectron(): boolean {
-    return !!(window && window.process && window.process.type);
+    return this.bridge.isElectron;
   }
 
-  constructor() {
-    // Conditional imports
-    if (this.isElectron) {
-      try {
-        this._ipc = window.require('electron').ipcRenderer;
-        this.webFrame = window.require('electron').webFrame;
-
-        this.childProcess = window.require('child_process');
-        this.fs = window.require('fs');
-        this.listenEvents();
-      } catch (error) {
-        console.error('Electron no se pudo iniciar correctamente');
-      }
-    }
+  get closeRequested$() {
+    return this.window.closeRequested$;
   }
 
-  require(module: string) {
-    return window['require'](module).ipcRenderer;
+  get updateState$() {
+    return this.update.state$;
   }
 
-  public removeListener(channel: string): void {
-    if (!this._ipc) return;
-    this._ipc.removeAllListeners(channel);
+  get updateState() {
+    return this.update.currentState;
   }
 
-  public on(channel: string, listener: any): void {
-    if (!this._ipc) return;
-    this._ipc.on(channel, listener);
+  getAppConfig() {
+    return this.app.getAppConfig();
   }
 
-  listenEvents() {
-    this._ipc.on(KEYWORD_ELECTRON_RESPONSE, (event, obj) => {
-      const arg = typeof obj === 'object' ? (obj as MessageTaskInterface) : (JSON.parse(obj) as MessageTaskInterface);
-      const tareas = this.colaDeMensajes.value;
-
-      if (tareas.hasOwnProperty(arg.id)) {
-        (tareas[arg.id] as MessageTask).fn.next(arg.response);
-        tareas[arg.id] = undefined;
-        this.updateColaMensaje(tareas);
-      } else {
-        ELECTRON_EVENTS_OBSERVER.next(obj);
-      }
-    });
+  setAppConfig(config: any) {
+    return this.app.setAppConfig(config);
   }
 
-  sendTask(task: MessageTask) {
-    return new Promise(async (resolve, reject) => {
-      if (this.isElectron) {
-        this.addColaMensaje(task);
-        this.trigger(task.serialize());
-
-        try {
-          const resultado = await lastValueFrom(task.fn.pipe(skip(1), take(1)));
-
-          resolve(resultado);
-        } catch (error) {
-          reject(error);
-        }
-      } else {
-        reject({ error: true });
-      }
-    });
+  setLocalAppConfig(config: any) {
+    return this.app.setLocalAppConfig(config);
   }
 
-  private trigger(arg: any) {
-    if (this.isElectron) {
-      this._ipc.send(KEYWORD_ELECTRON_SENDER, arg);
-    }
+  reloadApp() {
+    return this.app.reloadApp();
   }
 
-  private updateColaMensaje(lis) {
-    if (this.isElectron) this.colaDeMensajes.next(lis);
+  focusWindow() {
+    return this.window.focusWindow();
   }
 
-  private addColaMensaje(task: MessageTask) {
-    if (this.isElectron) {
-      const lis = this.colaDeMensajes.getValue();
-      lis[task.id] = task;
-      this.colaDeMensajes.next(lis);
-    }
+  confirmClose() {
+    return this.window.confirmClose();
+  }
+
+  printBase64(payload: { base64: string; file: string; type: string; printer: string; pageOrientation: string }) {
+    return this.documents.printBase64(payload);
+  }
+
+  exportCsv(payload: { fileName: string; excelData: Array<string[]>; configuration: any }) {
+    return this.documents.exportCsv(payload);
+  }
+
+  openExternal(url: string) {
+    return this.browser.openExternal(url);
+  }
+
+  checkForUpdates() {
+    return this.update.checkForUpdates('manual');
+  }
+
+  downloadUpdate() {
+    return this.update.downloadUpdate();
+  }
+
+  simulateUpdateDownload() {
+    this.update.simulateDownload();
+  }
+
+  refreshUpdateState() {
+    return this.update.refreshState();
   }
 }

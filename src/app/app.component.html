@@ -1,31 +1,77 @@
-<div *ngIf="!configReady" class="h-100 w-100 splash-container">
-  <h2 class="msg">Cargando archivo de configuración</h2>
-  <img class="logo" src="assets/img/logo_splash.png" />
-  <img class="rayas" src="assets/img/splash_screen_rayas.png" />
-  <img class="inspot" src="assets/img/inspot_splash.png" />
-</div>
-
-<div id="fondoC" *ngIf="loading && configReady" [ngClass]="{ fadeIn: loading, fadeOut: !loading }" class="h-100 w-100 position-absolute backnegro">
-  <img class="img-fluid logoLoading rubberBand" [src]="imgLogo" alt="" />
-  <span class="text"> CARGANDO ... </span>
-</div>
-
-<ng-container *ngIf="configReady">
-  <router-outlet></router-outlet>
-</ng-container>
-
-<p-dialog [closable]="false" [closeOnEscape]="false" header="Porcentaje de descarga" [(visible)]="visible" [modal]="true" [style]="{ width: '50vw' }" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
-  <div class="d-flex justify-content-between mb-2 position-relative">
-    <span class="negrita">Descargando actualizacion...</span>
-    <div class="mr-2">
-      <span class="negrita">{{ objPercent?.transferred }} Mb / </span>
-      <span class="negrita gris">{{ objPercent?.total }} Mb</span>
-    </div>
+@if (!isReady()) {
+  <div class="h-100 w-100 splash-container">
+    <h2 class="msg">Cargando archivo de configuración</h2>
+    <img class="logo" src="assets/img/logo_splash.png" />
+    <img class="rayas" src="assets/img/splash_screen_rayas.png" />
+    <img class="inspot" src="assets/img/inspot_splash.png" />
   </div>
-  <p-progressBar [value]="objPercent?.percent"></p-progressBar>
-  <div class="mr-2">
-    <span> </span>
+}
+
+@if (isReady()) {
+  @if (loading()) {
+    <div id="fondoC" [ngClass]="{ fadeIn: loading(), fadeOut: !loading() }" class="h-100 w-100 position-absolute backnegro">
+      <img class="img-fluid logoLoading rubberBand" [src]="imgLogo()" alt="" />
+      <span class="text"> CARGANDO ... </span>
+    </div>
+  }
+
+  <router-outlet></router-outlet>
+}
+
+<p-dialog
+  [closable]="updateUi.isDevelopment"
+  [closeOnEscape]="updateUi.isDevelopment"
+  header="DESCARGANDO ACTUALIZACIÓN"
+  [visible]="updateUi.visible()"
+  (visibleChange)="updateUi.setVisible($event)"
+  styleClass="update-download-dialog"
+  [modal]="true"
+  [style]="{ width: '40rem', maxWidth: '90vw' }"
+  [baseZIndex]="10000"
+  [draggable]="false"
+  [resizable]="false">
+  @if (updateUi.progress()) {
+    <div class="p-3 bg-body-tertiary rounded-3">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle bg-primary-subtle text-primary" style="width: 3rem; height: 3rem">
+          <i class="pi pi-download" aria-hidden="true"></i>
+        </div>
+        <div class="flex-grow-1">
+          <h5 class="mb-1 text-secondary">Descargando actualización</h5>
+          <p class="mb-0 text-body-secondary">Mantén la aplicación abierta mientras se completa la descarga.</p>
+        </div>
+        <span class="update-download-percent px-3 py-1 rounded-pill bg-primary-subtle text-primary border border-primary-subtle">
+          {{ updateUi.progress()?.percent }}%
+        </span>
+      </div>
+
+      <p-progressBar styleClass="update-download-progress" valueStyleClass="update-download-progress-value" [showValue]="false" [value]="updateUi.progress()?.percent"></p-progressBar>
+
+      <div class="d-flex justify-content-between mt-2 text-body-secondary" style="font-size: 0.85rem">
+        <span>{{ updateUi.progress()?.transferred }} MB descargados</span>
+        <span>{{ updateUi.progress()?.total }} MB en total</span>
+      </div>
+    </div>
+  } @else {
+    <div class="d-flex align-items-center gap-3 p-4 bg-body-tertiary rounded-3">
+      <div class="d-flex align-items-center justify-content-center flex-shrink-0 rounded-circle bg-primary-subtle text-primary" style="width: 3rem; height: 3rem">
+        <i class="pi pi-spinner pi-spin" aria-hidden="true"></i>
+      </div>
+      <div>
+        <h5 class="mb-1 text-secondary">Preparando descarga</h5>
+        <p class="mb-0 text-body-secondary">Estamos preparando los archivos de la actualización. Esto puede tardar unos segundos.</p>
+      </div>
+    </div>
+  }
+
+  <div class="update-download-note mt-3">
+    <strong class="d-block mb-1 text-danger">NOTA</strong>
+    <p class="mb-0 text-body-secondary">
+      Al finalizar la descarga, Novac System se cerrará para instalar la nueva versión. No abras la aplicación manualmente; se iniciará automáticamente cuando finalice la instalación.
+    </p>
   </div>
 </p-dialog>
 
-<app-new-modal></app-new-modal>
+<dynamic-modal></dynamic-modal>
+
+<button class="d-none position-absolute" (click)="enfocarApp()"></button>

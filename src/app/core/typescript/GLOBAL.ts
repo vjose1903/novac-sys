@@ -1,9 +1,4 @@
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
-import * as _ from 'lodash';
-import { Ss } from '../services/singleton.service';
-
-export const MODIFIED_CONFIG_FILE = new BehaviorSubject<any>(null);
-export const ELECTRON_EVENTS_OBSERVER = new BehaviorSubject<any>(null);
 
 export function applyMixins(derivedCtor: any, constructors: any[]) {
   constructors.forEach((baseCtor) => {

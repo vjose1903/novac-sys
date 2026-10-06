@@ -1,0 +1,83 @@
+.p-dialog-mask.p-overlay-mask {
+  z-index: 9999 !important;
+}
+
+.p-dialog {
+  border: 0px solid transparent !important;
+  border-radius: 0.5rem !important;
+  overflow: hidden !important;
+  background: var(--app-surface) !important;
+  color: var(--app-text) !important;
+  box-shadow: var(--app-overlay-shadow) !important;
+
+  .p-dialog-header {
+    background-color: var(--primary02) !important;
+    padding: 0.5rem 1rem !important;
+    z-index: 100001 !important;
+    text-transform: uppercase;
+
+    h4 {
+      font-size: 1.2rem !important;
+    }
+
+    .p-dialog-header-actions {
+      .p-dialog-close-button {
+        color: var(--app-modal-close-text) !important;
+
+        &:hover {
+          background: #0000002e !important;
+          color: var(--app-text) !important;
+        }
+      }
+    }
+  }
+
+  .p-dialog-content {
+    // padding: 1rem !important;
+    // height: inherit !important;
+    // overflow: hidden;
+    background: var(--app-surface) !important;
+    color: var(--app-text) !important;
+  }
+
+  .p-dialog-footer {
+    background: var(--app-surface) !important;
+    color: var(--app-text) !important;
+    padding: 0.7rem !important;
+  }
+
+  .find-casual-customer {
+    color: var(--app-text);
+
+    .persona-result {
+      background: var(--app-surface-soft) !important;
+      border-color: var(--app-border) !important;
+      color: var(--app-text) !important;
+
+      .label,
+      strong {
+        color: var(--app-text) !important;
+      }
+    }
+
+    .source-tag {
+      background: var(--app-surface-muted) !important;
+      color: var(--app-text) !important;
+    }
+
+    .consulta-status {
+      background: var(--app-surface-muted) !important;
+      color: var(--app-text) !important;
+    }
+  }
+}
+
+.overlay {
+  z-index: 999999999 !important;
+  background-color: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}

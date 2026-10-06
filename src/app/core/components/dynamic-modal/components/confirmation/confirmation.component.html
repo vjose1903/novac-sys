@@ -1,0 +1,15 @@
+<div class="confirmation-content" [class.has-reason-input]="showReasonInput">
+  <div class="confirmation-icon-shell" [class.default-icon]="!iconName">
+    <i class="{{ iconName || 'fa-solid fa-circle-question' }}" [ngStyle]="{ 'font-size': iconSize, color: iconColor }"></i>
+  </div>
+
+  <div class="confirmation-copy">
+    <p [innerHTML]="html"></p>
+  </div>
+
+  @if (showReasonInput) {
+    <div class="confirmation-reason">
+      <textarea class="form-control" placeholder="Ingresar motivo..." id="floatingTextarea" [(ngModel)]="reason" (ngModelChange)="validateDeleteBtnState()"></textarea>
+    </div>
+  }
+</div>

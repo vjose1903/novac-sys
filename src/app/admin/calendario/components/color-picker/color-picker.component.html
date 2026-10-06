@@ -1,0 +1,16 @@
+<div class="color-picker" [class.open]="open">
+  <button class="color-trigger" type="button" (click)="open = !open">
+    <span class="color-dot" [style.background]="previewColor"></span>
+    <i class="fas fa-chevron-down"></i>
+  </button>
+
+  <div class="color-menu" *ngIf="open">
+    <div class="color-grid">
+      <button *ngFor="let color of colors" type="button" class="swatch" [style.background]="color" (click)="selectColor(color)" [attr.aria-label]="color"></button>
+    </div>
+    <button type="button" class="default-color" (click)="selectColor(null)">
+      <i class="fas fa-check-circle"></i>
+      <span>Predeterminada</span>
+    </button>
+  </div>
+</div>

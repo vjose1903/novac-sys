@@ -1,0 +1,74 @@
+.calendar-legend {
+  background: var(--app-surface);
+  border: 1px solid var(--app-card-border);
+  border-radius: 1rem;
+  box-shadow: var(--app-overlay-shadow);
+  padding: 0.9rem;
+
+  .legend-header {
+    align-items: center;
+    border-bottom: 1px solid var(--app-card-border);
+    display: flex;
+    gap: 0.65rem;
+    margin: -0.05rem 0 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .legend-icon {
+    align-items: center;
+    background: color-mix(in srgb, var(--primary06) 20%, var(--app-surface));
+    border-radius: 0.7rem;
+    color: var(--primary08);
+    display: inline-flex;
+    flex: 0 0 2.1rem;
+    height: 2.1rem;
+    justify-content: center;
+    width: 2.1rem;
+  }
+
+  h6 {
+    color: var(--app-text);
+    font-size: 0.95rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .legend-header span:not(.legend-icon) {
+    color: var(--app-text-muted);
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-top: 0.12rem;
+  }
+
+  ul {
+    display: grid;
+    gap: 0.45rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    align-items: center;
+    background: color-mix(in srgb, var(--app-surface-soft) 86%, var(--app-surface));
+    border: 1px solid color-mix(in srgb, var(--app-card-border) 70%, transparent);
+    border-radius: 0.65rem;
+    color: var(--app-text);
+    display: flex;
+    font-size: 0.78rem;
+    font-weight: 700;
+    gap: 0.55rem;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.55rem;
+  }
+}
+
+.legend-dot {
+  flex: 0 0 auto;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, currentColor 12%, transparent);
+  height: 0.65rem;
+  width: 0.65rem;
+}

@@ -16,8 +16,8 @@
     "**/*.d.ts"
   ],
   "exclude": [
-    "dist",
-    "release",
-    "node_modules"
+    "../dist",
+    "../release",
+    "../node_modules"
   ]
 }

@@ -1,0 +1,106 @@
+.cuadre-section {
+  background: var(--app-surface);
+  border: 1px solid var(--app-card-border);
+  border-radius: 0.75rem;
+  padding: 0.85rem;
+}
+
+.cuadre-section-header,
+.cuadre-section-total {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.cuadre-section-header h5 {
+  color: var(--app-text);
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.cuadre-grid {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: minmax(6rem, 0.9fr) minmax(7rem, 1.3fr) minmax(6rem, 1fr) minmax(5.5rem, 1fr) 2.25rem;
+  margin-top: 0.75rem;
+}
+
+.cuadre-grid > * {
+  min-width: 0;
+}
+
+.cuadre-grid strong {
+  color: var(--app-text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.cuadre-icon-btn {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.cuadre-remove-btn {
+  background: transparent;
+  border-color: transparent;
+  color: #dc3545;
+}
+
+.cuadre-remove-btn:hover:not(:disabled) {
+  background: rgba(220, 53, 69, 0.14);
+  border-color: transparent;
+  color: #dc3545;
+}
+
+.cuadre-empty {
+  color: var(--app-text-muted);
+  grid-column: 1 / -1;
+  padding: 0.45rem 0;
+}
+
+.cuadre-section-total {
+  border-top: 1px solid var(--app-border);
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+:host ::ng-deep {
+  .cuadre-method-select,
+  .cuadre-method-select.p-select {
+    width: 100%;
+  }
+
+  .cuadre-method-select.p-select {
+    align-items: center;
+    display: flex;
+    height: calc(1.5em + 0.5rem + 2px) !important;
+    min-height: calc(1.5em + 0.5rem + 2px) !important;
+    padding: 0 !important;
+  }
+
+  .cuadre-method-select .p-select-label,
+  .cuadre-method-select .p-select-dropdown {
+    align-items: center;
+    color: var(--app-text);
+    display: flex;
+  }
+
+  .cuadre-method-select .p-select-label {
+    height: 100%;
+    line-height: 1.5;
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  .cuadre-method-select .p-select-dropdown {
+    width: 1.8rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .cuadre-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,28 @@
+<div class="position-relative w-100 h-100">
+  @if (show_estado && !estado_documento) {
+    <div class="canceladaContent">
+      <span class="canceladaInfo">
+        <span class="canceladaTitle"> {{ documento | uppercase }} ANULADA </span>
+
+        @if (fun.hasValue(ncf_referenced) && factura?.is_ncf_modificado) {
+          <span class="canceladaDescription"> Reemplazado por: {{ ncf_referenced }} </span>
+        }
+      </span>
+    </div>
+  }
+  @if (readyToRender && base64) {
+    <ngx-extended-pdf-viewer
+      [base64Src]="base64"
+      [filenameForDownload]="fileName"
+      [theme]="themeService.getMode()"
+      [showDownloadButton]="viewerOptions?.showDownloadButton || false"
+      [showOpenFileButton]="viewerOptions?.showOpenFileButton || false"
+      [showSecondaryToolbarButton]="viewerOptions?.showSecondaryToolbarButton || false"
+      [showZoomButtons]="viewerOptions?.showZoomButtons || true"
+      [showRotateButton]="viewerOptions?.showRotateButton || false"
+      [enablePrint]="viewerOptions?.enablePrint || false"
+      [textLayer]="viewerOptions?.textLayer || false"
+      [showTextEditor]="false"
+      [showDrawEditor]="false"></ngx-extended-pdf-viewer>
+  }
+</div>

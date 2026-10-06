@@ -8,9 +8,14 @@
   border-radius: 12px;
 }
 
-.SCROLLFORMULA {
+.scroll-formula-titles {
+  padding: 0 0.9rem 0 0.3rem !important;
+}
+
+.scroll-formula-content {
   max-height: 14rem !important;
   overflow: hidden auto;
+  padding: 0.2rem;
 }
 
 .raya {
@@ -32,7 +37,7 @@
     line-height: 2em;
   }
   input + label:before {
-    content: "";
+    content: '';
     position: absolute;
     display: block;
     left: 0;
@@ -46,7 +51,7 @@
     transition: all 0.3s;
   }
   input + label:after {
-    content: "";
+    content: '';
     position: absolute;
     display: block;
     left: 0px;
@@ -72,11 +77,53 @@
 
 .btns-formula {
   justify-content: center;
-  column-gap: 0.3rem;
+  column-gap: 0.2rem;
   display: flex;
   align-items: center;
   height: 100%;
   width: 100%;
+}
+
+.contenido-medida-row {
+  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.45fr) minmax(0, 1.35fr);
+  column-gap: 0.75rem;
+
+  > .w-100 {
+    grid-column: 1 / -1;
+  }
+
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  .control-label {
+    white-space: nowrap;
+  }
+
+  .contenido-cantidad-col {
+    max-width: none;
+    width: 100%;
+  }
+
+  .contenido-select-col {
+    max-width: none;
+    min-width: 0;
+    padding-inline: 0 !important;
+    width: 100%;
+  }
+
+  .contenido-precio-col {
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+
+    .control-label {
+      display: inline-flex;
+      margin-right: 0.35rem;
+    }
+  }
 }
 
 /* ============================================== */
@@ -84,21 +131,21 @@
 /* ============================================== */
 
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch {
+  &input[type='checkbox'].ios8-switch {
     position: absolute;
     margin: 8px 0 0 16px;
   }
 }
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch + label {
+  &input[type='checkbox'].ios8-switch + label {
     position: relative;
     padding: 5px 0 0 50px;
     line-height: 2em;
   }
 }
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch + label:before {
-    content: "";
+  &input[type='checkbox'].ios8-switch + label:before {
+    content: '';
     position: absolute;
     display: block;
     left: 0;
@@ -113,8 +160,8 @@ mdb-checkbox .form-check {
   }
 }
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch + label:after {
-    content: "";
+  &input[type='checkbox'].ios8-switch + label:after {
+    content: '';
     position: absolute;
     display: block;
     left: 0px;
@@ -129,17 +176,17 @@ mdb-checkbox .form-check {
   }
 }
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch + label:hover:after {
+  &input[type='checkbox'].ios8-switch + label:hover:after {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   }
 }
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch:checked + label:after {
+  &input[type='checkbox'].ios8-switch:checked + label:after {
     margin-left: 16px;
   }
 }
 mdb-checkbox .form-check {
-  &input[type="checkbox"].ios8-switch:checked + label:before {
+  &input[type='checkbox'].ios8-switch:checked + label:before {
     background: var(--primary07);
   }
 }

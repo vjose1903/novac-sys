@@ -9,6 +9,7 @@ const routes: Routes = [
   { path: 'empleados', loadChildren: () => import('./registro-empleados/registro-empleados.module').then((m) => m.RegistroEmpleadosModule) },
   { path: 'camiones', loadChildren: () => import('./registro-vehiculo/registro-vehiculo.module').then((m) => m.RegistroVehiculoModule) },
   { path: 'roles', loadChildren: () => import('./roles/roles.module').then((m) => m.RolesModule) },
+  { path: 'divisa', loadChildren: () => import('./divisa/divisa.module').then((m) => m.DivisaModule) },
 ];
 
 @NgModule({

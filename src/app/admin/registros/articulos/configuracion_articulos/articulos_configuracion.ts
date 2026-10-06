@@ -1,4 +1,4 @@
-import { CrudG } from './../../../../core/typescript/crud-g';
+import { CrudG } from '@core/typescript/crud-g';
 
 export interface ConfigArticuloI {
   id?: number;
@@ -9,5 +9,8 @@ export class ConfigArticuloC extends CrudG<any> {
   constructor() {
     super('config_articulos');
   }
-}
 
+  getWinPercentCalc(configArticulo: ConfigArticuloI) {
+    return (100 - configArticulo.porciento_ganancia) / 100;
+  }
+}

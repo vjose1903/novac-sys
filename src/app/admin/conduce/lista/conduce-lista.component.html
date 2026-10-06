@@ -1,9 +1,12 @@
 <div class="mainConduce">
-  <div class="mb-2 titulo">
-    <h3 class="negrita">Conduces de mercancías</h3>
-  </div>
-  <div *ngxPermissionsOnly="permissions.conduce.create" class="mb-3 botonNuevo">
-    <button class="btn btn-verde" (click)="navegar()">Nuevo conduce <i class="fa-solid fa-dolly"></i></button>
+  <div class="titulo">
+    <div class="screen-title-block">
+      <span class="screen-module-kicker">Operaciones</span>
+      <h3 class="negrita">Conduces de mercancías</h3>
+      <div *ngxPermissionsOnly="permissions.conduce.create" class="botonNuevo">
+        <button class="btn btn-verde" (click)="navegar()">Nuevo conduce <i class="fa-solid fa-dolly"></i></button>
+      </div>
+    </div>
   </div>
   <div class="divTabla">
     <div #cardTabla id="cardTabla" class="card cardListados">

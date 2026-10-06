@@ -1,0 +1,53 @@
+.imgDivisa {
+  width: 10rem;
+}
+
+.tasa-cambio-modal {
+  color: var(--app-text);
+
+  h5,
+  .control-label {
+    color: var(--app-text);
+  }
+
+  .tasa-actual-tag {
+    background: var(--app-input-disabled-bg) !important;
+    box-shadow: var(--app-overlay-shadow) !important;
+    color: var(--app-text-muted) !important;
+    padding-left: 1rem;
+  }
+
+  .tasa-actual-value {
+    color: var(--app-text-muted) !important;
+  }
+
+  .card {
+    background: var(--app-surface) !important;
+    border: 1px solid var(--app-card-border) !important;
+    color: var(--app-text);
+  }
+
+  .card-header {
+    background: var(--primary01) !important;
+    border-bottom-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+  }
+
+  .divContainerHistorial {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+    padding: 0;
+  }
+}
+
+.divContainerHistorial {
+  height: 25rem;
+  position: relative;
+  .fantasma_historial {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+  }
+}

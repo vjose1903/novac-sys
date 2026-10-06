@@ -1,0 +1,18 @@
+<div class="d-flex {{ column.div_class ? column.div_class : 'justify-content-center align-items-center ' }} w-100" [ngStyle]="{ 'column-gap': column.column_gap || 0 }">
+  @for (objIcon of visibleIcons; track getIconTrack(objIcon, $index)) {
+  <div>
+    <span class="span_icon" [ngClass]="{ icon_disable: disableInput(rowData, objIcon) }">
+      <i
+        id="{{ realIdTabla }}-{{ getIconKey(objIcon) }}-{{ indexBody }}"
+        [pTooltip]="rowData[objIcon.rowTooltip] || objIcon.tooltip || ''"
+        tooltipPosition="left"
+        (click)="iconBtn(column.key, indexBody, rowData, $event, objIcon)"
+        class=" iconPress {{ getIconClass(objIcon, rowData) }} {{ rowData.iconHover ? 'c-pointer' : '' }} {{ rowData[objIcon.text_color] ? 'text-' + rowData[objIcon.text_color] : 'table-cell-text' }}"
+        (mouseenter)="tServ.mouseMoveEvent('hover', rowData, objIcon.key, htmlServ.getId($event))"
+        (mouseleave)="tServ.mouseMoveEvent('leave', rowData, objIcon.key, htmlServ.getId($event))"
+      ></i>
+    </span>
+  </div>
+  }
+</div>
+ 

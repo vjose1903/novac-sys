@@ -1,0 +1,156 @@
+<form class="event-form" [formGroup]="form" (ngSubmit)="save()">
+  <div class="row">
+    <div class="col-12 p-0">
+      <div class="form-group">
+        <label class="control-label">Titulo: <span style="color: red">*</span></label>
+        <input type="text" formControlName="title" placeholder="Ej. Reunion con cliente" class="form-control" autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="col-6 ps-0">
+      <div class="form-group">
+        <label class="control-label">Tipo: <span style="color: red">*</span></label>
+          <p-select
+            class="event-type-select"
+            appendTo="body"
+            formControlName="calendar_event_type_id"
+            [options]="eventTypes"
+            optionLabel="name"
+            optionValue="id"
+            styleClass="form-control"
+            placeholder="Selecciona tipo">
+            <ng-template pTemplate="selectedItem" let-selectedType>
+              <div class="event-type-option" *ngIf="selectedType">
+                <span class="event-type-dot" [style.background-color]="selectedType.color"></span>
+                <span>{{ selectedType.name }}</span>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="item" let-type>
+              <div class="event-type-option">
+                <span class="event-type-dot" [style.background-color]="type.color"></span>
+                <span>{{ type.name }}</span>
+              </div>
+            </ng-template>
+          </p-select>
+      </div>
+    </div>
+
+    <div class="col-6 pe-0">
+      <div class="form-group">
+        <label class="control-label">Ubicacion: </label>
+        <input type="text" formControlName="location" placeholder="Oficina, telefono, enlace..." class="form-control" autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="col-6 ps-0">
+      <div class="form-group">
+        <label class="control-label">Color: </label>
+        <app-calendar-color-picker [value]="form.get('color')?.value" [defaultColor]="selectedTypeColor" (valueChange)="setColor($event)"></app-calendar-color-picker>
+      </div>
+    </div>
+
+    <div class="col-6 pe-0 d-flex align-items-center">
+      <div class="form-group horizontal-layout mb-0">
+        <input id="calendar-is-working-day" type="checkbox" formControlName="is_working_day" class="apple-switch" />
+        <label for="calendar-is-working-day" class="mb-0 switch-label">Dia laborable</label>
+      </div>
+    </div>
+
+    <div class="col-12 p-0">
+      <div class="form-group">
+        <label class="control-label">Descripcion: </label>
+        <textarea formControlName="description" rows="4" class="form-control"></textarea>
+      </div>
+    </div>
+
+    <div class="col-12 p-0">
+      <hr class="raya" />
+      <h6 class="calendar-section-title">Fecha y hora</h6>
+    </div>
+
+    <div class="col-6 ps-0">
+      <div class="form-group">
+        <label class="control-label">Desde: <span style="color: red">*</span></label>
+        <p-datepicker inputId="calendar-start-date" formControlName="start_date" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
+      </div>
+    </div>
+
+    <div class="col-6 pe-0">
+      <div class="form-group">
+        <label class="control-label">Hasta: <span style="color: red">*</span></label>
+        <p-datepicker inputId="calendar-end-date" formControlName="end_date" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
+      </div>
+    </div>
+
+    <div class="col-6 ps-0" *ngIf="!allDay">
+      <div class="form-group">
+        <label class="control-label">Hora inicio: </label>
+        <form-time-picker-input inputId="calendar-start-time" name="start_time" formControlName="start_time" [minuteStep]="5" placeholder="Selecciona hora"></form-time-picker-input>
+      </div>
+    </div>
+
+    <div class="col-6 pe-0" *ngIf="!allDay">
+      <div class="form-group">
+        <label class="control-label">Hora fin: </label>
+        <form-time-picker-input inputId="calendar-end-time" name="end_time" formControlName="end_time" [minuteStep]="5" placeholder="Selecciona hora"></form-time-picker-input>
+      </div>
+    </div>
+
+    <div class="col-6 ps-0 d-flex align-items-center">
+      <div class="form-group horizontal-layout">
+        <input id="calendar-all-day" type="checkbox" formControlName="all_day" class="apple-switch" />
+        <label for="calendar-all-day" class="mb-0 switch-label">Todo el dia</label>
+      </div>
+    </div>
+
+    <div class="col-12 p-0">
+      <app-calendar-recurrence-fields [form]="form"></app-calendar-recurrence-fields>
+    </div>
+
+    <div class="col-12 p-0">
+      <hr class="raya" />
+      <h6 class="calendar-section-title">Relacion</h6>
+    </div>
+
+    <div class="col-6 ps-0">
+      <div class="form-group">
+        <label class="control-label">Entidad vinculada: </label>
+        <p-select
+          [ngModel]="linkEntityType"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="changeLinkEntityType($event)"
+          [options]="entityTypeOptions"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="form-control calendar-compact-select"
+          placeholder="Selecciona entidad"></p-select>
+      </div>
+    </div>
+
+    <div class="col-6 pe-0" *ngIf="linkEntityType">
+      <div class="form-group">
+        <label class="control-label">Buscar: </label>
+        <input type="text" [(ngModel)]="linkQuery" [ngModelOptions]="{ standalone: true }" (input)="searchLinkables()" placeholder="Nombre o referencia" class="form-control" autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="col-12 p-0">
+      <div class="link-results" *ngIf="linkResults.length">
+        <button type="button" *ngFor="let record of linkResults" (click)="addLink(record)">
+          <span>{{ record.label }}</span>
+          <small>{{ record.entity_type }}</small>
+        </button>
+      </div>
+
+      <div class="selected-links" *ngIf="links.length">
+        <span *ngFor="let link of links; let index = index">
+          {{ link.label }}
+          <button type="button" (click)="removeLink(index)" aria-label="Quitar relacion">
+            <i class="fas fa-times"></i>
+          </button>
+        </span>
+      </div>
+    </div>
+  </div>
+</form>

@@ -1,105 +1,106 @@
-<div class="contenGrid">
-  <div class="navBar d-flex align-items-center">
-    <h4 class="negrita ml-3 mb-0">Configuraciones del sistema para: {{ config?.nombre_empresa }}</h4>
+<div class="widget config-widget">
+  <div class="widget-header d-flex align-items-center" [ngClass]="{ 'is-on-modal': is_on_modal }">
+    <h4 class="negrita ms-3 mb-0">Configuraciones del sistema para: {{ configApp?.nombre_empresa }}</h4>
   </div>
 
-  <div class="body">
-    <p-tabView styleClass="my_tabView back-light">
+  <div class="widget-content overflow-hidden">
+    <p-tabs class="back-light panel-padding-0 panel-overflow-auto" [value]="0">
+      <p-tablist>
+        <p-tab [value]="0"> Informaciones generales </p-tab>
+        <p-tab [value]="1"> Impresiones </p-tab>
+      </p-tablist>
       <!-- ============================ INFORMACIONES GENERALES ============================ -->
-      <p-tabPanel header="Informaciones generales">
-        <div class="form">
-          <div class="fantasma-form">
-            <div class="row">
-              <div class="col-12 p-0 mt-4">
-                <form *ngIf="config" [formGroup]="form">
-                  <div class="row">
-                    <div class="col-12 mb-2">
-                      <div [appMsgError]="'nombre_empresa'" [form]="form">
-                        <label class="control-label">Nombre de la empresa: </label>
-                        <input
-                          id="campoNombre"
-                          (keyup)="capitalice('nombre_empresa', $event.target.value)"
-                          (keydown.enter)="saltar('campoApellido')"
-                          type="text"
-                          formControlName="nombre_empresa"
-                          placeholder="Introduzca nombre de la empresa"
-                          class="form-control"
-                          autocomplete="off"
-                          autofocus
-                        />
-                        <span id="msgContainer_nombre_empresa"></span>
-                      </div>
-                    </div>
+      <p-tabpanels>
+        <p-tabpanel header="Informaciones generales" [value]="0">
+          @if (configApp && form) {
+            <form [formGroup]="form" (submit)="$event.preventDefault(); $event.stopPropagation()">
+              <div class="row my-3">
+                <div class="col-12 mb-2">
+                  <div class="form-group">
+                    <label class="control-label">Nombre de la empresa: </label>
+                    <input
+                      onElementReady
+                      (elementReady)="htmlServ.focusInput($event)"
+                      [id]="formFieldId.nombre_empresa"
+                      (keydown.enter)="saltar(formFieldId.nombre_empresa)"
+                      type="text"
+                      [formControlName]="formFieldName.nombre_empresa"
+                      placeholder="Introduzca nombre de la empresa"
+                      class="form-control"
+                      autocomplete="off" />
+                    <form-error-msg [control]="form.get(formFieldName.nombre_empresa)"></form-error-msg>
+                  </div>
+                </div>
 
-                    <div class="col-6">
-                      <label class="control-label">Logo de la empresa: </label>
-                      <app-upload-img [src_img]="logo_empresa" (getPhotoData)="getPhotoData($event)" [id]="'logo_empresa'"></app-upload-img>
-                    </div>
+                <div class="col-6">
+                  <label class="control-label">Logo de la empresa: </label>
+                  <app-upload-img [src_img]="logo_empresa" (getPhotoData)="getPhotoData($event)" [id]="'logo_empresa'"></app-upload-img>
+                </div>
 
-                    <div class="col-6">
-                      <label class="control-label">Logo de la empresa ( para impresión ): </label>
-                      <app-upload-img [src_img]="logo_impresion" (getPhotoData)="getPhotoData($event)" [id]="'logo_impresion'"></app-upload-img>
-                    </div>
+                <div class="col-6">
+                  <label class="control-label">Logo de la empresa ( para impresión ): </label>
+                  <app-upload-img [src_img]="logo_impresion" (getPhotoData)="getPhotoData($event)" [id]="'logo_impresion'"></app-upload-img>
+                </div>
 
-                    <div class="col-6 mb-2">
-                      <div [appMsgError]="'rnc_empresa'" [form]="form">
-                        <label class="control-label">Rnc: </label>
-                        <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="rnc_empresa" mask="999-99999-9" [autoClear]="false"></p-inputMask>
-                        <span id="msgContainer_rnc_empresa"></span>
-                      </div>
-                    </div>
+                <div class="col-6 mb-2">
+                  <div class="form-group">
+                    <label class="control-label">Rnc: </label>
+                    <p-inputMask [inputId]="formFieldId.rnc_empresa" (keydown.enter)="saltar(formFieldId.rnc_empresa)" [formControlName]="formFieldName.rnc_empresa" mask="999-99999-9" [autoClear]="false"></p-inputMask>
+                    <form-error-msg [control]="form.get(formFieldName.rnc_empresa)"></form-error-msg>
+                  </div>
+                </div>
 
-                    <div class="col-6 mb-2">
-                      <div [appMsgError]="'telefono_empresa'" [form]="form">
-                        <label class="control-label">Telefono: </label>
-                        <p-inputMask (keydown.enter)="saltar('campoApellido')" formControlName="telefono_empresa" mask="(999)-999-9999" [autoClear]="false"></p-inputMask>
-                        <span id="msgContainer_telefono_empresa"></span>
-                      </div>
-                    </div>
+                <div class="col-6 mb-2">
+                  <div class="form-group">
+                    <label class="control-label">Telefono: </label>
+                    <p-inputMask [inputId]="formFieldId.telefono_empresa" (keydown.enter)="saltar(formFieldId.telefono_empresa)" [formControlName]="formFieldName.telefono_empresa" mask="(999)-999-9999" [autoClear]="false"></p-inputMask>
+                    <form-error-msg [control]="form.get(formFieldName.telefono_empresa)"></form-error-msg>
+                  </div>
+                </div>
 
-                    <div class="col-8 mb-2">
-                      <div [appMsgError]="'direccion_empresa'" [form]="form">
-                        <label class="control-label">Direccion: </label>
-                        <input
-                          id="campoNombre"
-                          (keyup)="capitalice('direccion_empresa', $event.target.value)"
-                          (keydown.enter)="saltar('campoApellido')"
-                          type="text"
-                          formControlName="direccion_empresa"
-                          placeholder="Introduzca nombre de la empresa"
-                          class="form-control"
-                          autocomplete="off"
-                          autofocus
-                        />
-                        <span id="msgContainer_direccion_empresa"></span>
-                      </div>
-                    </div>
+                <div class="col-8 mb-2">
+                  <div class="form-group">
+                    <label class="control-label">Direccion: </label>
+                    <input
+                      [id]="formFieldId.direccion_empresa"
+                      (keyup)="capitalice(formFieldName.direccion_empresa, htmlServ.getValue($event))"
+                      (keydown.enter)="saltar(formFieldId.direccion_empresa)"
+                      type="text"
+                      [formControlName]="formFieldName.direccion_empresa"
+                      placeholder="Introduzca nombre de la empresa"
+                      class="form-control"
+                      autocomplete="off" />
+                    <form-error-msg [control]="form.get(formFieldName.direccion_empresa)"></form-error-msg>
+                  </div>
+                </div>
 
-                    <div class="col-4 mb-2">
-                      <div [appMsgError]="'color_app'" [form]="form">
-                        <label class="control-label">Color aplicacion: </label>
-                        <p-dropdown [options]="colores" formControlName="color_app" placeholder="Seleccione un color">
-                          <ng-template pTemplate="selectedItem">
-                            <div class="d-flex align-items-center" *ngIf="form.controls['color_app'].value">
-                              <div class="colorsito mr-2" [style.background-color]="form.controls['color_app'].value.color"></div>
-                              <div>{{ form.controls['color_app'].value.label }}</div>
-                            </div>
-                          </ng-template>
-                          <ng-template let-colorItem pTemplate="item">
-                            <div class="colorItem-item d-flex align-items-center">
-                              <div class="colorsito mr-2" [style.background-color]="colorItem.color"></div>
-                              <div>{{ colorItem.label }}</div>
-                            </div>
-                          </ng-template>
-                        </p-dropdown>
-                        <span id="msgContainer_color_app"></span>
-                      </div>
-                    </div>
+                <div class="col-4 mb-2">
+                  <div class="form-group">
+                    <label class="control-label">Color aplicacion: </label>
+                    <p-select [inputId]="formFieldId.color_app" [options]="colores" appendTo="body" [formControlName]="formFieldName.color_app" placeholder="Seleccione un color" (onChange)="saltar(formFieldId.color_app)">
+                      <ng-template pTemplate="selectedItem">
+                        @if (form.controls['color_app'].value) {
+                          <div class="d-flex align-items-center">
+                            <div class="colorsito me-2" [style.background-color]="form.controls['color_app'].value.color"></div>
+                            <div>{{ form.controls['color_app'].value.label }}</div>
+                          </div>
+                        }
+                      </ng-template>
+                      <ng-template let-colorItem pTemplate="item">
+                        <div class="colorItem-item d-flex align-items-center">
+                          <div class="colorsito me-2" [style.background-color]="colorItem.color"></div>
+                          <div>{{ colorItem.label }}</div>
+                        </div>
+                      </ng-template>
+                    </p-select>
+                    <form-error-msg [control]="form.get(formFieldName.color_app)"></form-error-msg>
+                  </div>
+                </div>
 
-                    <!-- <div class="col-6 mb-2">
+                <!-- <div class="col-6 mb-2">
                       <div [appMsgError]="'printer_caja_selected'" [form]="form">
                         <label class="control-label">Impresora facturación seleccionada: </label>
-                        <p-dropdown [options]="config.printersList" formControlName="printer_caja_selected" placeholder="Seleccione una impresora">
+                        <p-select appendTo="body" [options]="config.printersList" formControlName="printer_caja_selected" placeholder="Seleccione una impresora">
                           <ng-template pTemplate="selectedItem">
                             <div class="d-flex align-items-center" *ngIf="form.controls['printer_caja_selected'].value">
                               <div>{{ form.controls['printer_caja_selected'].value }}</div>
@@ -110,15 +111,14 @@
                               <div>{{ printerItem }}</div>
                             </div>
                           </ng-template>
-                        </p-dropdown>
+                        </p-select>
                         <span id="msgContainer_printer_caja_selected"></span>
                       </div>
                     </div>
-
                     <div class="col-6 mb-2">
                       <div [appMsgError]="'printer_reportes_selected'" [form]="form">
                         <label class="control-label">Impresora reportes seleccionada: </label>
-                        <p-dropdown [options]="config.printersList" formControlName="printer_reportes_selected" placeholder="Seleccione una impresora">
+                        <p-select appendTo="body" [options]="config.printersList" formControlName="printer_reportes_selected" placeholder="Seleccione una impresora">
                           <ng-template pTemplate="selectedItem">
                             <div class="d-flex align-items-center" *ngIf="form.controls['printer_reportes_selected'].value">
                               <div>{{ form.controls['printer_reportes_selected'].value }}</div>
@@ -129,215 +129,227 @@
                               <div>{{ printerItem }}</div>
                             </div>
                           </ng-template>
-                        </p-dropdown>
+                        </p-select>
                         <span id="msgContainer_printer_reportes_selected"></span>
                       </div>
                     </div> -->
 
-                    <div class="col-4 mb-3">
-                      <div [appMsgError]="'url_servidor'" [form]="form">
-                        <label class="control-label">Url Servidor: </label>
-                        <input id="campoNombre" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="url_servidor" placeholder="Introduzca url del servidor" class="form-control" autocomplete="off" autofocus />
-                        <span id="msgContainer_url_servidor"></span>
-                      </div>
-                    </div>
-
-                    <div class="col-4 mb-3">
-                      <div [appMsgError]="'url_servidor_respaldo'" [form]="form">
-                        <label class="control-label">Url Servidor Respaldo: </label>
-                        <input id="campoNombre" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="url_servidor_respaldo" placeholder="Introduzca url del servidor de respaldo" class="form-control" autocomplete="off" autofocus />
-                        <span id="msgContainer_url_servidor_respaldo"></span>
-                      </div>
-                    </div>
-
-                    <div class="col-4 mb-3">
-                      <div [appMsgError]="'url_servidor_descargas'" [form]="form">
-                        <label class="control-label">Url Servidor Descargas: </label>
-                        <input id="campoNombre" (keydown.enter)="saltar('campoApellido')" type="text" formControlName="url_servidor_descargas" placeholder="Introduzca url servidor de descargas" class="form-control" autocomplete="off" autofocus />
-                        <span id="msgContainer_url_servidor_descargas"></span>
-                      </div>
-                    </div>
-
-                    <div class="col-4 mb-3">
-                      <div>
-                        <label class="control-label">Documentos a imprimir: </label>
-
-                        <p-multiSelect
-                          class="multiSelectPrimeng"
-                          [options]="documentos_a_imprimir"
-                          [(ngModel)]="documentos_a_imprimir_selected"
-                          [ngModelOptions]="{ standalone: true }"
-                          defaultLabel="Seleccione"
-                          optionLabel="name"
-                          emptyFilterMessage="Sin resultados"
-                          display="chip"
-                          [displaySelectedLabel]="false"
-                          [showToggleAll]="false"
-                          filterBy="name"
-                          (onChange)="changeDocumentosAImprimir()"
-                        >
-                        </p-multiSelect>
-                      </div>
-                    </div>
-
-                    <div class="col-4 mb-3">
-                      <div>
-                        <label class="control-label">Medida producto terminado: </label>
-
-                        <p-dropdown [options]="medidas_articulos" formControlName="medida_producto_terminado" placeholder="Seleccione una medida" optionLabel="value" optionValue="value"> </p-dropdown>
-                      </div>
-                    </div>
-
-                    <div class="col-12 p-0 mt-3">
-                      <div class="row">
-                        <div class="col-6 p-0">
-                          <div class="row">
-                            <div class="col-12 mb-2">
-                              <div class="switchDiv" [appMsgError]="'usa_url_principal'" [form]="form">
-                                <input formControlName="usa_url_principal" class="apple-switch" type="checkbox" />
-                                <span class="ml-2 mb-0">Usa url principal</span>
-                              </div>
-                            </div>
-
-                            <div class="col-12 mb-2">
-                              <div class="switchDiv" [appMsgError]="'is_db_local'" [form]="form">
-                                <input formControlName="is_db_local" class="apple-switch" type="checkbox" />
-                                <span class="ml-2 mb-0">Usa base de datos local</span>
-                              </div>
-                            </div>
-
-                            <div class="col-12 mb-2">
-                              <div class="switchDiv" [appMsgError]="'is_produccion'" [form]="form">
-                                <input formControlName="is_produccion" class="apple-switch" type="checkbox" />
-                                <span class="ml-2 mb-0">Tienen Modulo Producción</span>
-                              </div>
-                            </div>
-
-                            <div class="col-12 mb-2">
-                              <div class="switchDiv" [appMsgError]="'se_calcula_saco'" [form]="form">
-                                <input formControlName="se_calcula_saco" class="apple-switch" type="checkbox" />
-                                <span class="ml-2 mb-0">Se calculan sacos</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="col-6 p-0">
-                          <div class="row">
-                            <div class="col-12 mb-2">
-                              <div class="h-100 w-100 d-flex align-items-center">
-                                <div class="switchDiv" [appMsgError]="'facturacion_editar_precio'" [form]="form">
-                                  <input formControlName="facturacion_editar_precio" class="apple-switch" type="checkbox" />
-                                  <span class="ml-2 mb-0">Editar precio en facturación</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div class="col-12 mb-2">
-                              <div class="h-100 w-100 d-flex align-items-center">
-                                <div class="switchDiv" [appMsgError]="'vende_sin_inventario'" [form]="form">
-                                  <input formControlName="vende_sin_inventario" class="apple-switch" type="checkbox" />
-                                  <span class="ml-2 mb-0">Vender sin inventario</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div class="col-12 mb-2">
-                              <div class="h-100 w-100 d-flex align-items-center">
-                                <div class="switchDiv" [appMsgError]="'calcular_itbis'" [form]="form">
-                                  <input formControlName="calcular_itbis" class="apple-switch" type="checkbox" />
-                                  <span class="ml-2 mb-0">Usa Itbis</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                <div class="col-6 mb-3">
+                  <div class="form-group">
+                    <label class="control-label">Url Servidor: </label>
+                    <input
+                      [id]="formFieldId.url_servidor"
+                      (keydown.enter)="saltar(formFieldId.url_servidor)"
+                      type="text"
+                      [formControlName]="formFieldName.url_servidor"
+                      placeholder="Introduzca url del servidor"
+                      class="form-control"
+                      autocomplete="off" />
+                    <form-error-msg [control]="form.get(formFieldName.url_servidor)"></form-error-msg>
                   </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </p-tabPanel>
+                </div>
 
-      <!-- ============================ PLANTILLAS DE IMPRESION ============================ -->
-      <p-tabPanel header="Impresiones">
-        <div class="form">
-          <div class="fantasma-form">
-            <div class="row">
-              <div class="col-12 p-0 mt-4">
-                <form *ngIf="config" [formGroup]="form">
+                <div class="col-6 mb-3">
+                  <div class="form-group">
+                    <label class="control-label">Url Servidor Respaldo: </label>
+                    <input
+                      [id]="formFieldId.url_servidor_respaldo"
+                      (keydown.enter)="saltar(formFieldId.url_servidor_respaldo)"
+                      type="text"
+                      [formControlName]="formFieldName.url_servidor_respaldo"
+                      placeholder="Introduzca url del servidor de respaldo"
+                      class="form-control"
+                      autocomplete="off" />
+                    <form-error-msg [control]="form.get(formFieldName.url_servidor_respaldo)"></form-error-msg>
+                  </div>
+                </div>
+
+                <div class="col-4 mb-3">
+                  <div class="form-group">
+                    <label class="control-label">Documentos a imprimir: </label>
+                    <p-multiSelect
+                      [inputId]="formFieldId.documentos_a_imprimir"
+                      [options]="documentos_a_imprimir"
+                      [(ngModel)]="documentos_a_imprimir_selected"
+                      [ngModelOptions]="{ standalone: true }"
+                      placeholder="Seleccione"
+                      optionLabel="name"
+                      emptyFilterMessage="Sin resultados"
+                      display="chip"
+                      [displaySelectedLabel]="false"
+                      [showToggleAll]="false"
+                      appendTo="body"
+                      filterBy="name"
+                      (onChange)="changeDocumentosAImprimir()"
+                      (onPanelHide)="saltar(formFieldId.documentos_a_imprimir)">
+                    </p-multiSelect>
+                    <form-error-msg [control]="form.get(formFieldName.documentos_a_imprimir)"></form-error-msg>
+                  </div>
+                </div>
+
+                <div class="col-4 mb-3">
+                  <div class="form-group">
+                    <label class="control-label">Medida producto terminado: </label>
+                    <p-select
+                      [inputId]="formFieldId.medida_producto_terminado"
+                      [options]="medidas_articulos"
+                      appendTo="body"
+                      [formControlName]="formFieldName.medida_producto_terminado"
+                      placeholder="Seleccione una medida"
+                      optionLabel="value"
+                      optionValue="value">
+                    </p-select>
+                    <form-error-msg [control]="form.get(formFieldName.medida_producto_terminado)"></form-error-msg>
+                  </div>
+                </div>
+
+                <div class="col-12 mt-3">
                   <div class="row">
-                    <div class="col-12 mb-3">
-                      <div class="row bg-dark-1 br-1 p-2">
-                        <div class="col-12 p-0">
-                          <label class="control-label">Documentos para imprimir: </label>
-                        </div>
+                    <div class="col-6 p-0">
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.usa_url_principal" formControlName="usa_url_principal" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.usa_url_principal" class="mb-0 c-pointer">Usa url principal</label>
+                        <form-error-msg [control]="form.get(formFieldName.usa_url_principal)"></form-error-msg>
+                      </div>
 
-                        <ng-container *ngFor="let item of impresiones">
-                          <div class="col-4 mb-3">
-                            <div class="box-impresion bg-dark-1">
-                              <div class="box-head bg-dark-1">
-                                <label class="control-label no-wrap mb-0 text-white">{{ item.label }}: </label>
-                                <i class="fa-solid fa-print c-pointer" (click)="printTest(item.key, form.controls[item.pageSizeFormControlName].value.descripcion)"></i>
-                              </div>
-                              <div class="box-body">
-                                <div [appMsgError]="item.pageSizeFormControlName" [form]="form" class="mb-2">
-                                  <div class="mb-0">Tamaño del PDF</div>
-                                  <p-dropdown [options]="paper_sizes" [formControlName]="item.pageSizeFormControlName" placeholder="Seleccione una tamaño de papel">
-                                    <ng-template pTemplate="selectedItem">
-                                      <div class="d-flex align-items-center" *ngIf="form.controls[item.pageSizeFormControlName].value.label">
-                                        <div>{{ form.controls[item.pageSizeFormControlName].value.label }}</div>
-                                      </div>
-                                    </ng-template>
-                                    <ng-template let-pageSize pTemplate="item">
-                                      <div class="pageSize-item d-flex align-items-center">
-                                        <div>{{ pageSize.label }}</div>
-                                      </div>
-                                    </ng-template>
-                                  </p-dropdown>
-                                  <span [id]="'msgContainer_' + item.pageSizeFormControlName"></span>
-                                </div>
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.is_db_local" formControlName="is_db_local" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.is_db_local" class="mb-0 c-pointer">Usa base de datos local</label>
+                        <form-error-msg [control]="form.get(formFieldName.is_db_local)"></form-error-msg>
+                      </div>
 
-                                <div [appMsgError]="item.printerFormControlName" [form]="form" class="mb-2">
-                                  <div class="mb-0">Impresora:</div>
-                                  <p-dropdown appendTo="body" [options]="config.printersList" [formControlName]="item.printerFormControlName" placeholder="Seleccione una impresora"> </p-dropdown>
-                                  <span [id]="'msgContainer_' + item.printerFormControlName"></span>
-                                </div>
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.is_produccion" formControlName="is_produccion" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.is_produccion" class="mb-0 c-pointer">Tienen Modulo Producción</label>
+                        <form-error-msg [control]="form.get(formFieldName.is_produccion)"></form-error-msg>
+                      </div>
 
-                                <div *ngIf="item.plantillaFormControlName" class="mt-3">
-                                  <div [appMsgError]="item.plantillaFormControlName" [form]="form">
-                                    <div class="mb-0">Plantilla de impresion</div>
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.usa_modulo_viajes" formControlName="usa_modulo_viajes" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.usa_modulo_viajes" class="mb-0 c-pointer">Usa módulo de viajes</label>
+                        <form-error-msg [control]="form.get(formFieldName.usa_modulo_viajes)"></form-error-msg>
+                      </div>
+                    </div>
 
-                                    <p-dropdown appendTo="body" [options]="get_plantillas(item.key)" [formControlName]="item.plantillaFormControlName" placeholder="Seleccione una plantilla" optionLabel="value" optionValue="value"> </p-dropdown>
-                                    <span [id]="'msgContainer_' + item.plantillaFormControlName"></span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </ng-container>
+                    <div class="col-6 p-0">
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.facturacion_editar_precio" formControlName="facturacion_editar_precio" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.facturacion_editar_precio" class="mb-0 c-pointer">Editar precio en facturación</label>
+                        <form-error-msg [control]="form.get(formFieldName.facturacion_editar_precio)"></form-error-msg>
+                      </div>
+
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.vende_sin_inventario" formControlName="vende_sin_inventario" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.vende_sin_inventario" class="mb-0 c-pointer">Vender sin inventario</label>
+                        <form-error-msg [control]="form.get(formFieldName.vende_sin_inventario)"></form-error-msg>
+                      </div>
+
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.calcular_itbis" formControlName="calcular_itbis" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.calcular_itbis" class="mb-0 c-pointer">Usa Itbis</label>
+                        <form-error-msg [control]="form.get(formFieldName.calcular_itbis)"></form-error-msg>
+                      </div>
+
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.usa_mora" formControlName="usa_mora" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.usa_mora" class="mb-0 c-pointer">Usa mora</label>
+                        <form-error-msg [control]="form.get(formFieldName.usa_mora)"></form-error-msg>
+                      </div>
+
+                      <div class="form-group horizontal-layout mb-2">
+                        <input [id]="formFieldId.usa_facturas_externas" formControlName="usa_facturas_externas" class="apple-switch" type="checkbox" />
+                        <label [for]="formFieldId.usa_facturas_externas" class="mb-0 c-pointer">Usa facturas externas</label>
+                        <form-error-msg [control]="form.get(formFieldName.usa_facturas_externas)"></form-error-msg>
                       </div>
                     </div>
                   </div>
-                </form>
+                </div>
+                @if (isDevelopment) {
+                  <div class="col-12 mt-3">
+                    <div class="form-group">
+                      <label id="development-server-label" class="control-label d-block mb-2">Servidor de desarrollo</label>
+                      <p-selectButton
+                        [options]="developmentServerOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        [(ngModel)]="developmentServerMode"
+                        [ngModelOptions]="{ standalone: true }"
+                        [allowEmpty]="false"
+                        ariaLabelledBy="development-server-label">
+                      </p-selectButton>
+                    </div>
+                  </div>
+                }
               </div>
-            </div>
-          </div>
-        </div>
-      </p-tabPanel>
-    </p-tabView>
+            </form>
+          }
+        </p-tabpanel>
 
-    <div class="buttons">
-      <div class="d-flex justify-content-end align-items-center">
-        <!-- <a class="btn mr-2" id="btn-gris" (click)="test()">Test</a> -->
+        <!-- ============================ PLANTILLAS DE IMPRESION ============================ -->
+        <p-tabpanel header="Impresiones" [value]="1">
+          @if (configApp && form) {
+            <form [formGroup]="form" (submit)="$event.preventDefault(); $event.stopPropagation()">
+              <div class="row my-3">
+                <div class="col-12 mb-3">
+                  <div class="row bg-dark-1 br-10 p-2">
+                    <div class="col-12 p-0">
+                      <label class="control-label">Documentos para imprimir: </label>
+                    </div>
+                    @for (item of impresiones; track $index) {
+                      <div class="col-4 mb-3">
+                        <div class="box-impresion bg-dark-1">
+                          <div class="box-head bg-dark-1">
+                            <label class="control-label no-wrap mb-0 text-white">{{ item.label }}: </label>
+                            <i class="fa-solid fa-print c-pointer" (click)="printTest(item.key, form.controls[item.pageSizeFormControlName].value.descripcion)"></i>
+                          </div>
+                          <div class="box-body">
+                            <div [appMsgError]="item.pageSizeFormControlName" [form]="form" class="mb-2">
+                              <div class="mb-0">Tamaño del PDF</div>
+                              <p-select appendTo="body" [options]="paper_sizes" [formControlName]="item.pageSizeFormControlName" placeholder="Seleccione una tamaño de papel">
+                                <ng-template pTemplate="selectedItem">
+                                  @if (form.controls[item.pageSizeFormControlName].value.label) {
+                                    <div class="d-flex align-items-center">
+                                      <div>{{ form.controls[item.pageSizeFormControlName].value.label }}</div>
+                                    </div>
+                                  }
+                                </ng-template>
+                                <ng-template let-pageSize pTemplate="item">
+                                  <div class="pageSize-item d-flex align-items-center">
+                                    <div>{{ pageSize.label }}</div>
+                                  </div>
+                                </ng-template>
+                              </p-select>
+                              <span [id]="'msgContainer_' + item.pageSizeFormControlName"></span>
+                            </div>
+                            <div [appMsgError]="item.printerFormControlName" [form]="form" class="mb-2">
+                              <div class="mb-0">Impresora:</div>
+                              <p-select appendTo="body" [options]="configApp.printersList" [formControlName]="item.printerFormControlName" placeholder="Seleccione una impresora"> </p-select>
+                              <span [id]="'msgContainer_' + item.printerFormControlName"></span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </form>
+          }
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </div>
 
-        <a class="btn mr-2" id="btn-blanco" (click)="salir()">Salir</a>
+  <div class="widget-footer">
+    <div class="d-flex flex-column">
+      <div class="buttons-section">
+        <!-- <a class="btn me-2" id="btn-gris" (click)="test()">Test</a> -->
 
-        <input type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn ml-2" value="Guardar" id="btn-verde" />
+        <button class="btn btn-sm" id="btn-blanco" (click)="salir()">Salir</button>
+        <button type="button" [disabled]="formIsInvalid()" style="max-width: 6rem" (click)="submit()" class="btn btn-sm" id="btn-verde">Guardar</button>
       </div>
+
+      <div class="footer pe-2 d-flex justify-content-end align-items-center" [ngClass]="{ 'is-on-modal': is_on_modal }" style="color: white">Novac System {{ configApp?.app_version }} - &#64;2020 Desarrollador: Victor J. Vasquez</div>
     </div>
   </div>
-  <div class="footer pr-2 d-flex justify-content-end align-items-center" style="color: white">Novac System {{ config?.app_version }} - @2020 Desarrollador: Victor J. Vasquez</div>
 </div>

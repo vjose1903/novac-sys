@@ -1,0 +1,17 @@
+<div class="calendar-legend">
+  <div class="legend-header">
+    <span class="legend-icon">
+      <i class="fa-solid fa-tags"></i>
+    </span>
+    <div>
+      <h6>Tipos de evento</h6>
+      <span>Colores del calendario</span>
+    </div>
+  </div>
+  <ul>
+    <li *ngFor="let type of eventTypes">
+      <span class="legend-dot" [style.background]="type.color"></span>
+      <span>{{ type.name }}</span>
+    </li>
+  </ul>
+</div>

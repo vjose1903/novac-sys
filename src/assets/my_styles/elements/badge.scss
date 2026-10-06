@@ -1,0 +1,53 @@
+/* ====================================================== */
+/* BADGE */
+/* ====================================================== */
+.badge {
+  cursor: default !important;
+  font-size: 1rem;
+  padding: 0.5rem;
+  box-shadow: 1px 1px 1px black;
+  letter-spacing: 1px;
+
+  &.text-shadow {
+    text-shadow: 1px 1px 1px #000000cf;
+  }
+  &.bg-red {
+    background-color: #eb3a3a !important;
+  }
+
+  &.bg-reen {
+    background-color: #459845 !important;
+  }
+
+  &.bg-blue {
+    background-color: #1a44de !important;
+  }
+
+  &.bg-yellow {
+    background-color: #e9e61e !important;
+  }
+
+  &.bg-orange {
+    background-color: #ffa711 !important;
+  }
+
+  &.disable {
+    filter: brightness(1.6) contrast(0.5);
+  }
+}
+
+.travel-selected-tag,
+.travel-pending-tag {
+  background: var(--app-travel-tag-bg) !important;
+  color: var(--app-travel-tag-text) !important;
+
+  .p-tag-value,
+  p {
+    color: inherit !important;
+  }
+}
+
+.travel-pending-tag {
+  background: var(--app-travel-pending-tag-bg) !important;
+  color: var(--app-travel-pending-tag-text) !important;
+}

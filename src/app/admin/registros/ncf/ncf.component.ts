@@ -1,20 +1,25 @@
-import { Ss } from './../../../core/services/singleton.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HtmlElementsService } from '@core/services/html-elements.service';
+import { Ss } from '@core/services/singleton.service';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import * as _ from 'lodash';
 
-import * as moment from '../../../core/javascript/moment';
-import { TablasService } from '../../components/new_tablas/tablas.service';
-import { MixinClass } from '../../../core/typescript/MixinClass';
-import { FacturaC, TiposFacturaC } from '../../facturacion/factura';
+import moment from '../../../core/javascript/moment';
+import { TablasService } from '@components/new_tablas/tablas.service';
+import { MixinClass } from '@core/typescript/MixinClass';
+import { FacturaC } from '../../facturacion/factura';
 import { NcfC } from './ncf';
-import { fun } from '../../../core/services/functions.service';
-import { table_config } from '../../components/new_tablas/tabla-class';
-import { Permisos } from '../../../core/typescript/permisos';
+import { fun } from '@core/services/functions.service';
+import { default_per_page, table_config } from '@components/new_tablas/tabla-class';
+import { Permisos } from '@core/typescript/permisos';
+import { DateUtils } from '@vjose1903/dateutils';
+import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import { confirmationButtons } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 
 @Component({
   selector: 'app-ncf',
   templateUrl: './ncf.component.html',
   styleUrls: ['./ncf.component.scss'],
+  standalone: false,
 })
 export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   form;
@@ -46,32 +51,39 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   listaNCFBack = [];
 
   facturaClass = new FacturaC();
-  tiposFacturasClass = new TiposFacturaC();
   ncfClass = new NcfC();
   permissions = Permisos;
 
   table_config: table_config = {
     info: [
-      { titulo: 'Cod.', tipo: 'text', key: 'codigo', estilos: [{ width: '5rem' }] },
-      { titulo: 'Tipo', tipo: 'text', key: 'tipoC', estilos: [{ width: '3rem' }] },
+      { titulo: 'Cod.', tipo: 'text', key: 'codigo', style: { width: '3.5rem' } },
+      { titulo: 'Tipo', tipo: 'text', key: 'tipoC', style: { width: '3rem' } },
       { titulo: 'Secuencia', tipo: 'text', key: 'secuencia_' },
       { titulo: 'Desde', tipo: 'text', key: 'desde' },
       { titulo: 'Hasta', tipo: 'text', key: 'hasta' },
-      { titulo: 'Usado', tipo: 'icon', key: 'usado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'usado_', text_color: 'colorUsado' }] },
-      { titulo: 'Activo', tipo: 'icon', key: 'estado_', estilos: [{ width: '4rem' }], iconsArray: [{ key: 'estado_', text_color: 'colorEstado' }] },
+      { titulo: 'Usado', tipo: 'icon', key: 'usado_', style: { width: '4rem' }, iconsArray: [{ key: 'usado_', text_color: 'colorUsado' }] },
+      { titulo: 'Activo', tipo: 'icon', key: 'estado_', style: { width: '4rem' }, iconsArray: [{ key: 'estado_', text_color: 'colorEstado' }] },
     ],
     colores: true,
     padding: '0.5rem',
     id_tabla: 'lista_ncf',
-    padre_functions: { data_request: (params) => this.getPaquetesNCF(params) },
+    padre_functions: { data_request: params => this.getPaquetesNCF(params) },
     filtrar: { local: false },
-    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: [10, 15, 20, 30], search: ' ', is_local: false },
+    obj_paginate: { show: true, showTotal: true, page: 1, per_page: 20, per_page_options: default_per_page, search: ' ', is_local: false },
     botones: { editar: { show: true, permiso: this.permissions.secuencia_comprobante.update }, borrar: { show: true, permiso: this.permissions.secuencia_comprobante.destroy } },
   };
   tablaComponent;
   formPermissions = [Permisos.secuencia_comprobante.create, Permisos.secuencia_comprobante.update];
 
-  constructor(private tServ: TablasService) {
+  htmlServ = inject(HtmlElementsService);
+  dynamicModalServ = inject(DynamicModalService);
+
+  ncfFiltroOptions() {
+    return [{ id: 'todos', descripcion: 'Todos' }, ...(this.lista_tipos_facturas || [])];
+  }
+  private tServ = inject(TablasService);
+
+  constructor() {
     super();
   }
 
@@ -82,24 +94,17 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.setDateInputs(new Date());
   }
 
-  iniciarCambioMenu(arg, callback) {
-    if (arg.bool) {
-      this.runFinalizarCambioMenu(arg);
-      callback({ bool: true });
-    }
-  }
-
   ngOnDestroy(): void {
     this._destroy_mixin();
   }
 
-  setDateInputs(actual) {
-    actual = moment(actual).format('MM/DD/YYYY');
-    const anio = moment(new Date(actual)).add(1, 'year').format('YYYY');
+  setDateInputs(buyDateSelected) {
+    buyDateSelected = DateUtils.format({ date: buyDateSelected, dateFormat: 'MM/DD/YYYY' });
+    const anio = DateUtils.add(1, 'years', buyDateSelected).getFullYear();
 
-    const newFecha = moment('12/31/' + anio).format('MM/DD/YYYY');
+    const newFecha = DateUtils.format({ date: '12/31/' + anio, dateFormat: 'MM/DD/YYYY' });
 
-    this.fechaCompra = new Date(actual);
+    this.fechaCompra = new Date(buyDateSelected);
     this.fechaValidez = new Date(newFecha);
   }
 
@@ -110,7 +115,8 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   async parseTiposFacturas() {
     try {
-      const temp_tipos_facturas = fun.duplicarJson(Ss.factServ.lista_tipos_facturas);
+      await Ss.factServ.getTiposFacturas();
+      const temp_tipos_facturas = fun.deepCloning(Ss.factServ.lista_tipos_facturas);
 
       for (let index = 0; index < temp_tipos_facturas.length; index++) {
         const tipo_factura_en_turno = temp_tipos_facturas[index];
@@ -125,13 +131,13 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
 
   filtrarNCF() {
     if (this.filtro === 'todos') {
-      this.listaNCF = fun.duplicarJson(this.listaNCFBack);
+      this.listaNCF = fun.deepCloning(this.listaNCFBack);
     } else {
-      this.listaNCF = this.listaNCFBack.filter((pack) => Number(pack.tipo_factura_id) === Number(this.filtro));
+      this.listaNCF = this.listaNCFBack.filter(pack => Number(pack.tipo_factura_id) === Number(this.filtro));
     }
   }
 
-  async getPaquetesNCF(params?: { per_page: number; page: number; search: string }) {
+  async getPaquetesNCF(params?: { per_page?: number; page?: number; search?: string }) {
     try {
       const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
 
@@ -139,11 +145,11 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
       this.listaNCF.length = 0;
       this.listaNCFBack.length = 0;
       const tempNCF = [];
-      res.data.forEach((ncf) => {
+      res.data.forEach(ncf => {
         if (ncf.tipo_factura_id !== 1 && ncf.tipo_factura_id !== 3) {
           ncf.cantidad = ncf.hasta - ncf.desde + 1;
-          ncf.tipoC = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].referencia;
-          ncf.tipoC_ = this.lista_tipos_facturas.filter((tipo) => tipo.id === ncf.tipo_factura_id)[0].descripcion;
+          ncf.tipoC = this.lista_tipos_facturas.filter(tipo => tipo.id === ncf.tipo_factura_id)[0].referencia;
+          ncf.tipoC_ = this.lista_tipos_facturas.filter(tipo => tipo.id === ncf.tipo_factura_id)[0].descripcion;
           ncf.codigo = _.padStart(ncf.id, 5, '0');
           ncf.fecha_compra = moment(ncf.fecha_compra, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
           ncf.fecha_valida = moment(ncf.fecha_valida, 'YYYY-MM-DD[T]HH:mm:ss').format('DD/MM/YYYY');
@@ -155,16 +161,15 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
           ncf.estado_ = ncf.estado ? 'fas fa-check' : 'fas fa-times';
           ncf.usado_ = ncf.usado ? 'fas fa-check' : 'fas fa-times';
 
-          ncf.customStyles = { codigo: { width: '5rem' }, tipoC: { width: '3rem' }, usado_: { width: '4rem' }, estado_: { width: '4rem' } };
-
           tempNCF.push(ncf);
         }
       });
 
       this.listaNCF = tempNCF;
-      this.listaNCFBack = fun.duplicarJson(tempNCF);
+      this.listaNCFBack = fun.deepCloning(tempNCF);
 
-      this.tablaComponent.changeConfig([{ total_count: res.total_registros }]);
+      this.table_config.total_count = res.total_registros;
+      this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
     } catch (error) {
       console.error(error);
 
@@ -207,7 +212,9 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
   saltar(campo) {
     if (campo != 'send') fun.enfocarInput(campo);
     else {
-      if (!this.formIsInvalid()) setTimeout(() => this.submit(), 250);
+      if (!this.formIsInvalid()) {
+        fun.setTimeout(() => this.submit(), 250);
+      }
     }
   }
 
@@ -242,7 +249,7 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     this.Desde = item.desde;
     this.Hasta = item.hasta;
 
-    this.ncfSelected = fun.duplicarJson(item);
+    this.ncfSelected = fun.deepCloning(item);
   }
 
   nuevoRegistro() {
@@ -274,44 +281,45 @@ export class NcfComponent extends MixinClass implements OnInit, OnDestroy {
     const comprobanteData = data;
     comprobanteData.nombre = 'comprobante para ' + comprobanteData.tipoC_ + ' numero: ' + comprobanteData.codigo;
 
-    const objConfirmationModal = {
-      id: 'eliminar_comprobante',
-      header: 'Confirmar',
-      texto: `Desea eliminar comprobante para <b>${comprobanteData.tipoC_}</b> numero: <b>${comprobanteData.codigo}</b>`,
-      width: '510px',
-      siFunction: (instance) => {
-        this.ncfClass.deleteOne(comprobanteData.id).then((res) => {
-          const actualPagination = this.tServ.getPaginationById('lista_ncf');
-          this.getPaquetesNCF(actualPagination);
-          instance.closeModal(instance.id, 'eliminar_comprobante');
-        });
-      },
+    const siFunction = () => {
+      this.ncfClass.deleteOne(comprobanteData.id).then(res => {
+        const actualPagination = this.tServ.getPaginationById('lista_ncf');
+        this.getPaquetesNCF(actualPagination);
+      });
     };
-    this.confirmationModal(objConfirmationModal);
+
+    this.dynamicModalServ.confirmationModal({
+      id: 'eliminar_comprobante',
+      texto: `Desea eliminar comprobante para <b>${comprobanteData.tipoC_}</b> numero: <b>${comprobanteData.codigo}</b>`,
+      btnKind: confirmationButtons.siNo,
+      onYes: siFunction.bind(this),
+    });
   }
 
   async submit() {
-    const obj = {
-      id: this.ncfSelected ? this.ncfSelected.id : null,
-      tipo_factura_id: this.tipo_articulo_id,
-      desde: this.Desde,
-      hasta: this.Hasta,
-      fecha_compra: moment(this.fechaCompra, 'DD/MM/YYYY').format(),
-      fecha_valida: moment(this.fechaValidez, 'DD/MM/YYYY').format(),
-      secuencia: this.ncfSelected ? this.ncfSelected.secuencia : this.Desde,
-      estado: this.is_editando ? this.estado : false,
-      usado: this.is_editando ? this.usado : false,
-      status: true,
-    };
-
     try {
-      const res = await this.ncfClass.createUpdateOne(obj);
-      const actualPagination = this.tServ.getPaginationById('lista_ncf');
-      this.getPaquetesNCF(actualPagination);
+      const formatConfig = { dateFormat: 'YYYY-MM-DD', include_hour: true, hourFormat: 'HH:MM:SS', separator: ' ' };
 
+      const obj = {
+        id: this.ncfSelected?.id || null,
+        tipo_factura_id: this.tipo_articulo_id,
+        desde: this.Desde,
+        hasta: this.Hasta,
+        fecha_compra: DateUtils.format({ date: DateUtils.add(8, 'hours', this.fechaCompra), ...formatConfig }),
+        fecha_valida: DateUtils.format({ date: DateUtils.add(8, 'hours', this.fechaValidez), ...formatConfig }),
+        secuencia: this.ncfSelected?.secuencia || this.Desde,
+        estado: this.is_editando ? this.estado : false,
+        usado: this.is_editando ? this.usado : false,
+        status: true,
+      };
+
+      await this.ncfClass.createUpdateOne(obj);
+
+      this.getPaquetesNCF(this.tServ.getPaginationById('lista_ncf'));
       this.borrar();
     } catch (error) {
       console.error(error);
+      fun.toastError('Error al guardar el NCF', 'ERROR');
     }
   }
 }

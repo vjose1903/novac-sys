@@ -1,0 +1,3 @@
+<div #cardTablaArticulo id="cardTabla" class="h-100 d-flex">
+  <dinamic-table [cardTabla]="cardTablaArticulo" [data]="dataFiltro()" (dataChange)="dataFiltro.set($event)" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>
+</div>

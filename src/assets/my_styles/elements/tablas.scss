@@ -1,0 +1,154 @@
+.divContainerTabla {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  > .innerTablas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.dinamicTable {
+  color: var(--app-table-text);
+
+  .divTable,
+  .myTable,
+  .divBody,
+  .tbody,
+  .tfoot,
+  .pieTabla {
+    background: var(--app-table-row-bg) !important;
+    color: var(--app-table-text) !important;
+  }
+
+  .thead.colorTitulo {
+    background: var(--app-table-header-bg) !important;
+    color: var(--app-table-header-text) !important;
+
+    > tr > .thHead {
+      background: var(--app-table-header-bg) !important;
+      color: var(--app-table-header-text) !important;
+    }
+  }
+
+  .thead.noColorTitulo {
+    background: var(--app-surface-muted) !important;
+    color: var(--app-text) !important;
+  }
+
+  .thHead {
+    color: inherit;
+    border-color: var(--app-table-border) !important;
+
+    &.titulo-oculto,
+    &.titulo-oculto .titulo {
+      color: transparent !important;
+    }
+  }
+
+  .tableTD {
+    color: inherit !important;
+    border-color: var(--app-table-border) !important;
+  }
+
+  .thead:not(.colorTitulo) {
+    border-bottom: 1px solid var(--app-table-border) !important;
+  }
+
+  .table_input:has(> input[disabled]) {
+    cursor: not-allowed !important;
+    position: relative;
+    width: 100%;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      z-index: 10;
+      pointer-events: auto;
+      cursor: not-allowed !important;
+    }
+
+    > input[disabled] {
+      pointer-events: none !important;
+    }
+  }
+
+  .table-input-disabled-overlay {
+    position: absolute;
+    inset: -1px;
+    z-index: 10;
+    cursor: not-allowed !important;
+  }
+
+  .inputTabla:disabled,
+  .inputTabla[disabled],
+  .p-select.p-disabled {
+    background: var(--app-table-input-disabled-bg) !important;
+    border-color: var(--app-table-input-disabled-border) !important;
+    color: var(--app-table-input-disabled-text) !important;
+    opacity: 1 !important;
+    cursor: not-allowed !important;
+  }
+
+  .inputTabla:disabled {
+    -webkit-text-fill-color: var(--app-table-input-disabled-text) !important;
+  }
+}
+
+.sort-icon {
+  position: relative;
+  width: 15px;
+  display: inline-block;
+  transform: translate(3px, -4px);
+
+  &::after,
+  &::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+  }
+
+  &::after {
+    top: 50%;
+    transform: translate(-50%, -50%) translateY(-4px);
+    border-bottom: 8px solid var(--app-table-sort-icon);
+  }
+
+  &::before {
+    top: 50%;
+    transform: translate(-50%, -50%) translateY(7px);
+    border-top: 8px solid var(--app-table-sort-icon);
+  }
+
+  &.order-asc::after {
+    border-bottom-color: var(--app-table-sort-active);
+  }
+
+  &.order-desc::before {
+    border-top-color: var(--app-table-sort-active);
+  }
+}
+
+@media (min-width: 992px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS LG ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS MD ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}
+
+@media (max-width: 767px) {
+  // =====================================================================================================================================================================
+  // PANTALLAS SM ========================================================================================================================================================
+  // =====================================================================================================================================================================
+}

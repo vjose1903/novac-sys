@@ -1,57 +1,65 @@
-<p *ngIf="!inputs.is_prefactura_selected">
-  Seguro que desea remover el articulo <strong>{{ inputs.nombre }}</strong>
-</p>
-
-<div *ngIf="inputs.is_prefactura_selected">
-
-  <ng-container *ngIf="inputs.data_detalle.is_defectuoso">
-    Seguro que desea retirar el articulo defectuoso:  <strong>{{ inputs.nombre }}</strong>
-  </ng-container>
-
-  <ng-container *ngIf="!inputs.data_detalle.is_defectuoso">
-    <h2><strong>Articulo: </strong> {{ inputs.nombre }}</h2>
-    <p>Especifique la razón de quitar este articulo de la Pre-factura.</p>
-    <div>
-      <hr class="rayaTop" />
+<div class="remove-confirmation" [class.prefactura]="is_prefactura_selected">
+  <div class="remove-confirmation-head">
+    <div class="remove-confirmation-icon">
+      <i class="fa-solid fa-trash-can"></i>
     </div>
-    <form [formGroup]="form">
-      <div class="row">
-        <div class="col-5">
-          <div class="d-flex align-items-center h-100">
-            <label class="control-label mr-2 mb-0">Devolver todo: </label>
-            <input class="apple-switch" type="checkbox" formControlName="all" (change)="changeValorCheck()" />
-          </div>
-        </div>
 
-        <div class="col-7">
-          <div class="form-group">
-            <label class="control-label mt-3">Cantidad: </label>
-            <input
-              id="cantidad"
-              min="1"
-              [max]="inputs.cantidad"
-              (keydown.enter)="saltar('razon')"
-              (focus)="$event.target.select()"
-              (blur)="checkCantidad()"
-              type="number"
-              class="form-control input_cantidad"
-              formControlName="cantidad"
-              placeholder="Introduzca la cantidad"
-              autocomplete="off"
-            />
-          </div>
-        </div>
+    <div class="remove-confirmation-copy">
+      @if (!is_prefactura_selected) {
+        <span>Seguro que desea remover el artículo</span>
+        <strong>{{ nombre }}</strong>
+      }
 
-        <div class="col-12">
-          <div class="form-group">
-            <label class="control-label">Razón: </label>
-            <select id="razon" (keydown.enter)="saltar('send')" formControlName="razon" class="form-control">
-              <option value="no_venta">Solo devolver</option>
-              <option value="producto_defectuoso">Producto defectuoso</option>
-            </select>
-          </div>
-        </div>
+      @if (is_prefactura_selected && data_detalle.is_defectuoso) {
+        <span>Seguro que desea retirar el artículo defectuoso</span>
+        <strong>{{ nombre }}</strong>
+      }
+
+      @if (is_prefactura_selected && !data_detalle.is_defectuoso) {
+        <span>Artículo</span>
+        <strong>{{ nombre }}</strong>
+        <small>Especifique la razón de quitar este artículo de la pre-factura.</small>
+      }
+    </div>
+  </div>
+
+  @if (is_prefactura_selected && !data_detalle.is_defectuoso) {
+    <form class="remove-confirmation-form" [formGroup]="form">
+      <label class="remove-switch-row">
+        <span>Devolver todo</span>
+        <input class="apple-switch" type="checkbox" formControlName="all" (change)="changeValorCheck()" />
+      </label>
+
+      <div class="form-group">
+        <label class="control-label">Cantidad: </label>
+        <input
+          id="cantidad"
+          min="1"
+          [max]="cantidad"
+          (keydown.enter)="saltar('razon')"
+          (focus)="htmlServ.selectValue($event)"
+          (blur)="checkCantidad()"
+          type="number"
+          class="form-control input_cantidad"
+          formControlName="cantidad"
+          placeholder="Introduzca la cantidad"
+          autocomplete="off" />
+      </div>
+
+      <div class="form-group">
+        <label class="control-label">Razón: </label>
+        <p-select
+          inputId="razon"
+          formControlName="razon"
+          [options]="[
+            { label: 'Solo devolver', value: 'no_venta' },
+            { label: 'Producto defectuoso', value: 'producto_defectuoso' }
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          (keydown.enter)="saltar('send')"></p-select>
       </div>
     </form>
-  </ng-container>
+  }
 </div>

@@ -8,6 +8,7 @@
 /app-builds
 /release
 /resources/*
+.nx/*
 /log/*
 main.js
 app_config.config
@@ -16,10 +17,19 @@ app_config.config
 *.pdf
 *.txt
 *.js
+!/scripts/*
+
+# Firebase configuration (contains sensitive credentials)
+electron/firebase-config.json
+firebase-config.json
+
+# Exceptuar eslint.config.js
+!eslint.config.js
 
 # dependencies
 /resources
 /log
+/.nx/*
 /node_modules
 /actualizacion
 actualizacion.zip

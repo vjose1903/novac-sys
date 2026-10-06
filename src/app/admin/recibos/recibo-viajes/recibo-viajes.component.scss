@@ -5,25 +5,198 @@
     "tarjetas"
     "listado-formulario";
 
-  grid-template-rows: min-content min-content auto;
-  row-gap: 0.5rem;
+  grid-template-rows: min-content min-content minmax(0, 1fr);
+  min-height: 0;
+  row-gap: 0.45rem;
   height: 100%;
   width: 100%;
 
   .titulo {
     grid-area: titulo;
+    align-items: end;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0 0.25rem;
+
+    h4 {
+      color: var(--app-text);
+      font-size: 1.65rem;
+      font-weight: 800 !important;
+      letter-spacing: 0;
+      line-height: 1.12;
+      margin: 0;
+    }
   }
+
+  .screen-module-kicker {
+    color: var(--app-text-muted);
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.2;
+    margin-bottom: 0.18rem;
+    text-transform: uppercase;
+  }
+
   .tarjetas {
     grid-area: tarjetas;
-    .colores {
+
+    .travel-status-panel {
+      align-items: center;
+      background: transparent !important;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
       display: flex;
-      column-gap: 0.5rem;
+      gap: 1rem;
+      justify-content: space-between;
+      padding: 0 0.25rem;
+      width: 100%;
+    }
+
+    .status-metrics {
+      display: flex;
+      gap: 0.55rem;
+      flex-wrap: nowrap;
+      min-width: 0;
+    }
+
+    .status-metric {
+      align-items: center;
+      background: linear-gradient(135deg, var(--app-surface) 0%, var(--app-surface-soft) 100%);
+      border: 1px solid var(--app-card-border);
+      border-radius: 0.75rem;
+      box-shadow: 0 0.45rem 1.1rem rgba(15, 23, 42, 0.1);
+      display: inline-flex;
+      gap: 0.45rem;
+      min-height: 2.2rem;
+      min-width: unset;
+      padding: 0.25rem 0.45rem;
+
+      .status-icon {
+        align-items: center;
+        border-radius: 0.45rem;
+        display: flex;
+        height: 1.45rem;
+        justify-content: center;
+        width: 1.45rem;
+      }
+
+      > span:not(.status-icon) {
+        align-items: center;
+        display: inline-flex;
+        gap: 0.5rem;
+      }
+
+      small {
+        color: var(--app-text-muted);
+        display: inline-block;
+        font-size: 0.58rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      strong {
+        color: var(--app-text);
+        display: inline-block;
+        font-size: 0.95rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      &.pending .status-icon {
+        background: rgba(199, 44, 44, 0.22);
+        color: #c72c2c;
+      }
+
+      &.pending {
+        border-color: rgba(199, 44, 44, 0.46);
+      }
+
+      &.credited .status-icon {
+        background: #fff3cd;
+        color: #b7791f;
+      }
+
+      &.credited {
+        border-color: rgba(183, 121, 31, 0.48);
+      }
+
+      &.completed .status-icon {
+        background: var(--primary01);
+        color: var(--primary08);
+      }
+
+      &.completed {
+        border-color: color-mix(in srgb, var(--primary08) 48%, transparent);
+      }
+
+      &.clear .status-icon {
+        background: var(--primary01);
+        color: var(--primary08);
+      }
+
+      &.clear {
+        border-color: color-mix(in srgb, var(--primary08) 48%, transparent);
+      }
+    }
+
+    .status-progress {
+      background: var(--app-surface);
+      border: 1px solid var(--app-card-border);
+      border-radius: 0.75rem;
+      box-shadow: 0 0.45rem 1.1rem rgba(15, 23, 42, 0.08);
+      flex: 0 0 min(22rem, 38%);
+      min-width: 15rem;
+      padding: 0.45rem 0.6rem;
+
+      ::ng-deep .p-progressbar {
+        background: #e8edf3;
+        border-radius: 999px;
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.12);
+        height: 0.42rem;
+        overflow: hidden;
+      }
+
+      ::ng-deep .p-progressbar-value {
+        background: linear-gradient(90deg, var(--primary06), var(--primary08));
+        border-radius: inherit;
+      }
+
+      ::ng-deep .p-progressbar-label {
+        display: none;
+      }
+    }
+
+    .status-progress-head {
+      align-items: center;
+      color: var(--app-text-muted);
+      display: flex;
+      font-size: 0.78rem;
+      font-weight: 700;
+      justify-content: space-between;
+      margin-bottom: 0.35rem;
+
+      strong {
+        color: var(--app-text);
+        font-weight: 800;
+      }
+
+      span span,
+      strong span {
+        color: var(--app-text-muted);
+      }
     }
   }
 
   .listado-formulario {
     display: flex;
     flex-direction: column;
+    min-height: 0;
     row-gap: 0.5rem;
 
     .listado {
@@ -38,6 +211,7 @@
 
       > .cardListados {
         position: relative;
+        overflow: hidden;
         > .divTabla {
           position: absolute;
           height: 100%;
@@ -59,7 +233,14 @@
       }
 
       .card {
+        background: var(--app-surface) !important;
+        border: 1px solid var(--app-card-border) !important;
+        border-radius: 0.95rem !important;
+        box-shadow: var(--app-overlay-shadow) !important;
         .card-header {
+          background: var(--app-table-header-bg) !important;
+          border-bottom: 1px solid var(--app-table-border);
+          color: var(--app-table-header-text);
         }
         .card-body {
           display: grid;
@@ -90,12 +271,35 @@
   column-gap: 1rem;
 }
 
-div.card-header {
-  background-color: var(--primary06);
-}
-
 .gris {
   color: var(--transparente01);
+}
+
+:host-context(html[data-theme-mode='dark']) {
+  .divListadoViajes {
+    .tarjetas {
+      .status-metric {
+        &.credited {
+          border-color: rgba(250, 204, 21, 0.38);
+
+          .status-icon {
+            background: rgba(234, 179, 8, 0.2);
+            color: #facc15;
+          }
+        }
+
+        &.completed,
+        &.clear {
+          border-color: rgba(74, 222, 128, 0.38);
+
+          .status-icon {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+          }
+        }
+      }
+    }
+  }
 }
 
 hr.rayaTop.mt-2 {

@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-// import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
-import { AuthGuard } from './core/guard/auth.guard';
-import { IsLoginGuard } from './core/guard/is-login.guard';
+import { AuthGuard } from '@core/guard/auth.guard';
+import { IsLoginGuard } from '@core/guard/is-login.guard';
 
-const routes: Routes = [
+export const routes: Routes =  [
   {
     path: '',
     redirectTo: 'auth/login',
@@ -27,18 +26,14 @@ const routes: Routes = [
     loadChildren: () => import('./login/login.module').then((m) => m.LoginModule),
     canActivate: [IsLoginGuard],
   },
-  // {
-  //   path: '**',
-  //   component: PageNotFoundComponent,
-  // },
 ];
 
-@NgModule({
-  imports: [
-    RouterModule.forRoot(routes, {
-    onSameUrlNavigation: 'reload'
-}),
-  ],
-  exports: [RouterModule],
-})
-export class AppRoutingModule {}
+// @NgModule({
+//   imports: [
+//     RouterModule.forRoot(routes, {
+//     onSameUrlNavigation: 'reload'
+// }),
+//   ],
+//   exports: [RouterModule],
+// })
+// export class AppRoutingModule {}

@@ -1,0 +1,38 @@
+<section class="cuadre-section">
+  <div class="cuadre-section-header">
+    <h5>{{ title }}</h5>
+    <button type="button" class="btn btn-sm btn-tema" (click)="addItem()" [disabled]="readonly"><i class="fas fa-plus"></i></button>
+  </div>
+
+  <div class="cuadre-grid">
+    <strong>Método</strong>
+    <strong>Descripción</strong>
+    <strong>Referencia</strong>
+    <strong>Monto</strong>
+    <span></span>
+
+    @for (item of items; track $index) {
+      <p-select
+        styleClass="cuadre-method-select"
+        appendTo="body"
+        [options]="availablePaymentMethods()"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="item.payment_method"
+        [disabled]="readonly || cardSection || isSystemItem(item)"
+        (ngModelChange)="patchItem($index, 'payment_method', $event)"
+      />
+      <input class="form-control form-control-sm" [value]="item.description" [readonly]="readonly" [disabled]="readonly" (input)="patchItem($index, 'description', $any($event.target).value)" />
+      <input class="form-control form-control-sm" [value]="item.reference" [readonly]="readonly" [disabled]="readonly" (input)="patchItem($index, 'reference', $any($event.target).value)" />
+      <input class="form-control form-control-sm text-end" appNumeroFormato [value]="item.amount" [readonly]="readonly" [disabled]="readonly" (input)="patchItem($index, 'amount', $any($event.target).value)" (appNumeroFormatoBlur)="patchItem($index, 'amount', $event)" />
+      <button type="button" class="btn btn-sm cuadre-icon-btn cuadre-remove-btn" (click)="removeItem($index)" [disabled]="readonly"><i class="fas fa-trash"></i></button>
+    } @empty {
+      <span class="cuadre-empty">Sin movimientos registrados.</span>
+    }
+  </div>
+
+  <div class="cuadre-section-total">
+    <span>Total</span>
+    <strong>{{ sectionTotal() }}</strong>
+  </div>
+</section>

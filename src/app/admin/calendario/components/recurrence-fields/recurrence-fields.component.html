@@ -1,0 +1,66 @@
+<div class="calendar-recurrence row" [formGroup]="form">
+  <div class="col-12 p-0">
+    <hr class="raya" />
+    <h6 class="calendar-section-title">Repeticion</h6>
+  </div>
+
+  <div class="col-6 ps-0">
+    <div class="form-group">
+      <label class="control-label">Se repite: </label>
+      <p-select
+        formControlName="recurrence_type"
+        [options]="recurrenceOptions"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="form-control calendar-compact-select"
+        placeholder="Selecciona repeticion"></p-select>
+    </div>
+  </div>
+
+  <div class="col-6 pe-0" *ngIf="recurrenceType !== 'none'">
+    <div class="form-group">
+      <label class="control-label">Cada: </label>
+      <input type="number" min="1" step="1" formControlName="recurrence_interval" class="form-control" />
+    </div>
+  </div>
+
+  <div class="col-12 p-0 week-days" *ngIf="recurrenceType === 'weekly'">
+    <label class="control-label">Dias: </label>
+    <div>
+      <button *ngFor="let day of weekDays" type="button" [class.active]="hasDay(day.value)" (click)="toggleDay(day.value)">
+        {{ day.label }}
+      </button>
+    </div>
+  </div>
+
+  <ng-container *ngIf="recurrenceType !== 'none'">
+    <div class="col-6 ps-0">
+      <div class="form-group">
+        <label class="control-label">Finaliza: </label>
+        <p-select
+          formControlName="recurrence_end_type"
+          [options]="finishOptions"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="form-control calendar-compact-select"
+          placeholder="Selecciona finalizacion"></p-select>
+      </div>
+    </div>
+
+    <div class="col-6 pe-0" *ngIf="finishType === 'until'">
+      <div class="form-group">
+        <label class="control-label">Fecha final: </label>
+        <p-datepicker inputId="calendar-recurrence-until" formControlName="recurrence_until" appendTo="body" dateFormat="dd/mm/yy" placeholder="dd/mm/aaaa"></p-datepicker>
+      </div>
+    </div>
+
+    <div class="col-6 pe-0" *ngIf="finishType === 'count'">
+      <div class="form-group">
+        <label class="control-label">Ocurrencias: </label>
+        <input type="number" min="1" step="1" formControlName="recurrence_count" class="form-control" />
+      </div>
+    </div>
+  </ng-container>
+</div>

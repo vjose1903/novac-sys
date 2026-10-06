@@ -1,0 +1,56 @@
+{
+  "id": "default",
+  "cliente": "brendy",
+  "color_app": "red",
+  "mode_app": "light",
+  "config_password": "SW4kcDB0Z3VAcmQVMj$pt30r=",
+  "direccion_empresa": "El higuerito, frente a la escuela, La Vega Rep. Dom.",
+  "logo_empresa": null,
+  "logo_impresion": null,
+  "nombre_empresa": "Panaderia & Reposteria Brendy",
+  "rnc_empresa": "132-35083-9",
+  "telefono_empresa": "(829)-423-1678",
+  "url_servidor": "https://novac-brendy.ddns.net",
+  "url_servidor_respaldo": "http://localhost:9091",
+  "usa_url_principal": false,
+  "usa_facturas_externas": false,
+  "has_contabilidad": true,
+  "is_db_local": true,
+  "calcular_itbis": false,
+  "usa_mora": false,
+  "is_produccion": true,
+  "facturacion_editar_precio": true,
+  "vende_sin_inventario": true,
+  "use_ecf": false,
+  "usa_modulo_viajes": false,
+  "medida_producto_terminado": "Producto",
+  "serie_default": "normal",
+
+  "printer_selected": {
+    "venta_contado": "Ninguna",
+    "venta_credito": "Ninguna",
+    "pre_venta": "Ninguna",
+    "cotizacion": "Ninguna",
+    "compra": "Ninguna",
+    "recibo_ingreso": "Ninguna",
+    "conduce": "Ninguna",
+    "nota": "Ninguna",
+    "cuadre_caja": "Ninguna",
+    "reporte": "Ninguna"
+  },
+
+  "pages_sizes": {
+    "venta_contado": "80mm_roll",
+    "venta_credito": "80mm_roll",
+    "pre_venta": "80mm_roll",
+    "cotizacion": "80mm_roll",
+    "compra": "80mm_roll",
+    "recibo_ingreso": "80mm_roll",
+    "conduce": "80mm_roll",
+    "nota": "80mm_roll",
+    "cuadre_caja": "80mm_roll",
+    "reporte": "8.5x11"
+  },
+
+  "documentos_a_imprimir": "nota,venta_credito,pre_venta,recibo_ingreso,conduce,cotizacion"
+}
