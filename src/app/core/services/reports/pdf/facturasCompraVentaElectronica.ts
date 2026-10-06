@@ -39,6 +39,7 @@ const tableColumnsWidth = [15, 190, 60, 60, 60, 60, 70];
 export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const is_venta = data.tipo === 'venta' ? true : false;
   const is_contado = data.condicion === 'Contado' ? true : false;
+  const qrCodeImage = data?.qr_url_dgii ? fun_.my_qrcode(data.qr_url_dgii) : null;
 
   const configApp: ConfigI = Ss.configServ.config;
 
@@ -50,7 +51,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
     footer: (currentPage, pageCount, pageSize) => pieFacturaVenta(data),
     images: {
       logo: `data:image/png;base64,${configApp.logo_impresion}`,
-      qrCodeImage: fun_.my_qrcode(data?.qr_url_dgii || ''),
+      ...(qrCodeImage ? { qrCodeImage } : {}),
     },
     styles: styles_,
     defaultStyle,
@@ -204,7 +205,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
 // PIE
 // ==========================================================================================================================================================
 function pieFacturaVenta(data) {
-  return getQRCode(data);
+  return data?.qr_url_dgii ? getQRCode(data) : { text: '' };
 }
 
 // ==========================================================================================================================================================
