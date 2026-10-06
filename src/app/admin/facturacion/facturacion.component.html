@@ -42,16 +42,18 @@
       }
 
       @if (!factServ.isCotizacion() && !factServ.isPreVenta()) {
-        <p-selectButton
-          [options]="facturasSerieOptions"
-          [ngModel]="is_external ? null : factServ.serieType()"
-          (ngModelChange)="factServ.serieType.set($event)"
-          (ngModelChange)="changeSerie()"
-          optionLabel="label"
-          optionValue="value"
-          optionDisabled="disabled"
-          [disabled]="is_external"
-          [allowEmpty]="false" />
+        @if (configApp?.usa_facturacion_electronica === true) {
+          <p-selectButton
+            [options]="facturasSerieOptions"
+            [ngModel]="is_external ? null : factServ.serieType()"
+            (ngModelChange)="factServ.serieType.set($event)"
+            (ngModelChange)="changeSerie()"
+            optionLabel="label"
+            optionValue="value"
+            optionDisabled="disabled"
+            [disabled]="is_external"
+            [allowEmpty]="false" />
+        }
       }
     </div>
   </div>
@@ -59,7 +61,7 @@
   <div class="colCard">
     <div class="cardPrincipal cardFacturacion">
       <div class="cabezaFactura field-sm">
-        <div class="row {{ factServ.isCotizacion() ? 'cotizacion-header-grid' : '' }}">
+        <div class="row {{ factServ.isCotizacion() || factServ.isPreVenta() ? 'cotizacion-header-grid' : '' }}">
           @if (factServ.tipoDocumento() != tipoDocFacturacion.pre_venta && factServ.tipoDocumento() != tipoDocFacturacion.cotizacion) {
             <div class="col-3 divRight ps-0 invoice-document-panel">
               <div class="row invoice-field-grid">

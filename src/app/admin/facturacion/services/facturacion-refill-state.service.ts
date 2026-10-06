@@ -25,6 +25,8 @@ export class FacturacionRefillStateService {
 
   getSerieForRefill(params: { factura: FacturasI; action: actionFacturacion; configApp: ConfigI }): { currentSerie: serie; equivalentSerie: boolean } {
     const { factura, action, configApp } = params;
+    if (configApp.usa_facturacion_electronica !== true) return { currentSerie: serie.normal, equivalentSerie: false };
+
     const tieneComprobanteElectronico = factura?.numero_comprobante?.includes('E');
     let currentSerie = tieneComprobanteElectronico ? serie.electronica : factura?.serie ?? serie.electronica;
     let equivalentSerie = false;

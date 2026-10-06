@@ -45,6 +45,7 @@ export const MENU_CONFIG: MenuItemI[] = [
     module: 'ecf',
     title: 'Facturación\nelectrónica',
     icon: 'assets/img/dgii-btn.png',
+    featureFlag: 'usa_facturacion_electronica',
     permission: [],
     type: 'dropdown',
     subItems: [

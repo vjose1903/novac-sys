@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { IpcService } from '@core/services/ipc.service';
 import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
 import { formFieldId, formFieldName } from './configuraciones.model';
+import { serie } from '@core/typescript/constantes';
 import { EmpresaService } from '@core/services/empresa.service';
 import { ThemeService } from '@core/services/theme.service';
 import { RequestC } from '@core/typescript/requests';
@@ -136,6 +137,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       [formFieldName.usa_mora]: [{ value: this.getValue(data, 'usa_mora') ?? false, disabled: false }, Validators.required],
       [formFieldName.is_produccion]: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
       [formFieldName.usa_modulo_viajes]: [{ value: this.getValue(data, 'usa_modulo_viajes') !== false, disabled: false }],
+      [formFieldName.usa_facturacion_electronica]: [{ value: this.getValue(data, 'usa_facturacion_electronica') ?? false, disabled: false }],
       [formFieldName.facturacion_editar_precio]: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
       [formFieldName.vende_sin_inventario]: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
       [formFieldName.medida_producto_terminado]: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
@@ -277,6 +279,8 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
     const keysToOmit = [...pageSizeKeys.map(key => `page_size_${key}`), ...pageSizeKeys.map(key => `printer_${key}`)];
 
     keysToOmit.forEach(key => delete formulario[key]);
+
+    if (formulario.usa_facturacion_electronica !== true) formulario.serie_default = serie.normal;
 
     // Agregar objetos estructurados
     formulario.pages_sizes = pages_sizes;

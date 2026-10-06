@@ -105,7 +105,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   notaSerieSelected = signal<serie>(serie.all);
 
   makeNotasSerieOptions: seriesDgiiI[] = seriesDGII({ includeAll: false });
-  makeNotaSerieSelected = signal<serie>(serie.electronica);
+  makeNotaSerieSelected = signal<serie>(serie.normal);
 
   fun = fun;
   serie = serie;
@@ -116,7 +116,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     [serie.no]: { mask: ' ', placeholder: ' ' },
   };
 
-  comprobante_mask_selected = computed(() => this.comprobantes_masks[this.serieSelected()]);
+  comprobante_mask_selected = computed(() => this.comprobantes_masks[this.getSerieForCurrentClient(this.serieSelected())]);
 
   table_config;
 
@@ -170,7 +170,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
   ngOnInit(): void {
     this.configApp = Ss.configServ.config;
-    this.makeNotaSerieSelected.set(this.configApp.serie_default);
+    const serieInitial = this.configApp.usa_facturacion_electronica === true ? this.configApp.serie_default : serie.normal;
+    this.serieSelected.set(this.getSerieForCurrentClient(serie.all));
+    this.notaSerieSelected.set(this.getSerieForCurrentClient(serie.all));
+    this.makeNotaSerieSelected.set(serieInitial);
+  }
+
+  private getSerieForCurrentClient(serieSelected: serie): serie {
+    return this.configApp?.usa_facturacion_electronica === true ? serieSelected : serie.normal;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -243,7 +250,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
   async getPaqueteComprobante() {
     try {
-      const tipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia == NotaC.base_comprobante[this.makeNotaSerieSelected()][this.buscarPara]);
+      const serieNota = this.getSerieForCurrentClient(this.makeNotaSerieSelected());
+      const tipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia == NotaC.base_comprobante[serieNota][this.buscarPara]);
 
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
 
@@ -320,7 +328,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
       const extra = { afterPath: `filtro/${palabra_a_buscar}`, parameters: { page: params.page, per_page: params.per_page, paginado: true, tipo_nota: '' } };
 
-      extra.parameters.tipo_nota = NotaC.base_comprobante[this.notaSerieSelected()][this.buscarPara];
+      extra.parameters.tipo_nota = NotaC.base_comprobante[this.getSerieForCurrentClient(this.notaSerieSelected())][this.buscarPara];
 
       try {
         const res = await this.notasClass.getAll(extra);
@@ -373,7 +381,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   changeNotaSerie(serie) {
-    this.notaSerieSelected.set(serie);
+    this.notaSerieSelected.set(this.getSerieForCurrentClient(serie));
     this.pedirNotas(this.tServ.obj_paginate.default);
   }
 
@@ -414,7 +422,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           tipo: this.tipo_documento_selected(),
           movimientos_viaje: true,
           extra_params: {
-            serie: this.serieSelected(),
+            serie: this.getSerieForCurrentClient(this.serieSelected()),
             ...(use_for ? { use_for } : {}),
             ...(this.buscarPara === 'solo_ver' ? { is_externa: this.solicitarFacturasExternas() } : {}),
           },
@@ -882,7 +890,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     if (this.buscarPara.includes('nota')) await this.getPaqueteComprobante();
 
     if (this.noExistenComprobantes == false) {
-      const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${idFactSelect}/${this.makeNotaSerieSelected()}`;
+      const serieNota = this.getSerieForCurrentClient(this.makeNotaSerieSelected());
+      const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${idFactSelect}/${serieNota}`;
       this.router.navigateByUrl(url);
     }
   }
@@ -928,7 +937,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
           const isAfterCertificationDate = DateUtils.compareDates(this.certificacionDate, DateUtils.format({ date: factura.fecha_equivalente, dateFormat: 'YYYY-MM-DD' })) >= 0;
 
-          if (isAfterCertificationDate && factura.is_external !== true) botonesDinamicos.push(botones.reemplaceButton);
+          if (this.configApp?.usa_facturacion_electronica === true && isAfterCertificationDate && factura.is_external !== true) {
+            botonesDinamicos.push(botones.reemplaceButton);
+          }
         }
       }
     }

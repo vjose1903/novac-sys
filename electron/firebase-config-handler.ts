@@ -2,6 +2,7 @@ import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore, doc, getDoc, collection, query, where, limit, getDocs } from 'firebase/firestore';
 import { getStorage, FirebaseStorage, ref, getBytes } from 'firebase/storage';
 import { ConfigI, EmpresaI } from '../src/app/core/interface/config-interface.js';
+import { serie } from '../src/app/core/typescript/constantes.js';
 import { pathAdd, writeLogs } from '../main';
 import MachineId from './machine-id.js';
 import * as fs from 'fs';
@@ -32,6 +33,7 @@ const GENERAL_CONFIG_KEYS: Array<keyof ConfigI> = [
   'config_password',
   'usa_url_principal',
   'usa_facturas_externas',
+  'usa_facturacion_electronica',
   'is_produccion',
   'has_contabilidad',
   'calcular_itbis',
@@ -342,7 +344,7 @@ export default class FirebaseConfigHandler {
   }
 
   private mergeConfig(generalConfig: Partial<ConfigI>, machineConfig: Partial<ConfigI>, localConfig: Partial<ConfigI> = {}): ConfigI {
-    return this.removeUndefinedValues(
+    const config = this.removeUndefinedValues(
       this.deepMerge(
         { ...this.handlerConfigFile.default_config, usa_facturas_externas: false },
         localConfig,
@@ -351,6 +353,10 @@ export default class FirebaseConfigHandler {
         { machineId: this.machineId, firebase_empresa_id: this._empresa.id }
       )
     ) as ConfigI;
+
+    if (config.usa_facturacion_electronica !== true) config.serie_default = serie.normal;
+
+    return config;
   }
 
   private hasMissingKeys(source: Partial<ConfigI>, keys: Array<keyof ConfigI>): boolean {
@@ -406,6 +412,7 @@ export default class FirebaseConfigHandler {
     const generalSnapshot = await getDoc(generalConfigRef);
     if (!generalSnapshot.exists()) {
       writeLogs('----- Configuración general no encontrada; usando valores locales -----');
+      if (localData.usa_facturacion_electronica !== true) localData.serie_default = serie.normal;
       const logoSyncKeys = (['logo_empresa', 'logo_impresion'] as const).filter(key => !!localConfig[key]);
       return {
         data: localData,
@@ -419,6 +426,10 @@ export default class FirebaseConfigHandler {
     const remoteData = this.pickConfigValues(currentGeneralConfig, GENERAL_CONFIG_KEYS);
     const syncPatch = this.collectMissingValues(localData, remoteData) as Partial<ConfigI>;
     const normalizedGeneralConfig = this.deepMerge(localData, remoteData);
+    if (normalizedGeneralConfig.usa_facturacion_electronica !== true && normalizedGeneralConfig.serie_default !== serie.normal) {
+      normalizedGeneralConfig.serie_default = serie.normal;
+      syncPatch.serie_default = serie.normal;
+    }
     const logoSyncKeys = (['logo_empresa', 'logo_impresion'] as const).filter(
       key => !(currentGeneralConfig as any)[`${key}_path`] && !!localConfig[key]
     );

@@ -451,13 +451,9 @@
                 }
 
                 h5 {
-                  color: #15803d;
+                  color: color-mix(in srgb, var(--primary08) 72%, var(--app-text));
                   font-variant-numeric: tabular-nums;
                   font-weight: 800;
-
-                  :host-context(html[data-theme-mode='dark']) & {
-                    color: #86efac;
-                  }
                 }
               }
             }
