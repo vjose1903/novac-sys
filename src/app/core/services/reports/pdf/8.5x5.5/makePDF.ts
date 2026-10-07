@@ -374,7 +374,7 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
     nombre: { label: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, valor: fun.capitalice(evaluar_nombre) || '' },
     doc_identidad: { label: `${is_suplidor ? 'RNC suplidor' : 'RNC cliente'} : `, valor: propietario?.rnc ?? data?.NoCliente_rnc ?? '' },
     direccion: { label: 'Dirección: ', valor: propietario.direccion || '' },
-    recibido: { label: 'Recibido: ', valorArray: [fun_.roundNumberToDecimal(data?.total), ` - ${fun_.my_capitalize(numero_letra)}`] },
+    recibido: { label: 'Recibido: ', valor: fun_.my_capitalize(numero_letra) },
   };
 
   const baseProps = { alignment: 'left', noWrap: true };
@@ -383,18 +383,12 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
     const config = propietarioConfig[key];
     return {
       ...baseProps,
+      noWrap: key !== 'recibido',
       margin: [0, index ? 3 : 0, 0, 0],
-      text:
-        key === 'recibido'
-          ? [
-              { text: config.label, bold: true, style: 'letra10' },
-              { text: config.valorArray[0], style: 'letra10' },
-              { text: config.valorArray[1], style: 'letra10' },
-            ]
-          : [
-              { text: config.label, bold: true, style: 'letra10' },
-              { text: config.valor, style: 'letra10' },
-            ],
+      text: [
+        { text: config.label, bold: true, style: 'letra10' },
+        { text: config.valor, style: 'letra10' },
+      ],
     };
   });
 }
