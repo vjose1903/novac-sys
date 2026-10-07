@@ -24,7 +24,7 @@ export class FacturacionStateService {
 
     return {
       titulo: this.getTitulo(tipoDocumento),
-      serieSelected: useNormalSerie ? serie.normal : configApp.serie_default,
+      serieSelected: useNormalSerie || configApp.usa_facturacion_electronica !== true ? serie.normal : configApp.serie_default,
       fechaDefault,
       modo_factura: this.getModoFacturaInicial(tipoDocumento),
       condicion_fact: this.getCondicionInicial(tipoDocumento),

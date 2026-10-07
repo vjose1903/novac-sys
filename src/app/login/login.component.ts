@@ -13,6 +13,7 @@ import { RequestC } from '@core/typescript/requests';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { Ss } from '@core/services/singleton.service';
 import { ConfigI } from '@core/interface/config-interface';
+import { serie } from '@core/typescript/constantes';
 import { fun } from '@core/services/functions.service';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { FacturaC } from '@admin/facturacion/factura';
@@ -159,7 +160,7 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
           empresa_id: empresaId,
           machine_id: this.configApp.machineId,
           config,
-          only_missing: true,
+          only_missing: !(this.configApp.usa_facturacion_electronica !== true && config.serie_default === serie.normal),
         },
         { afterPath: 'firebase/configuration' }
       );

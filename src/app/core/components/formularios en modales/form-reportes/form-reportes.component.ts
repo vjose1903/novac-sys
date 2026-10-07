@@ -51,6 +51,9 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   advancedFiltersReady: boolean = false;
 
   facturasSerieOptions: seriesDgiiI[] = seriesDGII({ includeAll: true });
+  get usaFacturacionElectronica(): boolean {
+    return Ss.configServ.config?.usa_facturacion_electronica === true;
+  }
 
   ReportDateTypeE = ReportDateTypeE;
   reportField = reportField;
@@ -314,7 +317,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
     }
 
     if (fun.hasValue(serie_selected)) {
-      this.form.controls.serie.setValue(serie_selected);
+      this.form.controls.serie.setValue(this.usaFacturacionElectronica ? serie_selected : serie.normal);
       this.setValidator('serie');
     }
 
@@ -596,6 +599,8 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   }
 
   submit() {
-    this.modalConfig.close({ data: { ...this.form.getRawValue(), is_external: this.is_external === true, switchGroup: { ...this.switchGroup } } });
+    const formValue = this.form.getRawValue();
+    if (!this.usaFacturacionElectronica && fun.hasValue(formValue.serie)) formValue.serie = serie.normal;
+    this.modalConfig.close({ data: { ...formValue, is_external: this.is_external === true, switchGroup: { ...this.switchGroup } } });
   }
 }

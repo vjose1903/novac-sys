@@ -81,6 +81,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   hasPermissionUpdateFormula = false;
   configApp: ConfigI;
   medida_config: string;
+  se_calcula_saco_config: boolean;
 
   table_config: table_config = {
     info: [
@@ -118,6 +119,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.createForm();
     this.configApp = Ss.configServ.config;
     this.medida_config = this.configApp.medida_producto_terminado;
+    this.se_calcula_saco_config = this.configApp.se_calcula_saco;
+
+    console.log("this.se_calcula_saco_config ", this.se_calcula_saco_config);
+
 
     this.permissionsService.hasPermission(this.permissions.articulo.update_formula).then(result => {
       this.hasPermissionUpdateFormula = result;
@@ -286,7 +291,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         if (fun.hasValue(this.form)) this.form.controls.precio_principal.reset(null);
 
         this.form.controls.medida.setValue(this.medida_config);
-        this.form.controls.calcular_saco.setValue(true);
+        this.form.controls.calcular_saco.setValue(this.se_calcula_saco_config && true);
       });
     } else {
       this.resetArray();

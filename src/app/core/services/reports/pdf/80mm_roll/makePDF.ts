@@ -33,7 +33,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
   const configApp: ConfigI = Ss.configServ.config;
 
   const dd = {
-    pageSize: { width: 200, height: 'auto' },
+    pageSize: { width: 220, height: 'auto' },
     pageOrientation: 'portrait',
     pageMargins: [5, 20, 5, 20],
     content: contenidoPDF(data, is_suplidor, configApp, tipo_pdf, is_electronica),

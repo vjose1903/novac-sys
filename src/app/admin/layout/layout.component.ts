@@ -192,7 +192,10 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   async changeSerieDefault() {
     const empresaId = this.configApp.firebase_empresa_id;
     const machineId = this.configApp.machineId;
-    const serie_default = this.configApp.serie_default === serie.electronica ? serie.normal : serie.electronica;
+    let serie_default = serie.normal;
+    if (this.configApp.usa_facturacion_electronica === true) {
+      serie_default = this.configApp.serie_default === serie.electronica ? serie.normal : serie.electronica;
+    }
 
     if (!empresaId || !machineId) {
       fun.toastError('No se encontró la empresa o máquina para guardar la serie.', 'ERROR');

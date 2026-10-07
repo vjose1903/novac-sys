@@ -41,12 +41,14 @@
                     Recargar aplicación
                   </a>
                 </li>
-                <li>
-                  <div class="popover-item" id="popover-item" (click)="changeSerieDefault(); dropdownCuenta.hide()">
-                    <i class="fas fa-file-invoice-dollar"></i>
-                    <strong>Serie por defecto:</strong> {{ my_capitalize(configApp.serie_default) }}
-                  </div>
-                </li>
+                @if (configApp?.usa_facturacion_electronica === true) {
+                  <li>
+                    <div class="popover-item" id="popover-item" (click)="changeSerieDefault(); dropdownCuenta.hide()">
+                      <i class="fas fa-file-invoice-dollar"></i>
+                      <strong>Serie por defecto:</strong> {{ my_capitalize(configApp.serie_default) }}
+                    </div>
+                  </li>
+                }
                 <li>
                   <div class="popover-item" id="popover-item" (click)="verificarActualizaciones(); dropdownCuenta.hide()">
                     <i class="fas fa-cloud-arrow-down"></i>

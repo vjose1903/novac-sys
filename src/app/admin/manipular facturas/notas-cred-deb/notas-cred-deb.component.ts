@@ -115,7 +115,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     effect(async () => {
       if (this.serieSelected()) {
         const type = this.isCredito ? 'nota_credito' : 'nota_debito';
-        this.tipoFactura = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia == NotaC.base_comprobante[this.serieSelected()][type] && tipo.serie == this.serieSelected());
+        const serieSelected = this.getSerieForCurrentClient(this.serieSelected());
+        this.tipoFactura = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia == NotaC.base_comprobante[serieSelected][type] && tipo.serie == serieSelected);
 
         await this.getPaqueteComprobante();
       }
@@ -127,7 +128,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
     this.configApp = Ss.configServ.config;
 
     this.fecha = moment().format('DD/MM/YYYY');
-    this.serieSelected.set(this.serie);
+    this.serieSelected.set(this.getSerieForCurrentClient(this.serie));
     if (this.isCredito) {
       this.tituloPag = 'Nota de crédito aplicada a factura ';
 
@@ -143,6 +144,10 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
 
   ngOnDestroy(): void {
     this._destroy_mixin();
+  }
+
+  private getSerieForCurrentClient(serieSelected: serie): serie {
+    return this.configApp?.usa_facturacion_electronica === true ? serieSelected : serie.normal;
   }
 
   async necesarioStart() {
@@ -520,7 +525,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
       bruto: this.brutoGeneral(),
       itbis: this.itbisGeneral(),
       total: this.totalGeneral(),
-      serie: this.serieSelected(),
+      serie: this.getSerieForCurrentClient(this.serieSelected()),
       facturas_aplicadas: [],
     };
 

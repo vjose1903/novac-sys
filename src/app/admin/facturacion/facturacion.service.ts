@@ -25,15 +25,15 @@ export class FacturacionService {
   filasDetalle;
 
   tipoFacturaClass = new TiposFacturaC();
-  serieType = signal(serie.electronica);
+  serieType = signal(serie.normal);
 
   isCompra = computed(() => this.tipoDocumento() == tipoDocFacturacion.compra);
   isVenta = computed(() => this.tipoDocumento() == tipoDocFacturacion.venta);
   isCotizacion = computed(() => this.tipoDocumento() == tipoDocFacturacion.cotizacion);
   isPreVenta = computed(() => this.tipoDocumento() == tipoDocFacturacion.pre_venta);
 
-  isComprobanteElectronico = computed(() => this.serieType() == serie.electronica);
-  isComprobanteNormal = computed(() => this.serieType() == serie.normal);
+  isComprobanteElectronico = computed(() => Ss.configServ.config?.usa_facturacion_electronica === true && this.serieType() == serie.electronica);
+  isComprobanteNormal = computed(() => Ss.configServ.config?.usa_facturacion_electronica !== true || this.serieType() == serie.normal);
 
   public get clienteContado(): { id?: any; direccion?: string; nombre_completo?: string } {
     if (fun.hasValue(Ss.configServ)) {
@@ -48,12 +48,13 @@ export class FacturacionService {
   constructor() {}
 
   async setTipos(args: { metodo: tipoDocFacturacion; serie: serie; equivalentSerie?: boolean; tipoFacturaId?: number }) {
-      const { metodo, serie, equivalentSerie, tipoFacturaId } = args;
+      const { metodo, serie: serieSolicitada, equivalentSerie, tipoFacturaId } = args;
+      const serieActual = Ss.configServ.config?.usa_facturacion_electronica === true ? serieSolicitada : serie.normal;
 
       await this.getTiposFacturas();
-      if (!comprobante[serie]) throw new Error('La serie de facturacion configurada no es valida. Revise la configuracion.');
+      if (!comprobante[serieActual]) throw new Error('La serie de facturacion configurada no es valida. Revise la configuracion.');
 
-      this.serieType.set(serie);
+      this.serieType.set(serieActual);
 
       if (metodo == tipoDocFacturacion.compra || metodo == tipoDocFacturacion.venta) {
         const defaultKey = metodo == tipoDocFacturacion.compra ? tFacturaKey.factura_de_credito_fiscal : tFacturaKey.factura_de_consumo;
@@ -92,7 +93,7 @@ export class FacturacionService {
 
       if (!this.tipoFactura) {
         this.tipoFacturaReferenciaSelected = undefined;
-        throw new Error(`No se encontro el tipo de factura para ${metodo} en la serie ${serie}. Revise los tipos de factura del servidor seleccionado.`);
+        throw new Error(`No se encontro el tipo de factura para ${metodo} en la serie ${serieActual}. Revise los tipos de factura del servidor seleccionado.`);
       }
 
       await this.setTipoFacturaSelected({ value: this.tipoFactura.id, by: 'id', equivalentSerie: false });

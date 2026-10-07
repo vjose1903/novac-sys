@@ -30,6 +30,7 @@ export interface ConfigI {
   config_password:             string;
   usa_url_principal:           boolean;
   usa_facturas_externas:       boolean;
+  usa_facturacion_electronica: boolean;
   is_produccion:               boolean;
   has_contabilidad:            boolean;
   calcular_itbis:              boolean;
@@ -43,6 +44,7 @@ export interface ConfigI {
   vende_sin_inventario:        boolean;
   use_ecf?:                    boolean;
   usa_modulo_viajes?:          boolean;
+  se_calcula_saco?:            boolean;
   documentos_a_imprimir:       string;
   serie_default:               serie;
   medida_producto_terminado:   string;

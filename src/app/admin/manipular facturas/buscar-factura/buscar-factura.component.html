@@ -66,18 +66,20 @@
 
           </div>
 
-          <div class="search-series-panel">
-            <div class="series-panel-label">
-              <span class="series-panel-icon">
-                <i class="fa-solid fa-layer-group"></i>
-              </span>
-              <div>
-                <span>Serie factura</span>
-                <small>Filtra por el tipo de comprobante</small>
+          @if (configApp?.usa_facturacion_electronica === true) {
+            <div class="search-series-panel">
+              <div class="series-panel-label">
+                <span class="series-panel-icon">
+                  <i class="fa-solid fa-layer-group"></i>
+                </span>
+                <div>
+                  <span>Serie factura</span>
+                  <small>Filtra por el tipo de comprobante</small>
+                </div>
               </div>
+              <p-selectButton [options]="facturasSerieOptions" [ngModel]="serieSelected()" (ngModelChange)="serieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
             </div>
-            <p-selectButton [options]="facturasSerieOptions" [ngModel]="serieSelected()" (ngModelChange)="serieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
-          </div>
+          }
 
           <div class="search-fields-row search-row-secondary">
             <!-- ================ TIPO FACTURA  ================ -->
@@ -167,12 +169,14 @@
     @if (mostrarListaFacturas()) {
       @if (buscarPara.includes('nota')) {
         <div class="table-top-actions">
-          <div class="note-series-card">
-            <div class="form-group mb-0">
-              <label class="control-label mb-0">Serie {{ para }}: </label>
-              <p-selectButton [options]="makeNotasSerieOptions" [ngModel]="makeNotaSerieSelected()" (ngModelChange)="makeNotaSerieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+          @if (configApp?.usa_facturacion_electronica === true) {
+            <div class="note-series-card">
+              <div class="form-group mb-0">
+                <label class="control-label mb-0">Serie {{ para }}: </label>
+                <p-selectButton [options]="makeNotasSerieOptions" [ngModel]="makeNotaSerieSelected()" (ngModelChange)="makeNotaSerieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+              </div>
             </div>
-          </div>
+          }
         </div>
       }
       <div #cardTablaVerFacturas class="card tablaContent">
@@ -200,7 +204,9 @@
           <span>Historial de documentos aplicados</span>
         </div>
       </div>
-      <p-selectButton [options]="notasSerieOptions" [ngModel]="notaSerieSelected()" (ngModelChange)="changeNotaSerie($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+      @if (configApp?.usa_facturacion_electronica === true) {
+        <p-selectButton [options]="notasSerieOptions" [ngModel]="notaSerieSelected()" (ngModelChange)="changeNotaSerie($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+      }
     </div>
   </ng-template>
   <div class="notes-drawer-content">
