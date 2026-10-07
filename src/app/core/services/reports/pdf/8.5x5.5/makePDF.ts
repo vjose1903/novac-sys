@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/indent */
 import * as _ from 'lodash';
+import Big from 'big.js';
 import * as fun_ from '../../utils/funciones';
 import { defaultStyle, styles_ } from '../../utils/files';
 import { Ss } from '../../../singleton.service';
@@ -365,7 +366,10 @@ function parseInfoFactura(data, tipo_pdf, is_electronica) {
 function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
   if (!infoPropietarioPartes[tipo_pdf].length) return [{ text: '' }];
 
-  const numero_letra = numLetra.NumeroALetras(data?.total);
+  const bruto = data?.bruto ?? data?.Bruto;
+  const mora = data?.mora ?? 0;
+  const montoRecibido = bruto !== undefined ? Big(bruto).plus(mora).round(2).toNumber() : Big(data?.total ?? 0).round(2).toNumber();
+  const numero_letra = numLetra.NumeroALetras(montoRecibido);
 
   const propietario = is_suplidor ? data?.suplidor : data?.cliente;
 
