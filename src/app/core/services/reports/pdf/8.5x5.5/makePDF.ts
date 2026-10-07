@@ -78,6 +78,8 @@ function getConfiguration(tipo_pdf: string, configApp: ConfigI) {
 // ==========================================================================================================================================================
 function cabeceraPDF(args: { data: any; currentPage: any; pageCount: any; pageSize: any; is_suplidor: boolean; configApp: ConfigI; tipo_pdf: any; is_electronica: boolean }) {
   const { data, currentPage, pageCount, pageSize, is_suplidor, configApp, tipo_pdf, is_electronica } = args;
+  const mostrarRegistroMercantil = ['recibo_ingreso', 'conduce', 'notas'].includes(tipo_pdf);
+  const registroMercantil = mostrarRegistroMercantil ? configApp.registro_mercantil?.trim() : '';
   const header = [
     {
       margin: [15, 15, 15, 0],
@@ -92,7 +94,7 @@ function cabeceraPDF(args: { data: any; currentPage: any; pageCount: any; pageSi
               width: 'auto',
             },
             {
-              margin: [-50, 0, 0, 0],
+              margin: [-50, registroMercantil ? -5 : 0, 0, 0],
               stack: [
                 { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
                 { text: configApp.direccion_empresa, alignment: 'center', style: 'letra10' },
@@ -105,6 +107,7 @@ function cabeceraPDF(args: { data: any; currentPage: any; pageCount: any; pageSi
                   ],
                   alignment: 'center',
                 },
+                ...(registroMercantil ? [{ text: [{ text: 'Registro Mercantil NO. ' }, { text: registroMercantil, bold: true }], alignment: 'center', style: 'letra9' }] : []),
               ],
               width: '*',
             },

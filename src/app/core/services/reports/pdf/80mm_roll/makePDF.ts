@@ -55,7 +55,8 @@ export function makePDF(data, file_name, tipo_pdf?) {
 
 function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf, is_electronica) {
   const configuration = configuraciones[tipo_pdf];
-  const registroMercantil = !is_suplidor ? configApp.registro_mercantil?.trim() : '';
+  const mostrarRegistroMercantil = ['recibo_ingreso', 'conduce', 'notas'].includes(tipo_pdf) || (!is_suplidor && tipo_pdf === 'ventas');
+  const registroMercantil = mostrarRegistroMercantil ? configApp.registro_mercantil?.trim() : '';
 
   data.tipo_tabla = 'normal';
 
