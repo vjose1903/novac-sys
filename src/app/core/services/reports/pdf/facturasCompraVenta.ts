@@ -57,6 +57,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
 // CABECERA
 // ==========================================================================================================================================================
 function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, configApp: ConfigI) {
+  const registroMercantil = is_venta ? configApp.registro_mercantil?.trim() : '';
   const header = [
     {
       margin: [15, 15, 15, 0],
@@ -74,7 +75,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
           ],
         },
         {
-          margin: [0, -40, 0, 0],
+          margin: [0, registroMercantil ? -45 : -40, 0, 0],
           stack: [
             { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
             { text: configApp.direccion_empresa, alignment: 'center', style: 'letra10' },
@@ -87,6 +88,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
               ],
               alignment: 'center',
             },
+            ...(registroMercantil ? [{ text: [{ text: 'Registro Mercantil NO. ' }, { text: registroMercantil, bold: true }], alignment: 'center', style: 'letra9' }] : []),
           ],
         },
 

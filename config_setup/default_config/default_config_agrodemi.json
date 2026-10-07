@@ -26,6 +26,7 @@
   "usa_modulo_viajes": true,
   "medida_producto_terminado": "Quintal",
   "serie_default": "electronica",
+  "registro_mercantil": "3679LV",
 
   "printer_selected": {
     "venta_contado": "Ninguna",

@@ -42,7 +42,7 @@
                   <app-upload-img [src_img]="logo_impresion" (getPhotoData)="getPhotoData($event)" [id]="'logo_impresion'"></app-upload-img>
                 </div>
 
-                <div class="col-6 mb-2">
+                <div class="col-12 col-md-6 col-lg-4 mb-2">
                   <div class="form-group">
                     <label class="control-label">Rnc: </label>
                     <p-inputMask [inputId]="formFieldId.rnc_empresa" (keydown.enter)="saltar(formFieldId.rnc_empresa)" [formControlName]="formFieldName.rnc_empresa" mask="999-99999-9" [autoClear]="false"></p-inputMask>
@@ -50,7 +50,15 @@
                   </div>
                 </div>
 
-                <div class="col-6 mb-2">
+                <div class="col-12 col-md-6 col-lg-4 mb-2">
+                  <div class="form-group">
+                    <label class="control-label">Registro mercantil: </label>
+                    <input [id]="formFieldId.registro_mercantil" (keydown.enter)="saltar(formFieldId.registro_mercantil)" type="text" [formControlName]="formFieldName.registro_mercantil" placeholder="Introduzca el registro mercantil" class="form-control" autocomplete="off" />
+                    <form-error-msg [control]="form.get(formFieldName.registro_mercantil)"></form-error-msg>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4 mb-2">
                   <div class="form-group">
                     <label class="control-label">Telefono: </label>
                     <p-inputMask [inputId]="formFieldId.telefono_empresa" (keydown.enter)="saltar(formFieldId.telefono_empresa)" [formControlName]="formFieldName.telefono_empresa" mask="(999)-999-9999" [autoClear]="false"></p-inputMask>

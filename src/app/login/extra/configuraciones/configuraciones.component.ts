@@ -120,6 +120,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       [formFieldName.machineId]: [{ value: this.getValue(data, 'machineId'), disabled: false }],
       [formFieldName.nombre_empresa]: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
       [formFieldName.rnc_empresa]: [{ value: this.getValue(data, 'rnc_empresa'), disabled: false }, Validators.required],
+      [formFieldName.registro_mercantil]: [{ value: this.getValue(data, 'registro_mercantil') ?? '', disabled: false }],
       [formFieldName.direccion_empresa]: [{ value: this.getValue(data, 'direccion_empresa'), disabled: false }, Validators.required],
       [formFieldName.telefono_empresa]: [{ value: this.getValue(data, 'telefono_empresa'), disabled: false }, Validators.required],
       [formFieldName.logo_empresa]: [{ value: this.getValue(data, 'logo_empresa'), disabled: false }, Validators.required],
@@ -200,7 +201,8 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
     const next_control_map = {
       [formFieldId.nombre_empresa]: formFieldId.rnc_empresa,
-      [formFieldId.rnc_empresa]: formFieldId.telefono_empresa,
+      [formFieldId.rnc_empresa]: formFieldId.registro_mercantil,
+      [formFieldId.registro_mercantil]: formFieldId.telefono_empresa,
       [formFieldId.telefono_empresa]: formFieldId.direccion_empresa,
       [formFieldId.direccion_empresa]: formFieldId.color_app,
       [formFieldId.color_app]: formFieldId.url_servidor,

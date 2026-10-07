@@ -55,6 +55,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
 
 function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf, is_electronica) {
   const configuration = configuraciones[tipo_pdf];
+  const registroMercantil = !is_suplidor ? configApp.registro_mercantil?.trim() : '';
 
   data.tipo_tabla = 'normal';
 
@@ -91,6 +92,7 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf, is_electr
             { text: configApp.rnc_empresa, style: 'letra8' },
           ],
         },
+        ...(registroMercantil ? [{ text: [{ text: 'Registro Mercantil NO. ' }, { text: registroMercantil, bold: true }], alignment: 'center', style: 'letra7', margin: [0, 2, 0, 0] }] : []),
         // ---------- DATOS DE LA FACTURA -----------
         {
           margin: [0, 10, 0, 0],
