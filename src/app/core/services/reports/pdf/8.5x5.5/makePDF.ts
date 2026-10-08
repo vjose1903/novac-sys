@@ -39,10 +39,14 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
   const configApp: ConfigI = Ss.configServ.config;
   const configuration = getConfiguration(tipo_pdf, configApp);
   const pageO = configuration['pageOrient'] ? configuration['pageOrient'] : 'portrait';
+  const mostrarRegistroMercantil = ['conduce', 'notas'].includes(base_tipo_pdf) && !!configApp.registro_mercantil?.trim();
+  const pageMargins = [...configuration.pageMargins];
+
+  if (mostrarRegistroMercantil) pageMargins[1] += 5;
 
   const dd = {
     pageSize: configuration.pageSize,
-    pageMargins: configuration.pageMargins,
+    pageMargins,
     header: (currentPage, pageCount, pageSize) => cabeceraPDF({ data, currentPage, pageCount, pageSize, is_suplidor, configApp, tipo_pdf: base_tipo_pdf, is_electronica }),
     content: contenidoPDF({ data, configApp, configuration, tipo_pdf: base_tipo_pdf, is_electronica }),
     footer: (currentPage, pageCount, pageSize) => pieFacturaVenta(data, is_electronica),
@@ -373,12 +377,8 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
 
   const propietario = is_suplidor ? data?.suplidor : data?.cliente;
 
-  const max_length = 60;
-
-  const evaluar_nombre = propietario.nombre_completo.length > max_length ? `${propietario.nombre_completo.substring(0, max_length)}...` : propietario.nombre_completo;
-
   const propietarioConfig = {
-    nombre: { label: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, valor: fun.capitalice(evaluar_nombre) || '' },
+    nombre: { label: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, valor: fun.capitalice(propietario.nombre_completo) || '' },
     doc_identidad: { label: `${is_suplidor ? 'RNC suplidor' : 'RNC cliente'} : `, valor: propietario?.rnc ?? data?.NoCliente_rnc ?? '' },
     direccion: { label: 'Dirección: ', valor: propietario.direccion || '' },
     recibido: { label: 'Recibido: ', valor: fun_.my_capitalize(numero_letra) },
@@ -390,6 +390,7 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
     const config = propietarioConfig[key];
     return {
       ...baseProps,
+      ...(key === 'nombre' ? { autoEllipsis: { widthRatio: 0.62 } } : {}),
       noWrap: key !== 'recibido',
       margin: [0, index ? 3 : 0, 0, 0],
       text: [

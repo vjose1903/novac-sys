@@ -12,13 +12,13 @@ import { fun } from '@core/services/functions.service';
 // ==========================================================================================================================================================
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
-function getPageMargin(is_contado) {
+function getPageMargin(is_contado, mostrarRegistroMercantil) {
   let margins = [];
 
   if (is_contado) {
-    margins = [15, 135, 15, 80];
+    margins = [15, 135 + (mostrarRegistroMercantil ? 5 : 0), 15, 80];
   } else {
-    margins = [15, 148.6, 15, 80];
+    margins = [15, 148.6 + (mostrarRegistroMercantil ? 5 : 0), 15, 80];
   }
 
   return margins;
@@ -45,7 +45,7 @@ export function makePDF(data, file_name, base_tipo_pdf?, post_tipo_pdf = '') {
 
   const dd = {
     pageSize: is_contado ? { width: 600, height: 398 } : { width: 600, height: 796 },
-    pageMargins: getPageMargin(is_contado),
+    pageMargins: getPageMargin(is_contado, is_venta && !!configApp.registro_mercantil?.trim()),
     header: (currentPage, pageCount, pageSize) => cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount, configApp),
     content: processContenidoFactura(data, is_contado, is_venta, configApp),
     footer: (currentPage, pageCount, pageSize) => pieFacturaVenta(data),
@@ -103,18 +103,15 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
 
         {
           margin: [0, 10, 0, 0],
+          autoEllipsis: { widthRatio: 0.72 },
           text: [
-            {
-              text: [
-                is_venta ? { text: 'Razón Social Cliente : ', style: 'letra10' } : { text: ' Razón Social Suplidor : ', style: 'letra10' },
-                is_venta ? { text: data.cliente.nombre_completo, style: 'letra10' } : { text: data.suplidor.nombre_completo, style: 'letra10' },
-              ],
-            },
+            { text: 'Razón Social : ', style: 'letra10' },
+            { text: is_venta ? data.cliente.nombre_completo : data.suplidor.nombre_completo, style: 'letra10' },
           ],
         },
 
         {
-          text: [{ text: `RNC ${is_venta ? 'cliente' : 'suplidor'} : `, style: 'letra10' }, is_venta ? { text: data.cliente?.rnc ?? data.NoCliente_rnc ?? '----------', style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
+          text: [{ text: 'RNC : ', style: 'letra10' }, is_venta ? { text: data.cliente?.rnc ?? data.NoCliente_rnc ?? '----------', style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
           margin: [0, 4, 0, 0],
         },
 

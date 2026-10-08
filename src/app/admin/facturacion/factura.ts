@@ -358,15 +358,6 @@ export class FacturaC extends CrudG<FacturasI> {
       data_parsed.total = data_parsed.total_factura;
       data_parsed.contenido_reporte = [];
 
-      const truncarNombre = entidad => {
-        if (fun.hasValue(entidad) && entidad.nombre_completo.length > 80) {
-          entidad.nombre_completo = `${entidad.nombre_completo.substring(0, 80)}...`;
-        }
-      };
-
-      truncarNombre(data_parsed.cliente);
-      truncarNombre(data_parsed.suplidor);
-
       data_parsed.detalle_facturas.forEach(detalle => {
         if ((detalle.is_devuelto && detalle.is_defectuoso) || !detalle.is_devuelto) {
           detalle['cantidad'] = `${fun.roundNumberToDecimal(detalle.cantidad)} ${unidadAbrev[fun.normalizarTexto(detalle.unidad)]}.`;
