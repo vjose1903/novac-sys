@@ -13,12 +13,13 @@ import { fun } from '@core/services/functions.service';
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
 function getPageMargin(is_contado, mostrarRegistroMercantil) {
+  const alturaRegistroMercantil = mostrarRegistroMercantil ? (is_contado ? 5 : 6) : 0;
   let margins = [];
 
   if (is_contado) {
-    margins = [15, 135 + (mostrarRegistroMercantil ? 5 : 0), 15, 80];
+    margins = [15, 135 + alturaRegistroMercantil, 15, 80];
   } else {
-    margins = [15, 148.6 + (mostrarRegistroMercantil ? 5 : 0), 15, 80];
+    margins = [15, 148.6 + alturaRegistroMercantil, 15, 80];
   }
 
   return margins;
@@ -103,67 +104,67 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
 
         {
           margin: [0, 10, 0, 0],
-          autoEllipsis: { widthRatio: 0.72 },
-          text: [
-            { text: 'Razón Social : ', style: 'letra10' },
-            { text: is_venta ? data.cliente.nombre_completo : data.suplidor.nombre_completo, style: 'letra10' },
-          ],
-        },
-
-        {
-          text: [{ text: 'RNC : ', style: 'letra10' }, is_venta ? { text: data.cliente?.rnc ?? data.NoCliente_rnc ?? '----------', style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
-          margin: [0, 4, 0, 0],
-        },
-
-        {
-          margin: [0, 4, 0, 0],
-          text: [
+          columns: [
             {
-              text: [{ text: 'Dirección : ', style: 'letra10' }, is_venta ? { text: data.cliente.direccion, style: 'letra10' } : { text: data.suplidor.direccion, style: 'letra10' }],
-            },
-          ],
-        },
-
-        {
-          margin: [420, -40, 0, 0],
-          stack: [
-            {
-              text: [
-                { text: 'Fecha Emisión: ', style: 'letra10' },
-                { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra10' },
-              ],
-              margin: [0, -10, 0, 0],
-            },
-            is_contado
-              ? { text: '' }
-              : {
+              width: '*',
+              stack: [
+                {
+                  autoEllipsis: { column: true },
                   text: [
-                    { text: 'Fecha limite pago : ', style: 'letra10' },
-                    { text: fun_.my_dateFormater(data.fecha_vencimiento), style: 'letra10' },
+                    { text: 'Razón Social : ', style: 'letra10' },
+                    { text: is_venta ? data.cliente.nombre_completo : data.suplidor.nombre_completo, style: 'letra10' },
+                  ],
+                },
+                {
+                  text: [{ text: 'RNC : ', style: 'letra10' }, is_venta ? { text: data.cliente?.rnc ?? data.NoCliente_rnc ?? '----------', style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' }],
+                  margin: [0, 4, 0, 0],
+                },
+                {
+                  margin: [0, 4, 0, 0],
+                  text: [{ text: 'Dirección : ', style: 'letra10' }, is_venta ? { text: data.cliente.direccion, style: 'letra10' } : { text: data.suplidor.direccion, style: 'letra10' }],
+                },
+              ],
+            },
+            {
+              width: 'auto',
+              stack: [
+                {
+                  text: [
+                    { text: 'Fecha Emisión: ', style: 'letra10' },
+                    { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra10' },
+                  ],
+                },
+                is_contado
+                  ? { text: '' }
+                  : {
+                      text: [
+                        { text: 'Fecha limite pago : ', style: 'letra10' },
+                        { text: fun_.my_dateFormater(data.fecha_vencimiento), style: 'letra10' },
+                      ],
+                      margin: [0, 3, 0, 0],
+                    },
+                {
+                  text: [
+                    { text: 'eNCF : ', style: 'letra10' },
+                    { text: data.numero_comprobante, style: 'letra10' },
                   ],
                   margin: [0, 3, 0, 0],
                 },
-            {
-              text: [
-                { text: 'eNCF : ', style: 'letra10' },
-                { text: data.numero_comprobante, style: 'letra10' },
+                {
+                  text: [
+                    { text: 'Doc No : ', style: 'letra10' },
+                    { text: fun_.my_padStart(data.numero_documento, 8, '0'), style: 'letra10' },
+                  ],
+                  margin: [0, 3, 0, 0],
+                },
+                {
+                  text: [
+                    { text: 'Fecha vencimiento : ', style: 'letra10' },
+                    data.tipo_factura_id == 23 ? { text: 'No aplica.', style: 'letra10' } : data.tipo === 'compra' ? { text: ' ' } : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra10' },
+                  ],
+                  margin: [0, 3, 0, 3],
+                },
               ],
-              margin: [0, 3, 0, 0],
-            },
-            {
-              text: [
-                { text: 'Doc No : ', style: 'letra10' },
-                { text: fun_.my_padStart(data.numero_documento, 8, '0'), style: 'letra10' },
-              ],
-              margin: [0, 3, 0, 0],
-            },
-
-            {
-              text: [
-                { text: 'Fecha vencimiento : ', style: 'letra10' },
-                data.tipo_factura_id == 23 ? { text: 'No aplica.', style: 'letra10' } : data.tipo === 'compra' ? { text: ' ' } : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra10' },
-              ],
-              margin: [0, 3, 0, 3],
             },
           ],
         },

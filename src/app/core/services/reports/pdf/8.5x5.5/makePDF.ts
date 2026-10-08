@@ -378,8 +378,8 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
   const propietario = is_suplidor ? data?.suplidor : data?.cliente;
 
   const propietarioConfig = {
-    nombre: { label: `Razón Social ${is_suplidor ? 'Suplidor' : 'Cliente'}: `, valor: fun.capitalice(propietario.nombre_completo) || '' },
-    doc_identidad: { label: `${is_suplidor ? 'RNC suplidor' : 'RNC cliente'} : `, valor: propietario?.rnc ?? data?.NoCliente_rnc ?? '' },
+    nombre: { label: 'Razón Social: ', valor: fun.capitalice(propietario.nombre_completo) || '' },
+    doc_identidad: { label: 'RNC: ', valor: propietario?.rnc ?? data?.NoCliente_rnc ?? '' },
     direccion: { label: 'Dirección: ', valor: propietario.direccion || '' },
     recibido: { label: 'Recibido: ', valor: fun_.my_capitalize(numero_letra) },
   };
@@ -390,7 +390,7 @@ function parseInfoPropietario(data, tipo_pdf, is_suplidor) {
     const config = propietarioConfig[key];
     return {
       ...baseProps,
-      ...(key === 'nombre' ? { autoEllipsis: { widthRatio: 0.62 } } : {}),
+      ...(key === 'nombre' ? { autoEllipsis: { column: true } } : {}),
       noWrap: key !== 'recibido',
       margin: [0, index ? 3 : 0, 0, 0],
       text: [
