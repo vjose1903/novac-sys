@@ -9,7 +9,7 @@ import { infoPagare } from './8.5x5.5/infoPdfs';
 // UNIR FACTURA VENTA
 // ==========================================================================================================================================================
 function getPageMargin(is_contado, mostrarRegistroMercantil) {
-  const alturaRegistroMercantil = mostrarRegistroMercantil ? (is_contado ? 5 : 6) : 0;
+  const alturaRegistroMercantil = mostrarRegistroMercantil ? (is_contado ? 12 : 13) : 0;
   let margins = [];
 
   if (is_contado) {
@@ -102,13 +102,13 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
                 {
                   autoEllipsis: { column: true },
                   text: [
-                    { text: 'Razón Social : ', style: 'letra10' },
+                    { text: 'Razón Social : ', style: 'letra10', bold: true },
                     { text: is_venta ? data.cliente.nombre_completo : data.suplidor.nombre_completo, style: 'letra10' },
                   ],
                 },
                 {
                   text: [
-                    { text: 'RNC : ', style: 'letra10' },
+                    { text: 'RNC : ', style: 'letra10', bold: true },
                     is_venta ? { text: data.cliente?.rnc ?? data.NoCliente_rnc ?? '----------', style: 'letra10' } : { text: data.suplidor.rnc, style: 'letra10' },
                   ],
                   margin: [0, 4, 0, 0],
@@ -116,7 +116,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
                 {
                   margin: [0, 4, 0, 0],
                   text: [
-                    { text: 'Dirección : ', style: 'letra10' },
+                    { text: 'Dirección : ', style: 'letra10', bold: true },
                     is_venta ? { text: data.cliente.direccion, style: 'letra10' } : { text: data.suplidor.direccion, style: 'letra10' },
                   ],
                 },
@@ -127,7 +127,7 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
               stack: [
                 {
                   text: [
-                    { text: 'Fecha : ', style: 'letra10' },
+                    { text: 'Fecha : ', style: 'letra10', bold: true },
                     { text: fun_.my_dateFormater(data.fecha_equivalente), style: 'letra10' },
                     { text: ' - ' + fun_.my_houreFormater(data.fecha_equivalente), style: 'letra10' },
                   ],
@@ -136,27 +136,27 @@ function cabeceraFacturaVenta(data, is_contado, is_venta, currentPage, pageCount
                   ? { text: '' }
                   : {
                       text: [
-                        { text: 'Fecha vencimiento : ', style: 'letra10' },
+                        { text: 'Fecha vencimiento : ', style: 'letra10', bold: true },
                         { text: fun_.my_dateFormater(data.fecha_vencimiento), style: 'letra10' },
                       ],
                       margin: [0, 3, 0, 0],
                     },
                 {
                   text: [
-                    { text: 'NCF : ', style: 'letra10' },
+                    { text: 'NCF : ', style: 'letra10', bold: true },
                     { text: data.numero_comprobante, style: 'letra10' },
                   ],
                   margin: [0, 3, 0, 0],
                 },
                 {
                   text: [
-                    { text: 'Doc No : ', style: 'letra10' },
+                    { text: 'Doc No : ', style: 'letra10', bold: true },
                     { text: fun_.my_padStart(data.numero_documento, 8, '0'), style: 'letra10' },
                   ],
                   margin: [0, 3, 0, 0],
                 },
                 {
-                  text: [{ text: 'Valida hasta : ', style: 'letra10' }, data.tipo_factura_id == 3 ? { text: 'No aplica.', style: 'letra10' } : data.tipo === 'compra' ? { text: ' ' } : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra10' }],
+                  text: [{ text: 'Valida hasta : ', style: 'letra10', bold: true }, data.tipo_factura_id == 3 ? { text: 'No aplica.', style: 'letra10' } : data.tipo === 'compra' ? { text: ' ' } : { text: fun_.my_dateFormater(data.fecha_valida), style: 'letra10' }],
                   margin: [0, 3, 0, 3],
                 },
               ],
