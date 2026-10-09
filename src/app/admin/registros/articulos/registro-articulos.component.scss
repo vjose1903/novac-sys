@@ -18,6 +18,35 @@
   padding: 0.2rem;
 }
 
+.formula-costo-div {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-radius: var(--app-field-radius, 0.72rem);
+
+  &.warning-price {
+    animation: warning_alert 0.5s infinite;
+
+    .warningAlert {
+      background-color: transparent !important;
+    }
+
+    input {
+      padding-left: 1.4rem !important;
+    }
+  }
+
+  .iconArrow {
+    position: absolute;
+    left: 0.25rem;
+    z-index: 1;
+    color: var(--app-text-muted);
+  }
+}
+
 .raya {
   border: 1px solid #e0e0e0;
   margin: 0.5rem 0.3rem;
