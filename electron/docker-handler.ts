@@ -24,7 +24,7 @@ export default class DockerHandler {
       first_reject ||= reject;
 
       if (this.count_docker <= 20 && this.count_db <= 20) {
-        runTerminalCommand('docker ps --filter "name=brendy-dev" --format "{{.Status}}"')
+        runTerminalCommand('docker ps --filter "name=agrodemi-dev" --format "{{.Status}}"')
           .then(res => {
             if (res.STDOUT.toLowerCase().includes('up')) {
               setTimeout(() => {
