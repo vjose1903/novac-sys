@@ -999,10 +999,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       }
 
       if (articulo.vendido_en == 'Saco' && (articulo.calcular_saco || esProductoTerminado) && this.factServ.tipoDocumento() != tipoDocFacturacion.compra) {
-        const contenidoLibra = articulo.contenido_articulos.find(element => element.medida == 'Libra');
-        const precioBaseSaco = contenidoLibra?.precio != null ? contenidoLibra.precio * 100 : precioPrincipal;
-        const costoBaseSaco = contenidoLibra?.costo != null ? contenidoLibra.costo * 100 : costoPrincipal;
-        this.entrarSacosAUnidades(unidadesArticulo, precioBaseSaco, costoBaseSaco);
+        this.entrarSacosAUnidades(unidadesArticulo, precioPrincipal, costoPrincipal);
       }
 
       articulo.contenido_articulos

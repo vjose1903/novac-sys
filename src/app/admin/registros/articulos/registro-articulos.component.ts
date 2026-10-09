@@ -175,6 +175,38 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     });
   }
 
+  private articuloComboId(formula) {
+    return Number(formula?.articulo_combo_id ?? formula?.articulo_combo?.id ?? formula?.articulo_combo);
+  }
+
+  private async cargarMateriasFueraDelIndex(formulas) {
+    const idsFaltantes: number[] = [...new Set<number>(formulas
+      .map(formula => this.articuloComboId(formula))
+      .filter((id): id is number => Number.isFinite(id) && id > 0 && !this.listaMateriasPrimasIndexed[id]))];
+
+    await Promise.all(idsFaltantes.map(async id => {
+      try {
+        const res = await this.articuloClass.getOne(id, {
+          parameters: {
+            nombre: true,
+            medida: true,
+            contenido: true,
+            costos: true,
+            costo_principal: true,
+            precio_principal: true,
+          },
+        });
+        const materiaPrima = res?.data;
+        if (!materiaPrima?.id) return;
+
+        this.listaMateriasPrimasIndexed[materiaPrima.id] = materiaPrima;
+        this.listaMateriasPrimas = [...this.listaMateriasPrimas.filter(item => item.id !== materiaPrima.id), materiaPrima];
+      } catch (error) {
+        console.error(`Error cargando el ingrediente ${id} de la formula:`, error);
+      }
+    }));
+  }
+
   getTipoArticulos() {
     this.listaTipoArticulos = [];
     this.articuloCatalogServ.getTipoArticulos().then(tiposArticulos => {
@@ -566,7 +598,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
           medida_en_turno = unidades[unidad_en_turno];
         }
       }
-
       const formGroup = this.getFormGroupInFormArray(index);
       if (fun.hasValue(formGroup)) {
         this.getFormControlInFormArray(index, 'medida_formula').setValue(medida_en_turno);
@@ -777,6 +808,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.tipoArticuloSelected = undefined;
     this.resetArray();
 
+    await this.cargarMateriasFueraDelIndex(this.articuloSelected.formulas_productos_terminados);
+
     for (let i = 0; i < this.articuloSelected.formulas_productos_terminados.length; i++) {
       const ingredient = this.articuloSelected.formulas_productos_terminados[i];
       this.addItem();
@@ -790,7 +823,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   fillFormula(ingredient, indexFormula, recalcular = false) {
     try {
-      const articulo_combo_id = ingredient.articulo_combo_id ?? ingredient?.articulo_combo?.id ?? ingredient.articulo_combo;
+      const articulo_combo_id = this.articuloComboId(ingredient);
       const materiaPrima = this.listaMateriasPrimasIndexed[articulo_combo_id];
 
       const unidades_minimas = { Libra: 'Lbs.', Unidad: 'Und.', Onza: 'Oz.' };
@@ -801,18 +834,20 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       let medida_en_turno;
 
       for (const unidad_en_turno of arrayUnidades) {
-        if (fun.hasValue(materiaPrima.costos[unidad_en_turno])) {
-          costo_en_turno = materiaPrima.costos[unidad_en_turno].costo;
-          precio_en_turno = materiaPrima.costos[unidad_en_turno].precio;
+        const costoUnidad = materiaPrima?.costos?.[unidad_en_turno];
+        if (fun.hasValue(costoUnidad)) {
+          costo_en_turno = costoUnidad.costo;
+          precio_en_turno = costoUnidad.precio;
           medida_en_turno = unidades_minimas[unidad_en_turno];
           break;
         }
       }
+      if (!medida_en_turno) medida_en_turno = unidades_minimas[ingredient.medida] || ingredient.medida;
 
       const formGroup = this.getFormGroupInFormArray(indexFormula);
 
       if (fun.hasValue(formGroup)) {
-        if (recalcular) {
+        if (recalcular && fun.hasValue(costo_en_turno)) {
           this.getFormControlInFormArray(indexFormula, 'costo_formula').setValue(fun.roundNumberToDecimal(costo_en_turno));
           this.getFormControlInFormArray(indexFormula, 'precio_formula').setValue(fun.roundNumberToDecimal(precio_en_turno));
         } else {
@@ -868,12 +903,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
       this.COMPRADOEN = 'Quintal';
       this.form.controls.otros_costos.setValue(fun.roundNumberToDecimal(articulo.otros_costos));
 
-      await this.getMateriasP().then(() => {
+      await this.getMateriasP().then(async () => {
         if (articulo.formulas_productos_terminados.length) {
           this.form.controls.medida.setValue(this.medida_config);
           this.resetCompradoEn(this.medida_config);
 
-          const formGroup = this.getFormGroupInFormArray(0);
+          await this.cargarMateriasFueraDelIndex(articulo.formulas_productos_terminados);
 
           for (let index = 0; index < articulo.formulas_productos_terminados.length; index++) {
             const ingredient = articulo.formulas_productos_terminados[index];
