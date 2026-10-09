@@ -12,6 +12,7 @@ export interface ConfigI {
   cliente:                     string;
   nombre_empresa:              string;
   rnc_empresa:                 string;
+  registro_mercantil?:         string;
   direccion_empresa:           string;
   telefono_empresa:            string;
   logo_empresa:                string;

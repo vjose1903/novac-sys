@@ -197,11 +197,45 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const options = [];
 
     if (medida === 'Saco') options.push('Libra');
+    if (medida === 'Quintal') options.push('Libra');
     if (medida === 'Caja') options.push('Paquete');
     if (medida === 'Caja' || medida === 'Producto' || medida === 'Bolsa') options.push('Unidad');
     if (medida === 'Galon') options.push('Onza');
 
+    if (this.tipoArticuloSelected?.codigo === 'producto_terminado') {
+      const vendidoEn = this.form?.controls?.['vendido_en']?.value;
+      if (vendidoEn && vendidoEn !== 'Unidad' && !options.includes(vendidoEn)) options.push(vendidoEn);
+      if (!options.includes('Paquete')) options.push('Paquete');
+    }
+
     return options;
+  }
+
+  medidaContenidoHijoOptions() {
+    return this.tipoArticuloSelected?.codigo === 'producto_terminado' ? ['Unidad', 'Libra', 'Onza'] : this.medidaHijoOptions;
+  }
+
+  requiereContenidoHijo() {
+    const formulario = this.form?.getRawValue();
+    if (formulario?.medida_contenido_padre === 'Paquete') return true;
+
+    return this.tipoArticuloSelected?.codigo === 'producto_terminado' &&
+      formulario?.medida_contenido_padre === formulario?.vendido_en &&
+      formulario?.medida_contenido_padre !== 'Unidad';
+  }
+
+  cambiarVendidoEn() {
+    const medidaPadre = this.form.controls.medida_contenido_padre.value;
+    if (medidaPadre && !this.medidaContenidoPadreOptions().includes(medidaPadre)) {
+      ['medida_contenido_padre', 'cantidad_contenido_padre', 'costo_padre', 'precio_padre', 'medida_contenido_hijo', 'cantidad_contenido_hijo', 'costo_hijo', 'precio_hijo'].forEach(campo => this.form.controls[campo].reset(null));
+    }
+  }
+
+  setDefaultContenidoProductoTerminado() {
+    if (this.tipoArticuloSelected?.descripcion !== 'Producto terminado') return;
+
+    const opcionesContenido = this.medidaContenidoPadreOptions();
+    if (opcionesContenido.length === 1) this.form.controls.medida_contenido_padre.setValue(opcionesContenido[0]);
   }
 
   openModalConfig() {
@@ -291,7 +325,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         if (fun.hasValue(this.form)) this.form.controls.precio_principal.reset(null);
 
         this.form.controls.medida.setValue(this.medida_config);
-        this.form.controls.calcular_saco.setValue(this.se_calcula_saco_config && true);
+        this.form.controls.calcular_saco.setValue(false);
+        this.setDefaultContenidoProductoTerminado();
       });
     } else {
       this.resetArray();
@@ -474,29 +509,22 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.ARRAY_FORMULA.removeAt(index);
   }
 
-  checkCostoFormula(fila) {
-    let res = false;
+  getCambioCostoFormula(fila) {
     const fila_formulario = fun.deepCloning(fila.value);
     const articulo = this.listaMateriasPrimasIndexed[fila_formulario.articulo_id];
 
-    if (fila_formulario.costo_formula && fun.hasValue(articulo)) {
-      const arrayUnidades = ['Unidad', 'Libra', 'Onza'];
-      let costo_en_turno;
-      let costo;
-      for (const unidad_en_turno of arrayUnidades) {
-        if (fun.hasValue(articulo.costos[unidad_en_turno])) {
-          costo_en_turno = articulo.costos[unidad_en_turno];
-          costo = fun.roundNumberToDecimal(costo_en_turno.costo);
-        }
-      }
+    if (!fila_formulario.costo_formula || !fun.hasValue(articulo)) return { changed: false, icon: undefined };
 
-      if (fun.desformatearStNumber(costo) != fun.desformatearStNumber(fila_formulario.costo_formula)) {
-        res = true;
-        if (!this.recalcular) this.recalcular = true;
-      }
-    }
+    const unidadFormula = { 'Und.': 'Unidad', 'Lbs.': 'Libra', 'Oz.': 'Onza' }[fila_formulario.medida_formula];
+    const costoActual = unidadFormula ? articulo.costos?.[unidadFormula]?.costo : null;
+    if (!fun.hasValue(costoActual)) return { changed: false, icon: undefined };
 
-    return res;
+    const costoGuardado = fun.desformatearStNumber(fila_formulario.costo_formula);
+    const costoNuevo = fun.desformatearStNumber(costoActual);
+    const changed = costoNuevo !== costoGuardado;
+    if (changed && !this.recalcular) this.recalcular = true;
+
+    return { changed, icon: changed ? (costoNuevo > costoGuardado ? 'fa-arrow-up' : 'fa-arrow-down') : undefined };
   }
 
   getFormControlInFormArray(index, formControlName) {
@@ -597,6 +625,12 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     const costo = fun.desformatearStNumber(formulario.costo_principal);
 
     if (precio > 0 && fun.hasValue(precio)) {
+      if (this.tipoArticuloSelected?.codigo === 'producto_terminado') {
+        this.calculatePricePadre();
+        this.calculatePriceHijo();
+        return;
+      }
+
       const precioLibra = precio / 100;
       const costoLibra = costo / 100;
       if (medida === 'Quintal') {
@@ -659,6 +693,16 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         else {
           res = fun.isEmpty(formulario.otros_costos) || fun.isEmpty(formulario.costo_principal) || fun.isEmpty(formulario.precio_principal);
           if (res) return res;
+
+          if (this.medidaContenidoPadreOptions().length) {
+            res = !formulario.cantidad_contenido_padre || !formulario.medida_contenido_padre || !formulario.costo_padre || !formulario.precio_padre;
+            if (res) return res;
+
+            if (this.requiereContenidoHijo()) {
+              res = !formulario.cantidad_contenido_hijo || !formulario.medida_contenido_hijo || !formulario.costo_hijo || !formulario.precio_hijo;
+              if (res) return res;
+            }
+          }
         }
       } else {
         res = false;
@@ -801,6 +845,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.tipoArticuloSelected = this.listaTipoArticulos.find(val => val.id == Number(articulo.tipo_articulo_id));
     this.is_combo = articulo.is_combo;
 
+    if (this.tipoArticuloSelected?.codigo === 'producto_terminado') this.form.controls.calcular_saco.setValue(false);
+
     if (articulo.is_combo || (articulo.formulas_productos_terminados && articulo.formulas_productos_terminados.length)) {
       this.COMPRADOEN = 'Quintal';
       this.form.controls.otros_costos.setValue(fun.roundNumberToDecimal(articulo.otros_costos));
@@ -857,6 +903,8 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
         }
       }
 
+      if (!articulo.contenido_articulos.length) this.setDefaultContenidoProductoTerminado();
+
       this.form.controls.tipo_articulo_id.setValue(articulo['tipo_articulo_id']);
       this.form.controls.costo_principal.setValue(fun.roundNumberToDecimal(articulo.costo_principal));
       this.form.controls.precio_principal.setValue(fun.roundNumberToDecimal(articulo.precio_principal));
@@ -890,16 +938,19 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
 
   formarContenido() {
     const formulario = this.form.getRawValue();
+    const isProductoTerminado = this.tipoArticuloSelected?.codigo === 'producto_terminado';
 
-    if (formulario.medida === 'Quintal' || formulario.medida === 'Saco') formulario.medida_contenido_padre = 'Libra';
+    if (!isProductoTerminado && (formulario.medida === 'Quintal' || formulario.medida === 'Saco')) formulario.medida_contenido_padre = 'Libra';
+
+    const medidaConContenidoLegacy = ['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida);
 
     const padre = {
       referencia: null,
       articulo_id: formulario.id,
       id: fun.hasValue(formulario.id_contenido_padre) ? formulario.id_contenido_padre : null,
       costo: _.isString(formulario.costo_padre) ? parseFloat(formulario.costo_padre) : formulario.costo_padre,
-      precio: fun.desformatearStNumber(['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.precio_padre : formulario.precio_libra),
-      cantidad: ['Caja', 'Saco', 'Producto', 'Galon'].includes(formulario.medida) ? formulario.cantidad_contenido_padre : 100,
+      precio: fun.desformatearStNumber(isProductoTerminado || medidaConContenidoLegacy ? formulario.precio_padre : formulario.precio_libra),
+      cantidad: isProductoTerminado || medidaConContenidoLegacy ? formulario.cantidad_contenido_padre : 100,
       medida: formulario.medida_contenido_padre,
       condicion: 'padre',
     };

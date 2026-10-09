@@ -144,6 +144,9 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
         case 'ver':
           this.conduceClass.parseDataToPdf(conduce_selected).then(conduce_parsed => {
             this.makeConducePdf(conduce_parsed);
+          }).catch(err => {
+            console.error('Error preparando los datos del conduce para el PDF:', err);
+            fun.toastError(err?.msg || err?.message || 'No se pudieron preparar los datos del conduce.', 'ERROR');
           });
           break;
 
@@ -196,7 +199,8 @@ export class ConduceListaComponent extends MixinClass implements OnInit, OnDestr
         reciboModalConf.show();
       })
       .catch(err => {
-        fun.toastError(err.msg, 'ERROR');
+        console.error('Error generando o mostrando el PDF del conduce:', err?.body || err);
+        fun.toastError(err?.msg || err?.message || 'No se pudo generar el PDF del conduce.', 'ERROR');
         this.loadServ.isLoading.next(false);
       });
   }

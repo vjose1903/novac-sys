@@ -25,6 +25,7 @@ const GENERAL_CONFIG_KEYS: Array<keyof ConfigI> = [
   'cliente',
   'nombre_empresa',
   'rnc_empresa',
+  'registro_mercantil',
   'direccion_empresa',
   'telefono_empresa',
   'color_app',

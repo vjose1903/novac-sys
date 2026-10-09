@@ -186,6 +186,8 @@ function formarCuerpo(data, configuration, detalle, j, is_electronica, offset = 
       pageBreak: configuration.isBreak ? (br_ ? 'before' : 'none') : 'none',
     };
 
+    if (['cliente_nombre', 'suplidor_nombre'].includes(info.key)) obj['autoEllipsis'] = { tableColumn: true };
+
     if (info.fillColor) obj['fillColor'] = info.fillColor;
 
     if (info.fillColorCondition) {

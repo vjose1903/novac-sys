@@ -2,6 +2,7 @@ import { DateUtils } from '@vjose1903/dateutils';
 import { fun } from '@core/services/functions.service';
 import { FacturasI, Pago } from '../../../facturacion/factura';
 import { Ss } from '@core/services/singleton.service';
+import Big from 'big.js';
 
 export class MoraCalculator {
   last_pago_valido: Pago;
@@ -17,7 +18,7 @@ export class MoraCalculator {
     for (let i = 0; i < pagos.length; i++) {
       const pago = pagos[i];
       if (fun.desformatearStNumber(pago.deposito) > 0) break;
-      this.abonos_a_mora += fun.desformatearStNumber(pago.mora);
+      this.abonos_a_mora = Big(this.abonos_a_mora).plus(fun.desformatearStNumber(pago.mora)).round(2).toNumber();
     }
 
     this.last_pago_valido = pagos.find(pago => fun.desformatearStNumber(pago.deposito) > 0);
@@ -46,30 +47,32 @@ export class MoraCalculator {
     if (!this.hasMora || porcentaje === mora_personalizada) return '0.00';
 
     // Calcular la mora basada en el porcentaje del balance
-    const balanceMora = this.factura.balance * (Number(porcentaje) / 100);
+    const balance = Big(this.factura.balance);
+    const porcentajeValue = Big(porcentaje);
 
     // Obtener días del mes actual
     const fechaActual = new Date();
     const diasEnMes = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 0).getDate();
 
     // Calcular mora final: (balance * porcentaje) * diasRetraso / diasEnMes
-    let mora = (balanceMora * this.getDiasRetraso()) / diasEnMes;
+    let mora = balance.times(porcentajeValue).div(100).times(this.getDiasRetraso()).div(diasEnMes);
 
     if (this.abonos_a_mora > 0) {
-      let abono_mora = this.abonos_a_mora;
+      const abono_mora = Big(this.abonos_a_mora);
 
-      if (mora - this.abonos_a_mora <= 0) {
+      if (mora.minus(abono_mora).lte(0)) {
         // Calcular porcentaje de la mora pagada
-        const porcentajePagado = this.abonos_a_mora / ((this.factura.balance * (2 / 100) * this.getDiasRetraso()) / diasEnMes);
+        const moraBase = balance.times(2).div(100).times(this.getDiasRetraso()).div(diasEnMes);
+        const porcentajePagado = abono_mora.div(moraBase);
 
         // Ajustar la nueva mora proporcionalmente
-        mora = mora * (1 - porcentajePagado);
+        mora = mora.times(Big(1).minus(porcentajePagado));
       } else {
-        mora = mora - abono_mora;
+        mora = mora.minus(abono_mora);
       }
     }
 
-    return formateado ? fun.roundNumberToDecimal(mora) : mora;
+    return formateado ? mora.round(2).toFixed(2) : mora.toNumber();
   }
 
   getDiasRetraso(print: boolean = false) {

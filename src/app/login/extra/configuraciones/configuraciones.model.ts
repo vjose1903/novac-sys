@@ -3,6 +3,7 @@ export enum formFieldName {
   machineId = 'machineId',
   nombre_empresa = 'nombre_empresa',
   rnc_empresa = 'rnc_empresa',
+  registro_mercantil = 'registro_mercantil',
   direccion_empresa = 'direccion_empresa',
   telefono_empresa = 'telefono_empresa',
   logo_empresa = 'logo_empresa',
@@ -51,6 +52,7 @@ export enum formFieldName {
 export enum formFieldId {
   nombre_empresa = 'field_nombre_empresa',
   rnc_empresa = 'field_rnc_empresa',
+  registro_mercantil = 'field_registro_mercantil',
   direccion_empresa = 'field_direccion_empresa',
   telefono_empresa = 'field_telefono_empresa',
   logo_empresa = 'field_logo_empresa',

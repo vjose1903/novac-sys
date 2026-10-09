@@ -26,6 +26,7 @@
   "usa_modulo_viajes": false,
   "medida_producto_terminado": "Producto",
   "serie_default": "normal",
+  "registro_mercantil": "1299LV",
 
   "printer_selected": {
     "venta_contado": "Ninguna",

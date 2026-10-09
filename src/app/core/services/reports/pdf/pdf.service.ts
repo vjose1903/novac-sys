@@ -10,6 +10,7 @@ import { fun } from '../../functions.service';
 import { Injectable } from '@angular/core';
 
 import { fonts } from '../utils/pdfFonts';
+import { PdfAutoEllipsis } from '../utils/pdf-auto-ellipsis';
 import { serie } from '@core/typescript/constantes';
 
 type PrintErrorCode =
@@ -142,6 +143,7 @@ export class PdfService {
 
   static async createPdfFromBase64(docDefinition: any, file_: string, reimprimir_: boolean): Promise<any> {
     const [{ default: pdfMake }, { vfs }] = await Promise.all([import('pdfmake/build/pdfmake'), import('../utils/vfs_fonts')]);
+    await PdfAutoEllipsis.prepare(docDefinition, vfs);
 
     return new Promise<any>((resolve, reject) => {
       try {

@@ -990,18 +990,25 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       const medida = articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo.medida;
       const precioPrincipal = this.factServ.isCompra() ? articulo.costo_principal : articulo.precio_principal;
       const costoPrincipal = articulo.costo_principal;
+      const unidadesMinimas = ['Libra', 'Onza', 'Unidad'];
+      const esProductoTerminado = articulo.descripcion?.toLowerCase() == 'producto terminado';
 
-      if (medida != 'Quintal' || this.factServ.isCompra()) {
+      if ((medida != 'Quintal' || this.factServ.isCompra()) && (this.factServ.isCompra() || articulo.is_detallable || !unidadesMinimas.includes(medida))) {
         unidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
       }
 
-      if (articulo.vendido_en == 'Saco' && articulo.calcular_saco && this.factServ.tipoDocumento() != tipoDocFacturacion.compra) this.entrarSacosAUnidades(unidadesArticulo, precioPrincipal, costoPrincipal);
+      if (articulo.vendido_en == 'Saco' && (articulo.calcular_saco || esProductoTerminado) && this.factServ.tipoDocumento() != tipoDocFacturacion.compra) {
+        const contenidoLibra = articulo.contenido_articulos.find(element => element.medida == 'Libra');
+        const precioBaseSaco = contenidoLibra?.precio != null ? contenidoLibra.precio * 100 : precioPrincipal;
+        const costoBaseSaco = contenidoLibra?.costo != null ? contenidoLibra.costo * 100 : costoPrincipal;
+        this.entrarSacosAUnidades(unidadesArticulo, precioBaseSaco, costoBaseSaco);
+      }
 
-      if (articulo.is_detallable || this.factServ.isCompra()) {
-        articulo.contenido_articulos.forEach(element => {
+      articulo.contenido_articulos
+        .filter(element => this.factServ.isCompra() || articulo.is_detallable || !unidadesMinimas.includes(element.medida))
+        .forEach(element => {
           unidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: articulo.contenido[element.medida] });
         });
-      }
 
       unidadesArticulo = _.uniqWith(unidadesArticulo, fun.isEqual);
     }
