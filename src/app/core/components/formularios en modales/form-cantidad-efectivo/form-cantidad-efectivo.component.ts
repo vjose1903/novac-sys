@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Output, EventEmitter, HostListener, inject, Input, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Output, EventEmitter, HostListener, inject, Input, QueryList, ViewChildren, signal, computed } from '@angular/core';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { fun } from '@core/services/functions.service';
 import { SharedService } from '@core/services/shared.service';
@@ -10,6 +10,7 @@ import { tipoDocFacturacion } from '@admin/facturacion/factura';
 import { IDynamicModal, IModalConfiguration } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalComponent } from '@core/components/dynamic-modal/dynamic-modal.component';
 import { DivisaService } from '@admin/registros/divisa/divisa.service';
+import Big from 'big.js';
 
 @Component({
   selector: 'app-form-cantidad-efectivo',
@@ -19,6 +20,24 @@ import { DivisaService } from '@admin/registros/divisa/divisa.service';
 })
 export class FormCantidadEfectivoComponent extends MixinClass implements OnInit, AfterViewInit, OnDestroy, IDynamicModal {
   @ViewChildren('formaPagoInput') formaPagoInputs!: QueryList<any>;
+  private readonly metodosDePagoState = signal<Array<{ forma_pago: string; monto: number | string }>>([]);
+  private readonly totalRecibidoBig = computed(() => {
+    let total = Big(0);
+    for (const pago of this.metodosDePagoState()) {
+      const monto = this.montoBig(pago.monto || 0);
+      if (!monto) return null;
+      total = total.plus(monto);
+    }
+    return total;
+  });
+
+  @Input()
+  set metodosDePago(value: Array<{ forma_pago: string; monto: number | string }>) {
+    this.metodosDePagoState.set(value || []);
+  }
+  get metodosDePago() {
+    return this.metodosDePagoState();
+  }
 
   readonly opcionesDeFormaPago = [
     { label: 'Efectivo', value: 'Efectivo' },
@@ -86,7 +105,6 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   @Input() efectivo: string;
   @Input() total_factura: string;
   @Input() formaPago: string = 'Efectivo';
-  @Input() metodosDePago: Array<{ forma_pago: string; monto: number | string }> = [];
   @Input() cambios_articulos: string;
   @Input() condicion_fact: string;
 
@@ -196,25 +214,45 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     this.validarForm('input');
   }
 
-  onMetodoPagoBlur(pago: { monto: number | string }) {
-    pago.monto = this.formatoNumero(pago.monto || 0);
+  actualizarFormaPago(index: number, forma_pago: string) {
+    this.metodosDePago = this.metodosDePago.map((pago, pagoIndex) => pagoIndex === index ? { ...pago, forma_pago } : pago);
     this.validarForm('input');
   }
 
+  actualizarMontoRecibido(index: number, monto: number | string) {
+    this.metodosDePago = this.metodosDePago.map((pago, pagoIndex) => pagoIndex === index ? { ...pago, monto } : pago);
+    this.calcularDevueta();
+    this.validarForm('input');
+  }
+
+  onMetodoPagoBlur(index: number, event?: Event) {
+    const monto = (event?.target as HTMLInputElement | null)?.value ?? this.metodosDePago[index]?.monto;
+    this.actualizarMontoRecibido(index, this.formatoNumero(monto || 0));
+  }
+
   totalRecibido() {
-    return this.metodosDePago.reduce((total, pago) => total + fun.desformatearStNumber(pago.monto || 0), 0);
+    return (this.totalRecibidoBig() || Big(0)).toNumber();
+  }
+
+  private montoBig(valor) {
+    const normalizado = String(valor ?? 0).replaceAll(',', '').trim() || '0';
+    try {
+      return Big(normalizado);
+    } catch {
+      return null;
+    }
   }
 
   metodosNetos() {
-    const devuelta = fun.desformatearStNumber(this.devuelta);
+    const devuelta = this.montoBig(this.devuelta) || Big(0);
     let pendienteDevuelta = devuelta;
 
     return this.metodosDePago
       .map(pago => {
-        const monto = fun.desformatearStNumber(pago.monto || 0);
-        const descuento = pago.forma_pago === 'Efectivo' ? Math.min(monto, pendienteDevuelta) : 0;
-        pendienteDevuelta -= descuento;
-        return { forma_pago: pago.forma_pago, monto: monto - descuento };
+        const monto = this.montoBig(pago.monto || 0) || Big(0);
+        const descuento = pago.forma_pago !== 'Tarjeta' ? (monto.lt(pendienteDevuelta) ? monto : pendienteDevuelta) : Big(0);
+        pendienteDevuelta = pendienteDevuelta.minus(descuento);
+        return { forma_pago: pago.forma_pago, monto: monto.minus(descuento).toNumber() };
       })
       .filter(pago => pago.monto > 0);
   }
@@ -238,7 +276,7 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     event.preventDefault();
     event.stopPropagation();
 
-    this.onMetodoPagoBlur(this.metodosDePago[index]);
+    this.onMetodoPagoBlur(index, event);
     if (index < this.metodosDePago.length - 1) {
       this.enfocarFormaPago(index + 1);
       return;
@@ -335,17 +373,18 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
       this.focusFormaPago();
     }
     if (campo === 'send') {
-      if (parseFloat(fun.desformatearStNumber(this.efectivo)) < fun.desformatearStNumber(this.total_factura)) {
-        fun.toastError('Efectivo no cubre el total de la factura', 'ERROR');
-        fun.enfocarInput('inputEfectivo');
-      } else {
-        this.btn_aceptar();
-      }
+      this.btn_aceptar();
     }
   }
 
   formatoNumero(num) {
-    return fun.roundNumberToDecimal(num);
+    if (fun.isEmpty(num)) return num;
+
+    const monto = this.montoBig(num);
+    if (!monto) return String(num);
+
+    const [enteros, decimales] = monto.toFixed(2).split('.');
+    return `${enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}.${decimales}`;
   }
 
   onEfectivoInput() {
@@ -369,12 +408,15 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     if (this.metodo == tipoDocFacturacion.compra && fun.isEmpty(this.efectivo)) {
       this.devuelta = '0.00';
     } else {
-      const total = fun.desformatearStNumber(this.total_factura);
-      const efectivo = this.metodo == tipoDocFacturacion.compra ? fun.desformatearStNumber(this.efectivo) : this.totalRecibido();
+      const total = this.montoBig(this.total_factura);
+      const efectivo = this.metodo == tipoDocFacturacion.compra ? this.montoBig(this.efectivo) : this.totalRecibidoBig();
 
-      const dev = efectivo - total;
+      if (!total || !efectivo || efectivo.eq(0) || efectivo.lte(total)) {
+        this.devuelta = '0.00';
+        return;
+      }
 
-      this.devuelta = efectivo == 0 ? '0.00' : this.formatoNumero(isNaN(dev) ? '0.00' : Math.max(0, dev));
+      this.devuelta = this.formatoNumero(efectivo.minus(total).toFixed(2));
     }
   }
 
@@ -383,8 +425,8 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   btn_aceptar() {
-    const devuelta_ = fun.desformatearStNumber(this.devuelta);
-    const efectivo = this.metodo == tipoDocFacturacion.compra ? fun.desformatearStNumber(this.efectivo) : this.totalRecibido();
+    const devuelta_ = (this.montoBig(this.devuelta) || Big(0)).toNumber();
+    const efectivo = this.metodo == tipoDocFacturacion.compra ? (this.montoBig(this.efectivo) || Big(0)).toNumber() : this.totalRecibido();
     const metodos_de_pago = this.metodo == tipoDocFacturacion.compra ? [] : this.metodosNetos();
     const obj = { dinero: efectivo, devuelta: this.devuelta ? devuelta_ : 0, forma_pago: metodos_de_pago.length === 1 ? metodos_de_pago[0].forma_pago : 'Mixto', metodos_de_pago, decision_cambio: this.cambiar_articulos === 'si' ? true : false };
 
@@ -409,13 +451,18 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   validarForm(from?): boolean {
-    const total = fun.desformatearStNumber(this.total_factura);
-    const efectivo = this.metodo == tipoDocFacturacion.compra ? fun.desformatearStNumber(this.efectivo) : this.totalRecibido();
+    const total = this.montoBig(this.total_factura);
+    const efectivo = this.metodo == tipoDocFacturacion.compra ? this.montoBig(this.efectivo) : this.totalRecibidoBig();
 
-    let isInvalid = isNaN(efectivo) ? true : total > efectivo;
-    if (this.metodo != tipoDocFacturacion.compra && efectivo > total) {
-      const efectivoDisponible = this.metodosDePago.filter(pago => pago.forma_pago === 'Efectivo').reduce((sum, pago) => sum + fun.desformatearStNumber(pago.monto || 0), 0);
-      isInvalid = efectivo - total > efectivoDisponible;
+    let isInvalid = !total || !efectivo || total.gt(efectivo);
+
+    if (!isInvalid && this.metodo != tipoDocFacturacion.compra) {
+      const totalTarjeta = this.metodosDePago
+        .filter(pago => pago.forma_pago === 'Tarjeta')
+        .reduce((suma, pago) => suma.plus(this.montoBig(pago.monto || 0) || Big(0)), Big(0));
+      const tieneOtroMetodo = this.metodosDePago.some(pago => pago.forma_pago !== 'Tarjeta');
+
+      isInvalid = totalTarjeta.gt(total) || (efectivo.gt(total) && !tieneOtroMetodo);
     }
 
     if (this.metodo == tipoDocFacturacion.compra) isInvalid = false;
@@ -434,25 +481,17 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   }
 
   private mensajeValidacion(): string {
+    const total = this.montoBig(this.total_factura);
+    const totalRecibido = this.totalRecibidoBig();
+    const totalTarjeta = this.metodosDePago
+      .filter(pago => pago.forma_pago === 'Tarjeta')
+      .reduce((suma, pago) => suma.plus(this.montoBig(pago.monto || 0) || Big(0)), Big(0));
+    const tieneOtroMetodo = this.metodosDePago.some(pago => pago.forma_pago !== 'Tarjeta');
+
+    if (total && totalTarjeta.gt(total)) return 'El monto pagado con tarjeta no puede superar el total del documento.';
+    if (total && totalRecibido?.gt(total) && !tieneOtroMetodo) return 'La devuelta debe corresponder a un método de pago distinto a tarjeta.';
+
     const documento = this.metodo == tipoDocFacturacion.recibo_ingreso ? 'del recibo.' : 'de la factura.';
-    if (this.excedenteSinEfectivo()) {
-      return 'El excedente solo puede devolverse en efectivo.';
-    }
-
     return `El monto ingresado no cubre el valor ${documento}`;
-  }
-
-  private excedenteSinEfectivo(): boolean {
-    if (this.metodo == tipoDocFacturacion.compra) return false;
-
-    const total = fun.desformatearStNumber(this.total_factura);
-    const recibido = this.totalRecibido();
-    if (isNaN(total) || isNaN(recibido) || recibido <= total) return false;
-
-    const efectivoDisponible = this.metodosDePago
-      .filter(pago => pago.forma_pago === 'Efectivo')
-      .reduce((sum, pago) => sum + fun.desformatearStNumber(pago.monto || 0), 0);
-
-    return recibido - total > efectivoDisponible;
   }
 }

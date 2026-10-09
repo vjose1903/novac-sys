@@ -537,6 +537,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     return excede;
   }
 
+  limitarDecimalesCantidad(event: Event, index: number) {
+    const input = event.target as HTMLInputElement;
+    const check = fun.checkLongDecimales(input.value, 2);
+    if (!check.error) return;
+
+    input.value = check.value;
+    (this.factServ.filasDetalle.at(index) as FormGroup).controls['cantidad'].setValue(Number(check.value), { emitEvent: false });
+  }
+
   async checkCantidadExcede(index, lugar) {
     return new Promise<boolean>(async resolve => {
       let sumCantidad = 0;
@@ -871,19 +880,23 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     inputs['nombre'] = unidad ? `${name} (${unidad})` : name;
 
     const modalConfig = new DynamicModalClass();
-    modalConfig.width = '57rem';
-    modalConfig.height = '32rem';
+    modalConfig.width = inputs.is_articulo_selected ? '42rem' : '57rem';
+    modalConfig.height = inputs.is_articulo_selected ? 'auto' : '32rem';
     modalConfig.component = RetornarDevueltoComponent;
     modalConfig.inputs = inputs;
     modalConfig.id = 'retornarDevuelto';
     modalConfig.header = 'Retornar Articulos Devueltos';
+    modalConfig.styleClass = 'confirmation-dialog';
+    modalConfig.contentStyleClass = 'confirmation-modal-content';
 
     modalConfig.botones = [
       { clase: 'btn btn-gris', action: modalActionsE.close, label: 'Cerrar', disable: false },
       { id: 'btn_aceptar', clase: 'btn btn-green', label: 'Aceptar', disable: false },
     ];
 
-    modalConfig.setCallback((arg: ICallbackModal) => this.retornarDevuelto(arg.data));
+    modalConfig.setCallback((arg: ICallbackModal) => {
+      if (arg.type == modalCloseType.returnData) this.retornarDevuelto(arg.data);
+    });
     modalConfig.show();
 
     if (this.dropRowMenu) this.dropRowMenu.hide();
@@ -977,18 +990,25 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       const medida = articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo.medida;
       const precioPrincipal = this.factServ.isCompra() ? articulo.costo_principal : articulo.precio_principal;
       const costoPrincipal = articulo.costo_principal;
+      const unidadesMinimas = ['Libra', 'Onza', 'Unidad'];
+      const esProductoTerminado = articulo.descripcion?.toLowerCase() == 'producto terminado';
 
-      if (medida != 'Quintal' || this.factServ.isCompra()) {
+      if ((medida != 'Quintal' || this.factServ.isCompra()) && (this.factServ.isCompra() || articulo.is_detallable || !unidadesMinimas.includes(medida))) {
         unidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
       }
 
-      if (articulo.vendido_en == 'Saco' && articulo.calcular_saco && this.factServ.tipoDocumento() != tipoDocFacturacion.compra) this.entrarSacosAUnidades(unidadesArticulo, precioPrincipal, costoPrincipal);
+      if (articulo.vendido_en == 'Saco' && (articulo.calcular_saco || esProductoTerminado) && this.factServ.tipoDocumento() != tipoDocFacturacion.compra) {
+        const contenidoLibra = articulo.contenido_articulos.find(element => element.medida == 'Libra');
+        const precioBaseSaco = contenidoLibra?.precio != null ? contenidoLibra.precio * 100 : precioPrincipal;
+        const costoBaseSaco = contenidoLibra?.costo != null ? contenidoLibra.costo * 100 : costoPrincipal;
+        this.entrarSacosAUnidades(unidadesArticulo, precioBaseSaco, costoBaseSaco);
+      }
 
-      if (articulo.is_detallable || this.factServ.isCompra()) {
-        articulo.contenido_articulos.forEach(element => {
+      articulo.contenido_articulos
+        .filter(element => this.factServ.isCompra() || articulo.is_detallable || !unidadesMinimas.includes(element.medida))
+        .forEach(element => {
           unidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: articulo.contenido[element.medida] });
         });
-      }
 
       unidadesArticulo = _.uniqWith(unidadesArticulo, fun.isEqual);
     }
@@ -1014,6 +1034,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   retornarDevuelto(arg: { key: string; retorno: { solo_devuelto: any; defectuoso: any } }) {
+    if (!arg?.retorno) return;
+
     const infoRetorno = [
       { tipo: 'defectuoso', data: arg.retorno?.defectuoso, contenedor_retorno: this.factServ.filasDetalle.controls },
       { tipo: 'solo_devuelto', data: arg.retorno?.solo_devuelto, contenedor_retorno: this.factServ.productos_devueltos || [] },
@@ -1025,6 +1047,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           const entidad = itemRetorno.tipo == 'defectuoso' ? item.value : item;
           return entidad.key == itemRetorno?.data?.key;
         });
+
+        if (!articulo_devuelto) return;
 
         const articulo_devuelto_index = _.findIndex(itemRetorno.contenedor_retorno, articulo_devuelto);
         const FormGroup_devuelto = articulo_devuelto as FormGroup;
@@ -1045,7 +1069,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
             detalle_devuelto['cantidad'] = articulo_devuelto.cantidad - retornar_info['cantidad'];
             detalle_devuelto['cantidad_en_unidades'] = articulo_devuelto.cantidad_en_unidades - retornar_info['cantidad_en_unidades'];
             detalle_devuelto['descuento_valor'] = fun.roundNumberToDecimal(articulo_devuelto.descuento_valor - retornar_info['descuento_valor']);
-            this.calcularMontosRow(articulo_devuelto_index);
           } else {
             articulo_devuelto['cantidad'] -= retornar_info['cantidad'];
             articulo_devuelto['cantidad_en_unidades'] -= retornar_info['cantidad_en_unidades'];
@@ -1053,7 +1076,10 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
             articulo_devuelto['total'] = articulo_devuelto['cantidad'] * fun.desformatearStNumber(articulo_devuelto['precio']) - articulo_devuelto['descuento_valor'];
           }
-          FormGroup_devuelto.patchValue(detalle_devuelto);
+          if (itemRetorno.tipo == 'defectuoso') {
+            FormGroup_devuelto.patchValue(detalle_devuelto);
+            this.calcularMontosRow(articulo_devuelto_index);
+          }
         }
 
         // ----- CAMBIO DEL ARTICULO ORIGEN -----

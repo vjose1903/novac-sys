@@ -33,7 +33,7 @@ export function makePDF(data, file_name, tipo_pdf?) {
   const configApp: ConfigI = Ss.configServ.config;
 
   const dd = {
-    pageSize: { width: 200, height: 'auto' },
+    pageSize: { width: 220, height: 'auto' },
     pageOrientation: 'portrait',
     pageMargins: [5, 20, 5, 20],
     content: contenidoPDF(data, is_suplidor, configApp, tipo_pdf, is_electronica),
@@ -55,6 +55,8 @@ export function makePDF(data, file_name, tipo_pdf?) {
 
 function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf, is_electronica) {
   const configuration = configuraciones[tipo_pdf];
+  const mostrarRegistroMercantil = ['recibo_ingreso', 'conduce', 'notas'].includes(tipo_pdf) || (!is_suplidor && tipo_pdf === 'ventas');
+  const registroMercantil = mostrarRegistroMercantil ? configApp.registro_mercantil?.trim() : '';
 
   data.tipo_tabla = 'normal';
 
@@ -91,6 +93,7 @@ function contenidoPDF(data, is_suplidor, configApp: ConfigI, tipo_pdf, is_electr
             { text: configApp.rnc_empresa, style: 'letra8' },
           ],
         },
+        ...(registroMercantil ? [{ text: [{ text: 'Registro Mercantil NO. ' }, { text: registroMercantil, bold: true }], alignment: 'center', style: 'letra7', margin: [0, 2, 0, 0] }] : []),
         // ---------- DATOS DE LA FACTURA -----------
         {
           margin: [0, 10, 0, 0],

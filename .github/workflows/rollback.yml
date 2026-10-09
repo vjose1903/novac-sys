@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: oprypin/find-latest-tag@v1
         with:
-          repository: vjose1903/novac-system  # The repository to scan.
+          repository: vjose1903/novac_system  # The repository to scan.
           releases-only: false
         id: get-latest-tag
 

@@ -98,7 +98,7 @@
                         Observaciones
                         <i class="fas fa-info-circle field-info" pTooltip="Comentario opcional para documentar cualquier detalle del cuadre." tooltipPosition="top"></i>
                       </label>
-                      <textarea class="form-control" rows="3" [value]="notes()" [readonly]="readOnly()" [disabled]="readOnly()" (input)="setNotes($any($event.target).value)"></textarea>
+                      <textarea class="form-control" rows="3" [value]="notes()" [readonly]="readOnly() && !canEditStoredNotes()" [disabled]="readOnly() && !canEditStoredNotes()" (input)="setNotes($any($event.target).value)"></textarea>
                     </div>
                     <div class="form-group">
                       <div class="mb-1">
@@ -166,6 +166,10 @@
 
                 @if (step() >= 3 && !existsCuadre() && !readOnly()) {
                   <button type="button" class="btn btn-sm btn-tema" (click)="saveCuadre()" [disabled]="saveResource.isLoading()">Guardar</button>
+                }
+
+                @if (step() >= 3 && canSaveNotes()) {
+                  <button type="button" class="btn btn-sm btn-tema" (click)="saveNotes()" [disabled]="stateActionResource.isLoading()">Guardar observaciones</button>
                 }
 
                 @if (canArchiveCurrentForm()) {

@@ -13,6 +13,7 @@ import { RequestC } from '@core/typescript/requests';
 import { MixinClass } from '@core/typescript/MixinClass';
 import { Ss } from '@core/services/singleton.service';
 import { ConfigI } from '@core/interface/config-interface';
+import { serie } from '@core/typescript/constantes';
 import { fun } from '@core/services/functions.service';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { FacturaC } from '@admin/facturacion/factura';
@@ -127,41 +128,55 @@ export class LoginComponent extends MixinClass implements OnInit, OnDestroy, Aft
     }
 
     try {
-      const config = { ...this.configApp };
+      const configPatch = fun.deepCloning(this.configApp.firebase_config_sync_patch || {});
+      const logoSyncKeys = this.configApp.firebase_logo_sync_keys || [];
+      if (!Object.keys(configPatch).length && !logoSyncKeys.length) return;
+
+      const config = { ...configPatch };
+      let uploadedLogos = {};
       const toImageDataUrl = (value: string) => {
         if (!value) return value;
         return value.startsWith('data:image/') ? value : `data:image/png;base64,${value}`;
       };
 
-      const logoResponse = await this.requestClass.createOne(
-        {
-          empresa_id: empresaId,
-          logos: {
-            logo_empresa: toImageDataUrl(config.logo_empresa),
-            logo_impresion: toImageDataUrl(config.logo_impresion),
+      if (logoSyncKeys.length) {
+        const logoResponse = await this.requestClass.createOne(
+          {
+            empresa_id: empresaId,
+            logos: {
+              ...(logoSyncKeys.includes('logo_empresa') ? { logo_empresa: toImageDataUrl(this.configApp.logo_empresa) } : {}),
+              ...(logoSyncKeys.includes('logo_impresion') ? { logo_impresion: toImageDataUrl(this.configApp.logo_impresion) } : {}),
+            },
           },
-        },
-        { afterPath: 'firebase/logos' }
-      );
+          { afterPath: 'firebase/logos' }
+        );
 
-      Object.assign(config, logoResponse?.data || {});
+        uploadedLogos = logoResponse?.data || {};
+        Object.assign(config, uploadedLogos);
+      }
 
       const configurationResponse = await this.requestClass.createOne(
         {
           empresa_id: empresaId,
-          machine_id: config.machineId,
+          machine_id: this.configApp.machineId,
           config,
+          only_missing: !(this.configApp.usa_facturacion_electronica !== true && config.serie_default === serie.normal),
         },
         { afterPath: 'firebase/configuration' }
       );
 
-      Object.assign(config, configurationResponse?.data || {}, {
+      const configActualizada = {
+        ...this.configApp,
+        ...uploadedLogos,
+        ...(configurationResponse?.data || {}),
         firebase_config_missing: false,
         firebase_config_needs_sync: false,
+        firebase_config_sync_patch: {},
+        firebase_logo_sync_keys: [],
         firebase_sync_done: true,
-      });
-      await this._ipc.setAppConfig(config);
-      this.configServ.config = config;
+      };
+      await this._ipc.setLocalAppConfig(configActualizada);
+      this.configServ.config = configActualizada;
     } catch (error) {
       console.error('No se pudo sincronizar la configuración inicial:', error);
     }

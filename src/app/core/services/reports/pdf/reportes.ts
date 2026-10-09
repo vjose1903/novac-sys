@@ -203,6 +203,7 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
                     ],
                     alignment: 'left',
                     margin: [0, 3, 0, 0],
+                    autoEllipsis: { column: true },
                   },
                 ],
               },
@@ -211,7 +212,7 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
         ],
       },
       {
-        margin: [0, -65, 0, 0],
+        margin: [0, -45, 0, 0],
         stack: [
           { text: configApp.nombre_empresa, alignment: 'center', bold: true, style: 'letra11' },
           { text: configApp.direccion_empresa, alignment: 'center', style: 'letra8' },
@@ -232,7 +233,7 @@ function cabeceraReporte(data, configuration, configApp: ConfigI) {
         margin: [0, 15, 0, 0],
         alignment: 'center',
       },
-      data.mostrar_sub_titulo ? { text: data.sub_titulo, style: 'letra10', margin: [15, 10, 0, 0] } : { text: '' },
+      data.mostrar_sub_titulo ? { text: data.sub_titulo, style: 'letra10', margin: [15, 10, 0, 0], autoEllipsis: { column: true } } : { text: '' },
     ];
   };
 

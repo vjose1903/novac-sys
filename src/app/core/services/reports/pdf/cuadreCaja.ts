@@ -262,10 +262,17 @@ function contenidoReporteDetallado(data) {
   const bills = getDenominations(data, 'bill');
   const coins = getDenominations(data, 'coin');
   const foreignCurrency = getDenominations(data, 'foreign_currency');
-  const otherPaymentMethods = getMovements(data, 'other_payment_methods');
+  const storedCardPaymentMethods = getMovements(data, 'card_payment_methods').map(item => ({
+    ...item,
+    payment_method: item.payment_method || item.method || item.forma_pago || 'card',
+  }));
+  const allOtherPaymentMethods = getMovements(data, 'other_payment_methods');
+  const cardPaymentMethods = [...storedCardPaymentMethods, ...allOtherPaymentMethods.filter(isCardPaymentMethod)];
+  const otherPaymentMethods = allOtherPaymentMethods.filter(item => !isCardPaymentMethod(item));
   const additionalTransfers = getMovements(data, 'additional_transfers');
   const physicalCashTotal = getFirstValue(totals, ['physical_cash_total', 'cash_total'], sumDenominations([...bills, ...coins, ...foreignCurrency]));
-  const otherPaymentMethodsTotal = getFirstValue(totals, ['other_payment_methods_total'], sumMovements(otherPaymentMethods));
+  const cardPaymentMethodsTotal = sumMovements(cardPaymentMethods);
+  const otherPaymentMethodsTotal = sumMovements(otherPaymentMethods);
   const additionalTransfersTotal = getFirstValue(totals, ['additional_transfers_total'], sumMovements(additionalTransfers));
   const operationalTotal = getFirstValue(totals, ['operational_total', 'total'], toNumber(physicalCashTotal) + toNumber(otherPaymentMethodsTotal) + toNumber(additionalTransfersTotal));
   const systemIncomeTotal = getFirstValue(systemIncome, ['system_income_total'], getFirstValue(totals, ['system_income_total'], 0));
@@ -277,7 +284,8 @@ function contenidoReporteDetallado(data) {
     makeCompactDenominationSection('BILLETES', bills, false),
     makeCompactDenominationSection('MONEDAS', coins, false),
     foreignCurrency.length ? makeCompactDenominationSection('DIVISAS', foreignCurrency, true) : emptyBlock(),
-    makeCompactMovementSection('TARJETAS, CHEQUES, DEPOSITOS Y TRANSFERENCIAS', otherPaymentMethods, otherPaymentMethodsTotal),
+    makeCompactMovementSection('TARJETAS', cardPaymentMethods, cardPaymentMethodsTotal),
+    makeCompactMovementSection('CHEQUES, DEPOSITOS Y TRANSFERENCIAS', otherPaymentMethods, otherPaymentMethodsTotal),
     makeCompactMovementSection('TRANSFERENCIAS ADICIONALES', additionalTransfers, additionalTransfersTotal),
     makeCompactTotalLine('TOTAL EFECTIVO DEL DIA', operationalTotal),
     makeCompactTotalsSection({
@@ -585,6 +593,11 @@ function getMovements(data, group) {
   const movements = data?.movimientos || data?.movements || {};
   if (Array.isArray(movements)) return movements.filter(item => item.movement_group === group);
   return movements[group] || [];
+}
+
+function isCardPaymentMethod(item) {
+  const method = String(item?.payment_method || item?.method || item?.forma_pago || '').trim().toLowerCase();
+  return method === 'card' || method.includes('tarj');
 }
 
 function getFirstValue(source, keys: string[], fallback) {

@@ -62,6 +62,7 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, IDy
   tableClickRow(event) {
     this.form.controls['defectuoso'].disable();
     this.form.controls['solo_devuelto'].disable();
+    this.form.patchValue({ devuelto: null, solo_devuelto: null, defectuoso: null });
 
     this.articuloSelected = fun.deepCloning(event.data);
 
@@ -157,6 +158,10 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, IDy
   }
 
   btn_aceptar() {
+    for (const campo of ['solo_devuelto', 'defectuoso', 'devuelto']) {
+      if (!this.checkCantidad(campo)) return;
+    }
+
     if (this.btnAceptarIsDisabled()) {
       fun.toastError('Complete los campos para retornar el articulo.', 'ERROR');
       return;
@@ -175,5 +180,9 @@ export class RetornarDevueltoComponent extends MixinClass implements OnInit, IDy
     }
 
     this.modalConfig.close(obj);
+  }
+
+  submit() {
+    this.btn_aceptar();
   }
 }

@@ -101,7 +101,15 @@
 }
 
 .cash-add-payment {
+  background: transparent !important;
+  color: color-mix(in srgb, var(--primary08) 72%, var(--app-text)) !important;
   justify-self: start;
+  box-shadow: none !important;
+
+  &:not(:disabled):hover {
+    background: color-mix(in srgb, var(--primary08) 12%, transparent) !important;
+    color: color-mix(in srgb, var(--primary08) 72%, var(--app-text)) !important;
+  }
 }
 
 .cash-remove-payment {

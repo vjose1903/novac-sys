@@ -14,6 +14,7 @@
   "url_servidor_respaldo": "https://8n3mw1zq-9093.use2.devtunnels.ms",
   "usa_url_principal": true,
   "usa_facturas_externas": false,
+  "usa_facturacion_electronica": true,
   "has_contabilidad": true,
   "is_db_local": false,
   "calcular_itbis": true,
@@ -25,6 +26,7 @@
   "usa_modulo_viajes": false,
   "medida_producto_terminado": "Producto",
   "serie_default": "normal",
+  "registro_mercantil": "",
 
   "printer_selected": {
     "venta_contado": "Ninguna",

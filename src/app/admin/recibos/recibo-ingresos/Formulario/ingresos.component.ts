@@ -18,6 +18,7 @@ import { ReciboIngresosCalculosService } from '../services/recibo-ingresos-calcu
 import { ReciboIngresosFacturasService } from '../services/recibo-ingresos-facturas.service';
 import { ReciboIngresosModalService } from '../services/recibo-ingresos-modal.service';
 import { Ss } from '@core/services/singleton.service';
+import Big from 'big.js';
 
 @Component({
   selector: 'app-ingresos',
@@ -121,23 +122,26 @@ export class IngresosComponent extends MixinClass implements OnInit, OnDestroy {
 
   recibiendo = computed(() => {
     if (this.facturasSelected().length == 0) return 0;
-    return this.facturasSelected().reduce((sum, item) => {
-      if (fun.hasValue(item.monto)) sum += this.parseMonto(item.monto);
+    const total = this.facturasSelected().reduce((sum, item) => {
+      if (fun.hasValue(item.monto)) return sum.plus(this.parseMonto(item.monto));
       return sum;
-    }, 0);
+    }, Big(0));
+
+    return total.round(2).toNumber();
   });
 
   restando = computed(() => {
     const debiendo = this.debiendo_con_mora();
     const recibiendo = this.recibiendo();
 
-    return debiendo - recibiendo <= 1 ? 0 : debiendo - recibiendo;
+    const balance = Big(debiendo).minus(recibiendo);
+    return balance.lte(1) ? 0 : balance.round(2).toNumber();
   });
 
-  mora_general = computed(() => this.all_facturas().reduce((sum, item) => this.parseMonto(item.mora) + sum, 0));
+  mora_general = computed(() => this.all_facturas().reduce((sum, item) => sum.plus(this.parseMonto(item.mora)), Big(0)).round(2).toNumber());
 
   debiendo_con_mora = computed(() => {
-    return Number(this.debiendo_sin_mora()) + Number(this.mora_general());
+    return Big(this.debiendo_sin_mora()).plus(this.mora_general()).round(2).toNumber();
   });
 
   clienteClass = new ClienteC();

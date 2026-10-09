@@ -14,7 +14,7 @@ export class ReciboIngresosCalculosService {
   }
 
   getMontoTotalFactura(balance: any, mora: any): string {
-    return fun.roundNumberToDecimal(Big(this.parseMonto(balance)).plus(this.parseMonto(mora)).toNumber());
+    return Big(this.parseMonto(balance)).plus(this.parseMonto(mora)).round(2).toFixed(2);
   }
 
   isInvalidMonto(value: any): boolean {
@@ -23,32 +23,42 @@ export class ReciboIngresosCalculosService {
   }
 
   formarDetalleRecibos(facturasSelected: FacturasI[], tipo_recibo: string) {
-    return facturasSelected.reduce(
+    const resultado = facturasSelected.reduce(
       (acc, fact) => {
         const detalle = this.getDetalleReciboFromFactura(fact, tipo_recibo);
 
         acc.detalle.push(detalle);
-        acc.bruto += detalle.deposito;
-        acc.mora += detalle.mora;
-        acc.total_recibo += this.parseMonto(fact.monto);
+        acc.bruto = acc.bruto.plus(detalle.deposito);
+        acc.mora = acc.mora.plus(detalle.mora);
 
         return acc;
       },
-      { bruto: 0, mora: 0, total_recibo: 0, detalle: [] as any[] }
+      { bruto: Big(0), mora: Big(0), detalle: [] as any[] }
     );
+
+    const bruto = resultado.bruto.round(2);
+    const mora = resultado.mora.round(2);
+
+    return {
+      bruto: bruto.toNumber(),
+      mora: mora.toNumber(),
+      total_recibo: bruto.plus(mora).round(2).toNumber(),
+      detalle: resultado.detalle,
+    };
   }
 
   getDetalleReciboFromFactura(fact: FacturasI, tipo_recibo: string) {
     const monto = Big(this.parseMonto(fact.monto));
-    const mora = this.parseMonto(fact.mora);
-    const mora_received = Math.min(monto.toNumber(), mora);
-    const deposito = Math.max(0, monto.minus(mora_received).toNumber());
+    const mora = Big(this.parseMonto(fact.mora));
+    const mora_received = monto.lt(mora) ? monto : mora;
+    const deposito = monto.minus(mora_received);
+    const deposito_recibido = deposito.gt(0) ? deposito : Big(0);
 
     return {
       cabecera_factura_id: fact.id,
       pago_total: fact.pagoT,
-      deposito,
-      mora: mora_received,
+      deposito: deposito_recibido.round(2).toNumber(),
+      mora: mora_received.round(2).toNumber(),
       descripcion: tipo_recibo === 'Pago factura' ? this.getDescripcionDetalle(fact) : '',
       pago_a_tiempo: fact.pago_a_tiempo,
     };

@@ -189,17 +189,39 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
     });
   }
 
-  changeSerieDefault() {
-    const new_config = { ...this.configApp, serie_default: this.configApp.serie_default === serie.electronica ? serie.normal : serie.electronica };
+  async changeSerieDefault() {
+    const empresaId = this.configApp.firebase_empresa_id;
+    const machineId = this.configApp.machineId;
+    let serie_default = serie.normal;
+    if (this.configApp.usa_facturacion_electronica === true) {
+      serie_default = this.configApp.serie_default === serie.electronica ? serie.normal : serie.electronica;
+    }
 
-    this._ipc
-      .setAppConfig(new_config)
-      .then(res => this.refreshPage())
-      .catch(err => {
-        console.error(err);
-        if (err.msg) fun.toastError(err.msg, 'ERROR');
-        else fun.toastError('Error al cambiar la configuración de la aplicación', 'ERROR');
-      });
+    if (!empresaId || !machineId) {
+      fun.toastError('No se encontró la empresa o máquina para guardar la serie.', 'ERROR');
+      return;
+    }
+
+    try {
+      await this.requestClass.createOne(
+        { empresa_id: empresaId, machine_id: machineId, config: { serie_default } },
+        { afterPath: 'firebase/configuration' }
+      );
+
+      const configActualizada = {
+        ...this.configApp,
+        serie_default,
+        firebase_sync_done: true,
+      };
+      const configGuardada = await this._ipc.setLocalAppConfig(configActualizada);
+
+      this.configServ.config = configGuardada;
+      this.configApp = configGuardada;
+    } catch (err) {
+      console.error(err);
+      if (err?.msg) fun.toastError(err.msg, 'ERROR');
+      else fun.toastError('Error al cambiar la serie por defecto', 'ERROR');
+    }
   }
 
   async changeThemeMode() {

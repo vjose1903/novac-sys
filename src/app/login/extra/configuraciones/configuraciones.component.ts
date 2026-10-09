@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { IpcService } from '@core/services/ipc.service';
 import { printTestPdf } from './info-docs-prueba/info-docs-prueba';
 import { formFieldId, formFieldName } from './configuraciones.model';
+import { serie } from '@core/typescript/constantes';
 import { EmpresaService } from '@core/services/empresa.service';
 import { ThemeService } from '@core/services/theme.service';
 import { RequestC } from '@core/typescript/requests';
@@ -119,6 +120,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       [formFieldName.machineId]: [{ value: this.getValue(data, 'machineId'), disabled: false }],
       [formFieldName.nombre_empresa]: [{ value: this.getValue(data, 'nombre_empresa'), disabled: false }, Validators.required],
       [formFieldName.rnc_empresa]: [{ value: this.getValue(data, 'rnc_empresa'), disabled: false }, Validators.required],
+      [formFieldName.registro_mercantil]: [{ value: this.getValue(data, 'registro_mercantil') ?? '', disabled: false }],
       [formFieldName.direccion_empresa]: [{ value: this.getValue(data, 'direccion_empresa'), disabled: false }, Validators.required],
       [formFieldName.telefono_empresa]: [{ value: this.getValue(data, 'telefono_empresa'), disabled: false }, Validators.required],
       [formFieldName.logo_empresa]: [{ value: this.getValue(data, 'logo_empresa'), disabled: false }, Validators.required],
@@ -136,6 +138,7 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       [formFieldName.usa_mora]: [{ value: this.getValue(data, 'usa_mora') ?? false, disabled: false }, Validators.required],
       [formFieldName.is_produccion]: [{ value: this.getValue(data, 'is_produccion'), disabled: false }, Validators.required],
       [formFieldName.usa_modulo_viajes]: [{ value: this.getValue(data, 'usa_modulo_viajes') !== false, disabled: false }],
+      [formFieldName.usa_facturacion_electronica]: [{ value: this.getValue(data, 'usa_facturacion_electronica') ?? false, disabled: false }],
       [formFieldName.facturacion_editar_precio]: [{ value: this.getValue(data, 'facturacion_editar_precio'), disabled: false }, Validators.required],
       [formFieldName.vende_sin_inventario]: [{ value: this.getValue(data, 'vende_sin_inventario'), disabled: false }, Validators.required],
       [formFieldName.medida_producto_terminado]: [{ value: this.getValue(data, 'medida_producto_terminado'), disabled: false }, Validators.required],
@@ -198,7 +201,8 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
     const next_control_map = {
       [formFieldId.nombre_empresa]: formFieldId.rnc_empresa,
-      [formFieldId.rnc_empresa]: formFieldId.telefono_empresa,
+      [formFieldId.rnc_empresa]: formFieldId.registro_mercantil,
+      [formFieldId.registro_mercantil]: formFieldId.telefono_empresa,
       [formFieldId.telefono_empresa]: formFieldId.direccion_empresa,
       [formFieldId.direccion_empresa]: formFieldId.color_app,
       [formFieldId.color_app]: formFieldId.url_servidor,
@@ -278,6 +282,8 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
 
     keysToOmit.forEach(key => delete formulario[key]);
 
+    if (formulario.usa_facturacion_electronica !== true) formulario.serie_default = serie.normal;
+
     // Agregar objetos estructurados
     formulario.pages_sizes = pages_sizes;
     formulario.printer_selected = printer_selected;
@@ -334,16 +340,20 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
       }
 
       this.configApp.firebase_empresa_id = empresaId;
+      const isLoggedIn = !!fun.getAuthToken();
+      const configurationPath = isLoggedIn ? 'firebase/configuration' : 'firebase/configuration/prelogin';
+      const preloginCredentials = isLoggedIn ? {} : { config_password: this.configCopy.config_password };
 
       const logoResponse = await this.requestClass.createOne(
         {
           empresa_id: empresaId,
+          ...preloginCredentials,
           logos: {
             logo_empresa: this.toImageDataUrl(formulario.logo_empresa),
             logo_impresion: this.toImageDataUrl(formulario.logo_impresion),
           },
         },
-        { afterPath: 'firebase/logos' }
+        { afterPath: isLoggedIn ? 'firebase/logos' : 'firebase/logos/prelogin' }
       );
 
       Object.assign(formulario, logoResponse?.data || {});
@@ -352,9 +362,10 @@ export class ConfiguracionesComponent implements OnInit, AfterViewInit {
         {
           empresa_id: empresaId,
           machine_id: this.configApp.machineId,
+          ...preloginCredentials,
           config: formulario,
         },
-        { afterPath: 'firebase/configuration' }
+        { afterPath: configurationPath }
       );
 
       Object.assign(formulario, configurationResponse?.data || {}, { firebase_sync_done: true });

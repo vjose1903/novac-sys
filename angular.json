@@ -92,7 +92,8 @@
           "builder": "@angular/build:dev-server",
           "options": {
             "buildTarget": "novac-system:build:dev",
-            "hmr": false
+            "hmr": false,
+            "prebundle": false
           },
           "configurations": {
             "dev": {

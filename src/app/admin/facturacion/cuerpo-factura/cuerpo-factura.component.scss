@@ -26,6 +26,14 @@
         position: relative;
         align-items: center;
 
+        &.warning-price {
+          animation: warning_alert 0.5s infinite;
+
+          .warningAlert {
+            background-color: transparent !important;
+          }
+        }
+
         .iconArrow {
           position: absolute;
           margin: 0.4rem;

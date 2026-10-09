@@ -12,7 +12,9 @@
         </div>
       </div>
 
-      <p-selectButton [options]="serieOptions" [ngModel]="serieSelected()" (ngModelChange)="serieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+      @if (configApp?.usa_facturacion_electronica === true) {
+        <p-selectButton [options]="serieOptions" [ngModel]="serieSelected()" (ngModelChange)="serieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+      }
     </div>
 
     <div class="colCard">

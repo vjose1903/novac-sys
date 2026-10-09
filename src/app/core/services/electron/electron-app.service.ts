@@ -6,6 +6,7 @@ import {
   DESKTOP_COMMAND_GET_APP_CONFIG,
   DESKTOP_COMMAND_RELOAD_APP,
   DESKTOP_COMMAND_SET_APP_CONFIG,
+  DESKTOP_COMMAND_SET_LOCAL_APP_CONFIG,
 } from '@electron/shared-electron-angular';
 
 import { ElectronBridgeService } from './electron-bridge.service';
@@ -26,6 +27,10 @@ export class ElectronAppService {
 
   setAppConfig(config: any) {
     return this.bridge.invoke(DESKTOP_COMMAND_SET_APP_CONFIG, config);
+  }
+
+  setLocalAppConfig(config: any) {
+    return this.bridge.invoke(DESKTOP_COMMAND_SET_LOCAL_APP_CONFIG, config);
   }
 
   reloadApp() {

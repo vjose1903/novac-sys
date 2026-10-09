@@ -217,6 +217,7 @@
                                           type="{{ column.inputType ? column.inputType : 'text' }}"
                                           [value]="getValueForm(column, rowData)"
                                           [disabled]="disableInput(rowData, column)"
+                                          (input)="limitarDecimales($event, column)"
                                           (mouseleave)="column.interactWithMouse ? inputTable.blur() : null"
                                           (mouseenter)="column.interactWithMouse ? inputTable.focus() : null"
                                           (focus)="handleInputsEvents('focus', $event.target, column, rowIndex, rowData)"

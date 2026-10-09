@@ -94,7 +94,7 @@
                     <div class="col-6 pe-0">
                       <div class="form-group">
                         <label class="control-label">Vendido en: <span style="color: red">*</span></label>
-                        <p-select inputId="vendido" formControlName="vendido_en" [options]="vendidoEn" optionLabel="front" optionValue="backend" placeholder="Tipo" appendTo="body" (keydown.enter)="saltar('articulo_id', -1)"></p-select>
+                        <p-select inputId="vendido" formControlName="vendido_en" [options]="vendidoEn" optionLabel="front" optionValue="backend" placeholder="Tipo" appendTo="body" (onChange)="cambiarVendidoEn()" (keydown.enter)="saltar('articulo_id', -1)"></p-select>
                         @if (!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)) {
                           <div class="alerta text-danger ms-1" style="font-size: 12px">Seleccione una opcion</div>
                         }
@@ -244,6 +244,7 @@
                       </div>
                       <div class="scroll-formula-content">
                         @for (formula of ARRAY_FORMULA.controls; track formula['controls'].key.value; let index_formula = $index) {
+                          @let cambioCosto = getCambioCostoFormula(formula);
                           <div formArrayName="rowFormula">
                             <div [formGroupName]="index_formula">
                               @if (index_formula > 0) {
@@ -285,7 +286,7 @@
                                       [id]="'cantidad_formula-' + index_formula"
                                       formControlName="cantidad_formula"
                                       class="form-control min"
-                                      style="border-radius: 0.25rem 0rem 0rem 0.25rem !important"
+                                      style="border-radius: var(--app-field-radius, 0.72rem) 0 0 var(--app-field-radius, 0.72rem) !important"
                                       autocomplete="off"
                                       (keyup)="checkLongDecimales($event)" />
                                   </div>
@@ -297,14 +298,19 @@
                                     id="medida_formula-{{ index_formula }}"
                                     tabindex="-1"
                                     formControlName="medida_formula"
-                                    style="border-radius: 0rem 0.25rem 0.25rem 0rem !important; padding: 0.2rem"
+                                    style="border-radius: 0 var(--app-field-radius, 0.72rem) var(--app-field-radius, 0.72rem) 0 !important; padding: 0.2rem"
                                     class="form-control disabled min"
                                     autocomplete="off" />
                                 </div>
                                 <!-- costo -->
                                 <div class="col-3 pe-0">
                                   <div class="form-group mb-0">
-                                    <input type="text" id="costo_formula-{{ index_formula }}" tabindex="-1" formControlName="costo_formula" [ngClass]="{ badAlert: checkCostoFormula(formula) }" class="form-control disabled min" autocomplete="off" />
+                                    <div class="formula-costo-div" [class.warning-price]="cambioCosto.changed" [pTooltip]="cambioCosto.changed ? (cambioCosto.icon === 'fa-arrow-up' ? 'Costo subió' : 'Costo bajó') : ''" tooltipPosition="top">
+                                      @if (cambioCosto.changed) {
+                                        <i class="fa-solid {{ cambioCosto.icon }} iconArrow"></i>
+                                      }
+                                      <input type="text" id="costo_formula-{{ index_formula }}" tabindex="-1" formControlName="costo_formula" [ngClass]="{ warningAlert: cambioCosto.changed }" class="form-control disabled min" autocomplete="off" />
+                                    </div>
                                   </div>
                                 </div>
 
@@ -427,13 +433,13 @@
                     </div>
                   </div>
                 }
-                @if (showContenido(form.controls['medida'].value)) {
+                @if (showContenido(form.controls['medida'].value) || tipoArticuloSelected?.descripcion === 'Producto terminado') {
                   <hr class="raya" />
                 }
                 <!-- ======================================================================================================================= -->
                 <!--  CONTENIDO DE LA CAJA O SACO O GALON -->
                 <!-- ======================================================================================================================= -->
-                @if (showContenido(form.controls['medida'].value)) {
+                @if (showContenido(form.controls['medida'].value) || tipoArticuloSelected?.descripcion === 'Producto terminado') {
               <div class="row contenido-medida-row">
                 <span class="w-100 text-green">Contenido {{ form.controls['medida'].value }}</span>
                 <div class="col-3 p-0 contenido-cantidad-col">
@@ -465,10 +471,9 @@
                     </div>
                 <div class="col-4 p-0 contenido-precio-col">
                       <div class="form-group">
-                        <label class="control-label">Precio </label> {{ ' ' }}
-                        <label class="control-label">{{ form.controls['medida_contenido_padre'].value }} </label>
+                        <label class="control-label">Precio {{ form.controls['medida_contenido_padre'].value }}</label>
                         <input
-                          (keydown.enter)="saltar(form.controls['medida_contenido_padre'].value === 'Paquete' ? 'contenidoHijo' : 'send')"
+                          (keydown.enter)="saltar(requiereContenidoHijo() ? 'contenidoHijo' : 'send')"
                           type="text"
                           id="precio_padre"
                           (focus)="htmlServ.selectValue($event)"
@@ -485,15 +490,15 @@
                     </div>
                   </div>
                 }
-                @if (form.controls['medida_contenido_padre'].value === 'Paquete') {
+                @if (requiereContenidoHijo()) {
                   <hr class="raya" />
                 }
                 <!-- ======================================================================================================================= -->
                 <!--  CONTENIDO DEL PAQUETE -->
                 <!-- ======================================================================================================================= -->
-                @if (form.controls['medida_contenido_padre'].value === 'Paquete') {
+                @if (requiereContenidoHijo()) {
                   <div class="row">
-                    <span class="w-100 text-green">Contenido Paquete</span>
+                    <span class="w-100 text-green">Contenido {{ form.controls['medida_contenido_padre'].value }}</span>
                     <div class="col-3 p-0">
                       <label class="control-label">Contiene: </label>
                       <div class="form-group">
@@ -508,14 +513,14 @@
                           class="form-control input_cantidad"
                           autocomplete="off" />
                         @if (!form.controls['cantidad_contenido_hijo'].valid && (form.controls['cantidad_contenido_hijo'].dirty || form.controls['cantidad_contenido_hijo'].touched)) {
-                          <div class="alerta text-danger ms-1" style="font-size: 12px">Cantidad del paquete</div>
+                          <div class="alerta text-danger ms-1" style="font-size: 12px">Cantidad del contenido</div>
                         }
                       </div>
                     </div>
                     <div class="col-5">
                       <div class="form-group">
                         <label class="control-label text-transparent">medida </label>
-                        <p-select inputId="medidaHijo" formControlName="medida_contenido_hijo" [options]="medidaHijoOptions" placeholder="Seleccione" appendTo="body" (keydown.enter)="saltar('precio_hijo')"></p-select>
+                        <p-select inputId="medidaHijo" formControlName="medida_contenido_hijo" [options]="medidaContenidoHijoOptions()" placeholder="Seleccione" appendTo="body" (keydown.enter)="saltar('precio_hijo')"></p-select>
                         @if (!form.controls['medida_contenido_hijo'].valid && (form.controls['medida_contenido_hijo'].dirty || form.controls['medida_contenido_hijo'].touched)) {
                           <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                         }

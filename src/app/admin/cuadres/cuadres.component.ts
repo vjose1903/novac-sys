@@ -184,6 +184,11 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     const status = this.selectedCuadre()?.status || this.selectedCuadre()?.estado;
     return !this.selectedIsNewFlow() || (this.existsCuadre() && status !== 'reopened');
   });
+  readonly canEditStoredNotes = computed(() => this.existsCuadre() && Number(this.selectedCuadre()?.id) > 0);
+  readonly canSaveNotes = computed(() => {
+    const storedNotes = this.selectedCuadre()?.notes ?? this.selectedCuadre()?.observaciones ?? '';
+    return this.readOnly() && this.canEditStoredNotes() && this.notes() !== storedNotes;
+  });
   readonly useStoredTotals = computed(() => this.existsCuadre() && this.selectedIsNewFlow() && this.readOnly());
 
   readonly operationalTotal = computed(() => {
@@ -310,7 +315,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       if (status === 'resolved' && request) {
         untracked(() => {
           this.actionRequest.set(null);
-          this.afterAction(value);
+          if (request.action === 'notes') this.afterNotesSave(value);
+          else this.afterAction(value);
         });
       }
     });
@@ -657,9 +663,16 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
   }
 
   setNotes(value: string) {
-    if (this.readOnly()) return;
+    if (this.readOnly() && !this.canEditStoredNotes()) return;
     this.notes.set(value || '');
-    this.markDirty();
+    if (!this.readOnly()) this.markDirty();
+  }
+
+  saveNotes() {
+    if (!this.canSaveNotes()) return;
+    const id = Number(this.selectedCuadre()?.id);
+    if (!id) return;
+    this.actionRequest.set({ id, action: 'notes', body: { notes: this.notes() }, nonce: Date.now() });
   }
 
   setReconciliationTolerance(value: string) {
@@ -806,6 +819,16 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     if (cuadre) this.selectedCuadre.set(cuadre);
     this.loadCuadres(this.tServ.getPaginationById('lista_cuadres') || this.listRequest());
     this.markPristine();
+  }
+
+  private afterNotesSave(response: any) {
+    const cuadre = response?.data || response?.cuadre || response;
+    if (cuadre) {
+      this.selectedCuadre.set(cuadre);
+      this.notes.set(cuadre.notes ?? cuadre.observaciones ?? this.notes());
+    }
+    this.loadCuadres(this.tServ.getPaginationById('lista_cuadres') || this.listRequest());
+    fun.toastSuccess('Observaciones guardadas correctamente', 'CORRECTO');
   }
 
   private buildSaveBody() {
