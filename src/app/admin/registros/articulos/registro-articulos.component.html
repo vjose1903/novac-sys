@@ -142,7 +142,7 @@
                       <div class="col-6 pe-0">
                         <div class="form-group">
                           <label class="control-label">Vendido en: <span style="color: red">*</span></label>
-                          <p-select inputId="vendido" formControlName="vendido_en" [options]="vendidoEn" optionLabel="front" optionValue="backend" placeholder="Tipo" appendTo="body" (keydown.enter)="saltar('costo_principal')"></p-select>
+                          <p-select inputId="vendido" formControlName="vendido_en" [options]="vendidoEn" optionLabel="front" optionValue="backend" placeholder="Tipo" appendTo="body" (onChange)="cambiarVendidoEn()" (keydown.enter)="saltar('costo_principal')"></p-select>
                           @if (!form.controls['vendido_en'].valid && (form.controls['vendido_en'].dirty || form.controls['vendido_en'].touched)) {
                             <div class="alerta text-danger ms-1" style="font-size: 12px">Seleccione una opcion</div>
                           }

@@ -225,9 +225,22 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   }
 
   cambiarVendidoEn() {
+    this.syncDetallableWithVenta();
     const medidaPadre = this.form.controls.medida_contenido_padre.value;
     if (medidaPadre && !this.medidaContenidoPadreOptions().includes(medidaPadre)) {
       ['medida_contenido_padre', 'cantidad_contenido_padre', 'costo_padre', 'precio_padre', 'medida_contenido_hijo', 'cantidad_contenido_hijo', 'costo_hijo', 'precio_hijo'].forEach(campo => this.form.controls[campo].reset(null));
+    }
+  }
+
+  syncDetallableWithVenta() {
+    const control = this.form?.controls?.is_detallable;
+    if (!control) return;
+
+    if (this.form.controls.vendido_en.value === 'Unidad') {
+      control.setValue(true);
+      control.disable({ emitEvent: false });
+    } else {
+      control.enable({ emitEvent: false });
     }
   }
 
@@ -441,7 +454,10 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
   borrar(reset = false) {
     [this.articuloSelected, this.tipoArticuloSelected] = Array(2).fill(undefined);
 
-    if (fun.hasValue(this.form)) this.form.reset();
+    if (fun.hasValue(this.form)) {
+      this.form.controls.is_detallable.enable({ emitEvent: false });
+      this.form.reset();
+    }
     if (fun.hasValue(this.form)) this.form.controls.is_detallable.setValue(false);
     if (fun.hasValue(this.form)) this.form.controls.existencia.setValue(0);
 
@@ -843,6 +859,7 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     this.MEDIDACAJA = '';
 
     this.tipoArticuloSelected = this.listaTipoArticulos.find(val => val.id == Number(articulo.tipo_articulo_id));
+    this.syncDetallableWithVenta();
     this.is_combo = articulo.is_combo;
 
     if (this.tipoArticuloSelected?.codigo === 'producto_terminado') this.form.controls.calcular_saco.setValue(false);

@@ -992,8 +992,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       const costoPrincipal = articulo.costo_principal;
       const unidadesMinimas = ['Libra', 'Onza', 'Unidad'];
       const esProductoTerminado = articulo.descripcion?.toLowerCase() == 'producto terminado';
+      const vendeEnUnidad = articulo.vendido_en === 'Unidad';
 
-      if ((medida != 'Quintal' || this.factServ.isCompra()) && (this.factServ.isCompra() || articulo.is_detallable || !unidadesMinimas.includes(medida))) {
+      if ((medida != 'Quintal' || this.factServ.isCompra()) && (this.factServ.isCompra() || articulo.is_detallable || !unidadesMinimas.includes(medida) || (vendeEnUnidad && medida === 'Unidad'))) {
         unidadesArticulo.push({ value: medida, precio: articulo.precio_principal, costo: articulo.costo_principal, cantidad: articulo.contenido[medida] });
       }
 
@@ -1005,7 +1006,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
       }
 
       articulo.contenido_articulos
-        .filter(element => this.factServ.isCompra() || articulo.is_detallable || !unidadesMinimas.includes(element.medida))
+        .filter(element => this.factServ.isCompra() || articulo.is_detallable || !unidadesMinimas.includes(element.medida) || (vendeEnUnidad && element.medida === 'Unidad'))
         .forEach(element => {
           unidadesArticulo.push({ value: element.medida, precio: element.precio, costo: element.costo, cantidad: articulo.contenido[element.medida] });
         });
