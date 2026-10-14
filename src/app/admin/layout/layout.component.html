@@ -24,7 +24,7 @@
 
         <div class="right">
           <div class="btn-group dropCuenta" id="dropCuenta">
-            <span class="popover-toggle button-basic" (click)="dropdownCuenta.toggle($event)">
+            <span class="popover-toggle button-basic" (mousedown)="guardarFocoActual()" (click)="dropdownCuenta.toggle($event)">
               <img class="rounded-circle" [src]="imgUser" alt="Admin" />
               Cuenta <span class="caret"></span>
             </span>

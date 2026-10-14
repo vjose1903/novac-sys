@@ -75,6 +75,19 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
   themeServ = inject(ThemeService);
   divisaServ = inject(DivisaService);
   private destroy$ = new Subject<void>();
+  private focoAntesDelPopover?: HTMLElement;
+
+  guardarFocoActual(): void {
+    const activeElement = document.activeElement;
+    this.focoAntesDelPopover = activeElement instanceof HTMLElement && activeElement !== document.body ? activeElement : undefined;
+  }
+
+  private restaurarFocoActual(): void {
+    const elemento = this.focoAntesDelPopover;
+    this.focoAntesDelPopover = undefined;
+    if (!elemento?.isConnected) return;
+    setTimeout(() => elemento.focus({ preventScroll: true }), 0);
+  }
 
   constructor(
     private router: Router,
@@ -217,6 +230,8 @@ export class LayoutComponent extends MixinClass implements OnInit, OnDestroy, Af
 
       this.configServ.config = configGuardada;
       this.configApp = configGuardada;
+      this.cdRef.detectChanges();
+      this.restaurarFocoActual();
     } catch (err) {
       console.error(err);
       if (err?.msg) fun.toastError(err.msg, 'ERROR');

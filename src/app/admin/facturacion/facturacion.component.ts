@@ -20,7 +20,7 @@ import { ClienteC } from '@registros/registro-clientes/cliente';
 import { SuplidorC } from '@registros/registro-suplidores/suplidores';
 import { fun } from '@core/services/functions.service';
 import { VehiculoC } from '@registros/registro-vehiculo/vehiculo';
-import { seriesDGII, teclasCode } from '@core/typescript/constantes';
+import { serie, teclasCode } from '@core/typescript/constantes';
 import { Permisos } from '@core/typescript/permisos';
 import { ConfigI } from '@core/interface/config-interface';
 import { Ss } from '@core/services/singleton.service';
@@ -228,8 +228,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   private lastExternalFacturaClickAt = 0;
   private travelConfigSub?: { unsubscribe: () => void };
   private travelFeatureState?: boolean;
+  private serieConfiguradaActual?: serie;
 
-  facturasSerieOptions = seriesDGII();
   htmlServ = inject(HtmlElementsService);
   factServ = inject(FacturacionService);
   dynamicModalServ = inject(DynamicModalService);
@@ -260,7 +260,14 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
   ngOnInit() {
     this.configApp = Ss.configServ.config;
     this.travelFeatureState = this.configApp?.usa_modulo_viajes !== false;
+    this.serieConfiguradaActual = this.getSerieConfigurada(this.configApp);
     this.travelConfigSub = Ss.configServ.config$.subscribe(config => {
+      this.configApp = config;
+      const serieConfigurada = this.getSerieConfigurada(config);
+      const cambioSerieConfigurada = this.serieConfiguradaActual !== undefined && serieConfigurada !== this.serieConfiguradaActual;
+      this.serieConfiguradaActual = serieConfigurada;
+      if (cambioSerieConfigurada) this.aplicarSerieConfigurada(serieConfigurada);
+
       const enabled = config?.usa_modulo_viajes !== false;
       if (enabled === this.travelFeatureState) return;
       this.travelFeatureState = enabled;
@@ -270,6 +277,30 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
       }
       this.validatePermisos();
     });
+  }
+
+  private getSerieConfigurada(config: ConfigI): serie {
+    return config?.usa_facturacion_electronica === true ? config.serie_default : serie.normal;
+  }
+
+  private aplicarSerieConfigurada(serieConfigurada: serie) {
+    if (
+      !fun.hasValue(this.factServ.tipoDocumento()) ||
+      this.factServ.isCotizacion() ||
+      this.factServ.isPreVenta() ||
+      this.is_external ||
+      this.factServ.serieType() === serieConfigurada
+    ) return;
+
+    this.factServ.setTipos({ metodo: this.factServ.tipoDocumento(), serie: serieConfigurada, equivalentSerie: true })
+      .then(() => {
+        this.errorComprobante = false;
+        setTimeout(() => this.checkTipoFactura(false), 0);
+      })
+      .catch(error => {
+        console.error(error);
+        fun.toastError(error?.message || 'No se pudo actualizar la serie de facturación.', 'ERROR');
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -868,14 +899,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     return 0;
   }
 
-  async changeSerie() {
-    this.factServ.setTipos({ metodo: this.factServ.tipoDocumento(), serie: this.factServ.serieType(), equivalentSerie: true }).then(result => {
-      this.errorComprobante = false;
-      setTimeout(() => this.checkTipoFactura(), 0);
-    });
-  }
-
-  async checkTipoFactura() {
+  async checkTipoFactura(enfocarCondicion = true) {
     this.factServ
       .setTipoFacturaSelected({ value: this.factServ.tipoFacturaReferenciaSelected, by: 'referencia' })
       .then(result => {
@@ -888,8 +912,8 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         }
 
         this.calcularPorcientoComprobante().then(continuar => {
-          if (continuar) fun.enfocarInput('condicion');
-          else this.errorComprobante = true;
+          if (!continuar) this.errorComprobante = true;
+          else if (enfocarCondicion) fun.enfocarInput('condicion');
         });
       })
       .catch(error => {

@@ -43,16 +43,10 @@
 
       @if (!factServ.isCotizacion() && !factServ.isPreVenta()) {
         @if (configApp?.usa_facturacion_electronica === true) {
-          <p-selectButton
-            [options]="facturasSerieOptions"
-            [ngModel]="is_external ? null : factServ.serieType()"
-            (ngModelChange)="factServ.serieType.set($event)"
-            (ngModelChange)="changeSerie()"
-            optionLabel="label"
-            optionValue="value"
-            optionDisabled="disabled"
-            [disabled]="is_external"
-            [allowEmpty]="false" />
+          <p-tag
+            [value]="factServ.isComprobanteElectronico() ? 'Electrónica' : 'Normal'"
+            [severity]="factServ.isComprobanteElectronico() ? 'success' : 'secondary'"
+            [rounded]="true" />
         }
       }
     </div>
