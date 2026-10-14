@@ -13,7 +13,7 @@
       </div>
 
       @if (configApp?.usa_facturacion_electronica === true) {
-        <p-selectButton [options]="serieOptions" [ngModel]="serieSelected()" (ngModelChange)="serieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+        <p-tag [value]="serieSelected() === 'electronica' ? 'Electrónica' : 'Normal'" [severity]="serieSelected() === 'electronica' ? 'success' : 'secondary'" [rounded]="true" />
       }
     </div>
 

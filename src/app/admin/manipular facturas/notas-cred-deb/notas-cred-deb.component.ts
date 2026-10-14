@@ -15,7 +15,7 @@ import { table_config, transformType } from '@components/new_tablas/tabla-class'
 import { ConfirmacionImprimirComponent } from '@components/formularios en modales/confirmacion-imprimir/confirmacion-imprimir.component';
 import { PdfService } from '@core/services/reports/pdf/pdf.service';
 import Big from 'big.js';
-import { serie, seriesDGII, seriesDgiiI } from '@core/typescript/constantes';
+import { serie } from '@core/typescript/constantes';
 import { DateUtils } from '@vjose1903/dateutils';
 import { confirmationButtons, ICallbackModal, modalActionsE, modalCloseType } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
@@ -30,7 +30,6 @@ import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-moda
 export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestroy {
   @Input() id_factura: number;
   @Input() tipoNota: any;
-  @Input() serie: serie;
 
   factura!: FacturasI;
 
@@ -70,7 +69,7 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   permissions = Permisos;
 
   serieSelected = signal<serie>(null);
-  serieOptions: seriesDgiiI[] = seriesDGII({ includeAll: false });
+  private configSub?: { unsubscribe: () => void };
 
   table_config: table_config = {
     info: [
@@ -126,9 +125,13 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   ngOnInit() {
     this._init_mixin({ component: 'notas', is_routing: true });
     this.configApp = Ss.configServ.config;
+    this.serieSelected.set(this.getSerieDefault(this.configApp));
+    this.configSub = Ss.configServ.config$.subscribe(config => {
+      this.configApp = config;
+      this.serieSelected.set(this.getSerieDefault(config));
+    });
 
     this.fecha = moment().format('DD/MM/YYYY');
-    this.serieSelected.set(this.getSerieForCurrentClient(this.serie));
     if (this.isCredito) {
       this.tituloPag = 'Nota de crédito aplicada a factura ';
 
@@ -143,7 +146,12 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   ngOnDestroy(): void {
+    this.configSub?.unsubscribe();
     this._destroy_mixin();
+  }
+
+  private getSerieDefault(config: ConfigI): serie {
+    return config?.usa_facturacion_electronica === true ? config.serie_default || serie.normal : serie.normal;
   }
 
   private getSerieForCurrentClient(serieSelected: serie): serie {
@@ -159,9 +167,8 @@ export class NotasCredDebComponent extends MixinClass implements OnInit, OnDestr
   }
 
   async getPaqueteComprobante() {
-    const TipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia === this.tipoFactura.referencia);
-
-    this.ncfClass.getAll({ afterPath: `custom/${TipoFact.id}/true` }).then(res => {
+    if (!this.tipoFactura?.id) return;
+    this.ncfClass.getAll({ afterPath: `custom/${this.tipoFactura.id}/true` }).then(res => {
       this.paqueteComprobante = res['data'];
     });
   }

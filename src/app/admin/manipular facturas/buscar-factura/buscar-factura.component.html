@@ -167,18 +167,6 @@
   </div>
   <div class="col-12 abajo">
     @if (mostrarListaFacturas()) {
-      @if (buscarPara.includes('nota')) {
-        <div class="table-top-actions">
-          @if (configApp?.usa_facturacion_electronica === true) {
-            <div class="note-series-card">
-              <div class="form-group mb-0">
-                <label class="control-label mb-0">Serie {{ para }}: </label>
-                <p-selectButton [options]="makeNotasSerieOptions" [ngModel]="makeNotaSerieSelected()" (ngModelChange)="makeNotaSerieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
-              </div>
-            </div>
-          }
-        </div>
-      }
       <div #cardTablaVerFacturas class="card tablaContent">
         <div class="divTabla">
           <dinamic-table [cardTabla]="cardTablaVerFacturas" [(data)]="facturas" [(TablasComponent)]="tablaComponent" [config]="table_config" (table_events)="handle_table_events($event)"></dinamic-table>

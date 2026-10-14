@@ -104,8 +104,6 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   notasSerieOptions: seriesDgiiI[] = seriesDGII({ includeAll: true });
   notaSerieSelected = signal<serie>(serie.all);
 
-  makeNotasSerieOptions: seriesDgiiI[] = seriesDGII({ includeAll: false });
-  makeNotaSerieSelected = signal<serie>(serie.normal);
 
   fun = fun;
   serie = serie;
@@ -170,14 +168,16 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
   ngOnInit(): void {
     this.configApp = Ss.configServ.config;
-    const serieInitial = this.configApp.usa_facturacion_electronica === true ? this.configApp.serie_default : serie.normal;
     this.serieSelected.set(this.getSerieForCurrentClient(serie.all));
     this.notaSerieSelected.set(this.getSerieForCurrentClient(serie.all));
-    this.makeNotaSerieSelected.set(serieInitial);
   }
 
   private getSerieForCurrentClient(serieSelected: serie): serie {
     return this.configApp?.usa_facturacion_electronica === true ? serieSelected : serie.normal;
+  }
+
+  private getSerieDefault(): serie {
+    return this.configApp?.usa_facturacion_electronica === true ? this.configApp.serie_default || serie.normal : serie.normal;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -250,7 +250,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
   async getPaqueteComprobante() {
     try {
-      const serieNota = this.getSerieForCurrentClient(this.makeNotaSerieSelected());
+      const serieNota = this.getSerieDefault();
       const tipoFact = Ss.factServ.lista_tipos_facturas.find(tipo => tipo.referencia == NotaC.base_comprobante[serieNota][this.buscarPara]);
 
       const res = await this.ncfClass.getAll({ afterPath: `custom/${tipoFact.id}/true` });
@@ -890,7 +890,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     if (this.buscarPara.includes('nota')) await this.getPaqueteComprobante();
 
     if (this.noExistenComprobantes == false) {
-      const serieNota = this.getSerieForCurrentClient(this.makeNotaSerieSelected());
+      const serieNota = this.getSerieDefault();
       const url = `/admin/manipular/nota/${this.buscarPara === 'nota_credito' ? 'credito' : 'debito'}/${idFactSelect}/${serieNota}`;
       this.router.navigateByUrl(url);
     }
