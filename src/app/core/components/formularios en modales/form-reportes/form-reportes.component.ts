@@ -86,6 +86,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   private readonly externalReportTypes = ['ventas_diarias', 'ventas_rango'];
   private lastExternalReportClickAt = 0;
   private previousExternalReportFormState: { serie: any; condicion: any; tipo_factura_id: any } | null = null;
+  private defaultPaymentMethods: Array<{ label: string; value: boolean }> = [];
 
   private fb = inject(UntypedFormBuilder);
 
@@ -99,6 +100,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
   }
 
   ngOnInit() {
+    this.defaultPaymentMethods = this.switchGroup?.array?.map(metodo => ({ label: metodo.label, value: Boolean(metodo.value) })) ?? [];
     this.necesarioStart();
   }
 
@@ -505,6 +507,7 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
     this.is_external = isExternal;
 
     if (isExternal) {
+      this.switchGroup?.array?.forEach(metodo => (metodo.value = metodo.label === 'Efectivo'));
       this.previousExternalReportFormState = {
         serie: this.form.controls.serie.value,
         condicion: this.form.controls.condicion.value,
@@ -516,6 +519,10 @@ export class FormReportesComponent extends MixinClass implements OnInit, IDynami
       this.disableExternalReportControls();
     } else {
       this.enableExternalReportControls();
+      this.switchGroup?.array?.forEach(metodo => {
+        const defaultMethod = this.defaultPaymentMethods.find(item => item.label === metodo.label);
+        if (defaultMethod) metodo.value = defaultMethod.value;
+      });
       if (fun.hasValue(this.previousExternalReportFormState)) {
         this.form.patchValue(this.previousExternalReportFormState, { emitEvent: false });
       }
