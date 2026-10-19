@@ -887,6 +887,7 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       description: this.cleanMovementDescription(item.description || ''),
       reference: item.reference || '',
       amount: this.toNumber(item.amount),
+      source_key: item.source_key,
     };
   }
 
@@ -904,8 +905,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
     const responseMovements = response.movements || {};
     const isNewFlow = this.resolvePrepareIsNewFlow(response, stored);
     const storedSystemIncome = stored?.system_income || stored?.system_income_details || {};
-    const systemIncome = stored && isNewFlow ? storedSystemIncome : response.system_income || this.emptySystemIncome();
-    const totals = stored ? stored?.totals || {} : response.totals || {};
+    const systemIncome = response.system_income || (stored && isNewFlow ? storedSystemIncome : this.emptySystemIncome());
+    const totals = response.totals || stored?.totals || {};
     const responseTotals = response.totals || {};
     const reconciliationTolerance = stored && isNewFlow ? (stored?.totals?.reconciliation_tolerance ?? responseTotals?.reconciliation_tolerance ?? '0.00') : '0.00';
     const suggested = (responseMovements.suggested_from_system || []).map(item => ({ ...item, movement_group: item.movement_group || 'other_payment_methods', source: 'system_suggestion' }));
@@ -963,7 +964,8 @@ export class CuadresComponent extends MixinClass implements OnInit, OnDestroy {
       description: item.description || '',
       reference: item.reference || '',
       amount: fun.roundNumberToDecimal(item.amount || '0.00'),
-      source: item.source || (responseItems.length ? 'system_suggestion' : 'manual'),
+      source: item.source || (item.source_key || responseItems.length ? 'system_suggestion' : 'manual'),
+      source_key: item.source_key,
     }));
   }
 

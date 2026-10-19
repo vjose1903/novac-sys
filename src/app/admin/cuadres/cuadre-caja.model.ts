@@ -33,6 +33,7 @@ export interface CuadreMovimiento {
   reference: string;
   amount: string;
   source?: string;
+  source_key?: string;
 }
 
 export interface CuadreSystemIncome {

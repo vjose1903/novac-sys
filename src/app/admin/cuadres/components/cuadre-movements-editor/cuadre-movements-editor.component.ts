@@ -59,6 +59,6 @@ export class CuadreMovementsEditorComponent {
   }
 
   isSystemItem(item: CuadreMovimiento) {
-    return this.disableSystemItems && item.source !== 'manual';
+    return this.disableSystemItems && (item.source_key != null || item.source !== 'manual');
   }
 }

@@ -22,10 +22,10 @@
         [disabled]="readonly || cardSection || isSystemItem(item)"
         (ngModelChange)="patchItem($index, 'payment_method', $event)"
       />
-      <input class="form-control form-control-sm" [value]="item.description" [readonly]="readonly" [disabled]="readonly" (input)="patchItem($index, 'description', $any($event.target).value)" />
-      <input class="form-control form-control-sm" [value]="item.reference" [readonly]="readonly" [disabled]="readonly" (input)="patchItem($index, 'reference', $any($event.target).value)" />
-      <input class="form-control form-control-sm text-end" appNumeroFormato [value]="item.amount" [readonly]="readonly" [disabled]="readonly" (input)="patchItem($index, 'amount', $any($event.target).value)" (appNumeroFormatoBlur)="patchItem($index, 'amount', $event)" />
-      <button type="button" class="btn btn-sm cuadre-icon-btn cuadre-remove-btn" (click)="removeItem($index)" [disabled]="readonly"><i class="fas fa-trash"></i></button>
+      <input class="form-control form-control-sm" [value]="item.description" [readonly]="readonly || isSystemItem(item)" [disabled]="readonly || isSystemItem(item)" (input)="patchItem($index, 'description', $any($event.target).value)" />
+      <input class="form-control form-control-sm" [value]="item.reference" [readonly]="readonly || isSystemItem(item)" [disabled]="readonly || isSystemItem(item)" (input)="patchItem($index, 'reference', $any($event.target).value)" />
+      <input class="form-control form-control-sm text-end" appNumeroFormato [value]="item.amount" [readonly]="readonly || isSystemItem(item)" [disabled]="readonly || isSystemItem(item)" (input)="patchItem($index, 'amount', $any($event.target).value)" (appNumeroFormatoBlur)="patchItem($index, 'amount', $event)" />
+      <button type="button" class="btn btn-sm cuadre-icon-btn cuadre-remove-btn" (click)="removeItem($index)" [disabled]="readonly || isSystemItem(item)"><i class="fas fa-trash"></i></button>
     } @empty {
       <span class="cuadre-empty">Sin movimientos registrados.</span>
     }
