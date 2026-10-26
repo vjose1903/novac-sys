@@ -1615,7 +1615,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
     }
 
     // Procesar según el tipo de documento
-    if (this.factServ.tipoDocumento() != tipoDocFacturacion.compra && (this.condicion_fact == 'Crédito' || this.is_viaje || this.factServ.isPreVenta() || this.factServ.isCotizacion())) {
+    if (this.factServ.tipoDocumento() != tipoDocFacturacion.compra && (this.condicion_fact == 'Crédito' || (this.is_viaje && this.condicion_fact != 'Contado') || this.factServ.isPreVenta() || this.factServ.isCotizacion())) {
       return this.abrirModalConfirmacionImprimir();
     } else {
       return this.abrirModalCantidadEfectivo();
