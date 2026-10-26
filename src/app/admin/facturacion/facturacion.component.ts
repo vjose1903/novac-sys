@@ -836,7 +836,6 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   cambiarCondicion(arg) {
     if (arg == 'Crédito') {
-      this.modo_factura = 'normal';
       this.fecha_vencimiento = new Date();
       this.fecha_equivalente = new Date();
     } else {
