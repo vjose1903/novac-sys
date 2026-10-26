@@ -1,0 +1,121 @@
+:host {
+  display: inline-flex;
+}
+
+.filtros-viajes-trigger {
+  align-items: center;
+  background: var(--app-surface);
+  border: 1px solid var(--app-card-border);
+  border-radius: 0.75rem;
+  color: var(--app-text-muted);
+  display: inline-flex;
+  font-size: 0.72rem;
+  font-weight: 800;
+  gap: 0.4rem;
+  min-height: 2.2rem;
+  padding: 0.25rem 0.6rem;
+  transition: border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--primary08);
+    box-shadow: 0 0.35rem 0.8rem rgba(15, 23, 42, 0.12);
+    color: var(--primary08);
+    outline: 0;
+  }
+
+  strong {
+    align-items: center;
+    background: var(--primary08);
+    border-radius: 999px;
+    color: #fff;
+    display: inline-flex;
+    font-size: 0.62rem;
+    height: 1.2rem;
+    justify-content: center;
+    min-width: 1.2rem;
+    padding: 0 0.25rem;
+  }
+}
+
+.filtros-viajes-form {
+  display: grid;
+  gap: 0.65rem;
+  min-width: min(18rem, calc(100vw - 2rem));
+  overflow: visible;
+  padding: 0.75rem;
+  position: relative;
+
+  ::ng-deep .p-select {
+    width: 100%;
+  }
+}
+
+.filtros-viajes-heading {
+  display: grid;
+  gap: 0.15rem;
+
+  strong {
+    color: var(--app-text);
+    font-size: 0.9rem;
+  }
+
+  span {
+    color: var(--app-text-muted);
+    font-size: 0.68rem;
+  }
+}
+
+.filtro-completadas {
+  align-items: center;
+  color: var(--app-text);
+  display: inline-flex;
+  font-size: 0.76rem;
+  font-weight: 700;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.filtro-select {
+  display: grid;
+  gap: 0.25rem;
+
+  > span {
+    color: var(--app-text-muted);
+    font-size: 0.7rem;
+    font-weight: 800;
+  }
+}
+
+.filtros-viajes-apply {
+  background: var(--primary08);
+  border: 0;
+  border-radius: 0.55rem;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  min-height: 2.15rem;
+  padding: 0.35rem 0.75rem;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.filtros-viajes-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.filtros-viajes-clear {
+  background: var(--app-surface-soft);
+  border: 1px solid var(--app-card-border);
+  border-radius: 0.55rem;
+  color: var(--app-text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  min-height: 2.15rem;
+  padding: 0.35rem 0.75rem;
+}

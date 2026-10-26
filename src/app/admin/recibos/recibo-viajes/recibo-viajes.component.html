@@ -35,6 +35,7 @@
             </span>
           </div>
         }
+        <app-filtros-viajes [camiones]="camiones" [choferes]="choferes" (filtersChange)="actualizarFiltrosViajes($event)"></app-filtros-viajes>
         @if (viajes_cant == 0) {
           <div class="status-metric clear">
             <span class="status-icon"><i class="fas fa-check"></i></span>

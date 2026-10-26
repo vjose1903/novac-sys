@@ -15,6 +15,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Ss } from '@core/services/singleton.service';
 import { confirmationButtons, modalActionsE } from '@core/components/dynamic-modal/config/dynamic-modal.interface';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
+import type { FiltrosViaje } from './components/filtros-viajes/filtros-viajes.component';
 @Component({
   selector: 'app-recibo-viajes',
   templateUrl: './recibo-viajes.component.html',
@@ -102,6 +103,13 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
   forma_pago: any;
   total_recibido: any;
 
+  filtrosViaje: FiltrosViaje = {
+    mostrarCompletadas: false,
+    condicion: '',
+    camionId: '',
+    choferId: '',
+  };
+
   monto_pendiente = 0;
   have_incidencia = false;
   incidencia = '';
@@ -175,19 +183,32 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     config.data = this.camiones;
   }
 
-  async getViajes(params?: { per_page: number; page: number; search: string }) {
+  async getViajes(params: { per_page?: number; page?: number; search?: string } = this.tServ.obj_paginate.default) {
     const requestId = ++this.viajesRequestId;
-    this.resetViajesSummary();
-    this.viajes.length = 0;
-    const palabra_a_buscar = fun.isEmpty(params.search) ? ' ' : params.search;
+    const palabra_a_buscar = fun.isEmpty(params?.search) ? ' ' : params.search;
+
+    const parameters: Record<string, any> = {
+      page: params?.page,
+      per_page: params?.per_page,
+      paginado: true,
+      movimientos_viaje: true,
+      estado: true,
+      palabra_a_buscar: palabra_a_buscar,
+    };
+
+    if (this.filtrosViaje.mostrarCompletadas) parameters.mostrar_completadas = true;
+    if (this.filtrosViaje.condicion) parameters.condicion = this.filtrosViaje.condicion;
+    if (this.filtrosViaje.camionId) parameters.camion_id = this.filtrosViaje.camionId;
+    if (this.filtrosViaje.choferId) parameters.chofer_id = this.filtrosViaje.choferId;
 
     const res = await this.facturaClass.getAll({
       afterPath: 'custom/viajes',
-      parameters: { page: params.page, per_page: params.per_page, paginado: true, movimientos_viaje: true, estado: true, palabra_a_buscar: palabra_a_buscar },
+      parameters,
     });
     if (requestId !== this.viajesRequestId) return false;
 
     const fechaA = moment().format('YYYY-MM-DD');
+    const viajes = [];
     res.data.forEach(viaje => {
       const pago_a_tiempo = viaje.condicion == 'Contado' ? true : viaje.fecha_vencimiento > fechaA ? true : false;
 
@@ -214,8 +235,10 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
         return movimiento_viaje;
       });
 
-      this.viajes.push(viaje);
+      viajes.push(viaje);
     });
+
+    this.viajes = viajes;
 
     this.applyViajesSummary((res as any).summary, res.total_registros);
 
@@ -223,6 +246,15 @@ export class ReciboViajesComponent extends MixinClass implements OnInit, OnDestr
     this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
 
     return true;
+  }
+
+  actualizarFiltrosViajes(filtros: FiltrosViaje) {
+    this.filtrosViaje = filtros;
+    const pagination = this.tServ.getPaginationById('lista_viajes') || fun.deepCloning(this.tServ.obj_paginate.default);
+    pagination.page = 1;
+    pagination.page_front = 0;
+    this.tServ.modifyPaginationById('lista_viajes', [{ page: 1 }]);
+    this.getViajes(pagination);
   }
 
   resetViajesSummary() {

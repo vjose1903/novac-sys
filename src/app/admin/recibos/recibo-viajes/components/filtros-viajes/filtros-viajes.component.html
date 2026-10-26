@@ -1,0 +1,67 @@
+<button type="button" class="filtros-viajes-trigger" (click)="filtrosPopover.toggle($event)" [attr.aria-label]="'Abrir filtros de viajes'">
+  <i class="fas fa-filter"></i>
+  <span>Filtros</span>
+  @if (filtrosActivos() > 0) {
+    <strong>{{ filtrosActivos() }}</strong>
+  }
+</button>
+
+<p-popover #filtrosPopover appendTo="body" [dismissable]="false" styleClass="filtros-viajes-popover" (onShow)="alMostrarPopover()" (onHide)="alCerrarPopover()">
+  <div class="filtros-viajes-form">
+    <div class="filtros-viajes-heading">
+      <strong>Filtrar viajes</strong>
+      <span>Refina el listado por estado, condición, camión o chofer.</span>
+    </div>
+
+    <label class="filtro-completadas">
+      <input class="apple-switch" type="checkbox" [checked]="mostrarCompletadas()" (change)="setMostrarCompletadas($any($event.target).checked)" />
+      <span>Mostrar completadas históricas</span>
+    </label>
+
+    <label class="filtro-select">
+      <span>Condición</span>
+      <p-select
+        inputId="filtroCondicionViajes"
+        styleClass="form-control field-sm"
+        [ngModel]="condicion()"
+        [options]="condiciones"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        (ngModelChange)="setCondicion($event)"></p-select>
+    </label>
+
+    <label class="filtro-select">
+      <span>Camión</span>
+      <p-select
+        inputId="filtroCamionViajes"
+        styleClass="form-control field-sm"
+        [ngModel]="camionId()"
+        [options]="camionesConTodos()"
+        optionLabel="info_vehiculo"
+        optionValue="id"
+        appendTo="body"
+        (ngModelChange)="setCamion($event)"></p-select>
+    </label>
+
+    <label class="filtro-select">
+      <span>Chofer</span>
+      <p-select
+        inputId="filtroChoferViajes"
+        styleClass="form-control field-sm"
+        [ngModel]="choferId()"
+        [options]="choferesConTodos()"
+        optionLabel="nombre_completo"
+        optionValue="id"
+        appendTo="body"
+        (ngModelChange)="setChofer($event)"></p-select>
+    </label>
+
+    <div class="filtros-viajes-actions">
+      @if (filtrosActivos() > 0) {
+        <button type="button" class="filtros-viajes-clear" (click)="limpiarFiltros()">Limpiar filtros</button>
+      }
+      <button type="button" class="filtros-viajes-apply" [disabled]="!filtrosPendientes" (click)="aplicarFiltros()">Aplicar filtros</button>
+    </div>
+  </div>
+</p-popover>
