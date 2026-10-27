@@ -948,6 +948,7 @@
   }
 
   .info_fact {
+    --archive-accent-dark: #257d25;
     background: color-mix(in srgb, var(--app-surface) 88%, var(--app-surface-soft));
     border: 1px solid color-mix(in srgb, var(--app-card-border) 78%, transparent);
     border-radius: 0.9rem;
@@ -964,6 +965,22 @@
       box-shadow 160ms ease,
       transform 160ms ease;
 
+    &.accent-green {
+      --archive-accent-dark: #257d25;
+    }
+
+    &.accent-red {
+      --archive-accent-dark: #7d2525;
+    }
+
+    &.accent-blue {
+      --archive-accent-dark: #253b7d;
+    }
+
+    &.accent-yellow {
+      --archive-accent-dark: #a99c0e;
+    }
+
     &.activa {
       background: color-mix(in srgb, var(--primary06) 18%, var(--app-surface));
       border-color: color-mix(in srgb, var(--primary08) 46%, var(--app-card-border));
@@ -971,6 +988,15 @@
 
       &:hover {
         background: color-mix(in srgb, var(--primary06) 22%, var(--app-surface));
+      }
+    }
+
+    &.external-card {
+      border-color: color-mix(in srgb, #385aab 62%, var(--app-card-border));
+      box-shadow: 0 0.55rem 1rem -0.85rem rgba(56, 90, 171, 0.72);
+
+      &:hover {
+        border-color: color-mix(in srgb, #385aab 76%, var(--app-card-border));
       }
     }
 
@@ -995,6 +1021,12 @@
       .doc-type {
         font-size: 0.78rem;
         font-weight: 800;
+
+        .external-invoice-icon {
+          color: var(--archive-accent-dark);
+          font-size: 0.72rem;
+          margin-right: 0.25rem;
+        }
       }
 
       .editing-tag {
@@ -1044,7 +1076,7 @@
       line-height: 1.25;
 
       i {
-        color: var(--primary08);
+        color: var(--archive-accent-dark);
         margin-top: 0.1rem;
       }
 
@@ -1082,7 +1114,7 @@
       padding: 0.42rem 0.5rem;
 
       i {
-        color: var(--primary08);
+        color: var(--archive-accent-dark);
         grid-row: span 2;
       }
 
@@ -1108,9 +1140,9 @@
 
       .iconFacturaGuardada {
         align-items: center;
-        background: color-mix(in srgb, var(--primary08) 14%, var(--app-surface));
+        background: color-mix(in srgb, var(--archive-accent-dark) 14%, var(--app-surface));
         border-radius: 0.45rem;
-        color: var(--primary08);
+        color: var(--archive-accent-dark);
         display: inline-flex;
         font-size: 0.82rem;
         height: 1.55rem;
@@ -1118,9 +1150,14 @@
         width: 1.55rem;
 
         &.is_atrasada {
-          background: color-mix(in srgb, #f59e0b 18%, var(--app-surface));
-          color: #d97706 !important;
+          background: color-mix(in srgb, var(--archive-accent-dark) 14%, var(--app-surface));
+          color: var(--archive-accent-dark) !important;
         }
+      }
+
+      .external-invoice-state-icon {
+        background: color-mix(in srgb, var(--archive-accent-dark) 14%, var(--app-surface));
+        color: var(--archive-accent-dark);
       }
     }
 
@@ -1137,7 +1174,7 @@
       }
 
       strong {
-        color: #15803d;
+        color: var(--archive-accent-dark);
         font-size: 0.98rem;
         font-variant-numeric: tabular-nums;
         font-weight: 800;

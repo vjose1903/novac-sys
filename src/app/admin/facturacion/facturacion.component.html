@@ -565,11 +565,16 @@
                 <div class="archived-doc-list h-100">
                   @for (fact of facturas_localStorage(); track $index) {
                     <div class="factura_guardada" (click)="rellenarFacturaArchivada(fact)">
-                      <div class="info_fact h-100 {{ factura_guardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }}">
-                        <div class="colorsito bg-raya-{{ docTab.color }}{{ fact?.action == 'update' ? '-orange' : '' }}"></div>
+                      <div class="info_fact h-100 {{ factura_guardada?.archivo_id === fact?.archivo_id ? 'activa' : '' }} {{ esFacturaExternaArchivada(fact) ? 'external-card accent-blue' : 'accent-' + docTab.color }}">
+                        <div class="colorsito {{ esFacturaExternaArchivada(fact) ? 'bg-raya-blue' : 'bg-raya-' + docTab.color + (fact?.action == 'update' ? '-orange' : '') }}"></div>
                         <div class="archived-card-header">
                           <div>
-                            <span class="doc-type text-mayuscula text-separado-2 texto-borde-{{ docTab.color }} texto-{{ docTab.color }}">{{ my_capitalize(fact?.tipo) }} </span>
+                            <span class="doc-type text-mayuscula text-separado-2 {{ esFacturaExternaArchivada(fact) ? 'texto-borde-blue texto-blue' : 'texto-borde-' + docTab.color + ' texto-' + docTab.color }}">
+                              @if (esFacturaExternaArchivada(fact)) {
+                                <i class="fa-solid fa-arrow-up-right-from-square external-invoice-icon"></i>
+                              }
+                              {{ my_capitalize(fact?.tipo) }}
+                            </span>
                             @if (fact?.action == 'update') {
                               <span class="editing-tag">Editando</span>
                             }
@@ -599,6 +604,7 @@
                         </div>
                         <div class="archived-card-footer">
                           <div class="archived-state-icons">
+                            <i class="fas fa-arrow-up-right-from-square {{ esFacturaExternaArchivada(fact) ? 'iconFacturaGuardada external-invoice-state-icon' : 'd-none' }}"></i>
                             <i class="fas fa-history {{ fact.factura_pendiente ? 'iconFacturaGuardada is_atrasada' : 'd-none' }}" pTooltip="factura pendiente" tooltipPosition="left"></i>
                             <i class="fas fa-truck-moving {{ fact.is_viaje ? 'iconFacturaGuardada' : 'd-none' }}" pTooltip="Factura de viaje" tooltipPosition="left"></i>
                             <i class="fa-regular fa-copyright {{ fact.action == 'bill_from_cotizacion' ? 'iconFacturaGuardada' : 'd-none' }}" pTooltip="Factura desde cotización" tooltipPosition="left"></i>

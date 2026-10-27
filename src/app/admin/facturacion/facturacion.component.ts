@@ -616,7 +616,7 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
         }
       }
 
-      const shouldActivateExternalFlow = original_factura.action === actionFacturacion.update && this.isExternalFactura(factura);
+      const shouldActivateExternalFlow = this.isExternalFactura(factura);
       this.is_external = shouldActivateExternalFlow;
 
       if (original_factura.action !== actionFacturacion.duplicate) this.setPropietario(factura);
@@ -1492,6 +1492,10 @@ export class FacturacionComponent extends FactsLocalStorage implements OnInit, O
 
   private isExternalFactura(factura: any): boolean {
     return factura?.is_external === true || factura?.is_external === 'true';
+  }
+
+  esFacturaExternaArchivada(factura: any): boolean {
+    return this.isExternalFactura(factura);
   }
 
   private isClienteContadoSeleccionado(): boolean {
