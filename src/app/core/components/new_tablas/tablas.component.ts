@@ -527,6 +527,14 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   restablecerInputTabla(column, index, data) {
     const input = document.getElementById(`input-${this.realIdTabla}-${column.key}-${index}`) as HTMLInputElement | null;
     if (input) input.value = this.getValueForm(column, data);
+
+    const rowEditing = this.tServ.rowsEditing.find(item => item.id == data.id);
+    if (!rowEditing) return;
+
+    const newData = fun.deepCloning(rowEditing);
+    fun.setProperty(newData, column.key, fun.getProperty(data, column.key));
+    this.tServ.modifyRowsEditing(newData, 'add');
+    this.handle_table_events('inputChange', { data, newData, index, key: column.key, value: fun.getProperty(data, column.key), id_tabla: this.realIdTabla });
   }
 
   updateDataCopy(data) {

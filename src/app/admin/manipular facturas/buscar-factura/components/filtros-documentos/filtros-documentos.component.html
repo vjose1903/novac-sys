@@ -36,11 +36,11 @@
     <div class="filtros-documentos-range">
       <label class="filtro-select">
         <span>Mínimo</span>
-        <input type="text" inputmode="decimal" class="form-control inputE field-sm" appNumeroFormato [decimals]="2" [ngModel]="totalMin()" (ngModelChange)="setTotalMin($event)" placeholder="Sin mínimo" autocomplete="off" />
+        <input type="text" inputmode="decimal" class="form-control inputE field-sm" appNumeroFormato [decimals]="2" [padDecimalsOnBlur]="false" [ngModel]="totalMin()" (ngModelChange)="setTotalMin($event)" placeholder="Sin mínimo" autocomplete="off" />
       </label>
       <label class="filtro-select">
         <span>Máximo</span>
-        <input type="text" inputmode="decimal" class="form-control inputE field-sm" appNumeroFormato [decimals]="2" [ngModel]="totalMax()" (ngModelChange)="setTotalMax($event)" placeholder="Sin máximo" autocomplete="off" />
+        <input type="text" inputmode="decimal" class="form-control inputE field-sm" appNumeroFormato [decimals]="2" [padDecimalsOnBlur]="false" [ngModel]="totalMax()" (ngModelChange)="setTotalMax($event)" placeholder="Sin máximo" autocomplete="off" />
       </label>
     </div>
 
@@ -56,7 +56,7 @@
               <span class="balance-comparator-option"><strong>{{ option.symbol }}</strong><span>{{ option.label }}</span></span>
             </ng-template>
           </p-select>
-          <input type="text" inputmode="decimal" class="form-control inputE field-sm" appNumeroFormato [decimals]="2" [ngModel]="balanceValor()" (ngModelChange)="setBalanceValor($event)" placeholder="Monto" autocomplete="off" />
+          <input type="text" inputmode="decimal" class="form-control inputE field-sm" appNumeroFormato [decimals]="2" [padDecimalsOnBlur]="false" [ngModel]="balanceValor()" (ngModelChange)="setBalanceValor($event)" placeholder="Monto" autocomplete="off" />
         </div>
       </label>
     }

@@ -45,6 +45,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
   noExistenComprobantes = false;
   sinResultadosFacturas = false;
+  private facturasRequestId = 0;
   paqueteComprobante: any;
   tipo_factura_id = null;
   valor_a_buscar: any = null;
@@ -467,10 +468,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
   async pedirFactura(params?: { per_page?: number; page?: number; search?: string }) {
     return new Promise<void>(async (resolve, reject) => {
+      const requestId = ++this.facturasRequestId;
+      const requestParams = params ?? fun.deepCloning(this.tServ.obj_paginate.default);
       const documento_descripcion = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'Cotización' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'Pre-Venta' : 'Factura';
 
       try {
-        this.facturas.length = 0;
         this.sinResultadosFacturas = false;
 
         const valor = fun.isEmpty(this.valor_a_buscar) ? '' : this.valor_a_buscar;
@@ -480,8 +482,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           campo: this.buscar_por,
           valor: valor,
           tipo_factura_id: this.tipo_factura_id,
-          page: params.page,
-          per_page: params.per_page,
+          page: requestParams.page,
+          per_page: requestParams.per_page,
           paginado: true,
           tipo: this.tipo_documento_selected(),
           movimientos_viaje: true,
@@ -499,8 +501,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
         };
 
         const res = await this.facturaClass.getFacturasByParams(args);
+        if (requestId !== this.facturasRequestId) {
+          resolve();
+          return;
+        }
 
         const datos = res['data'] || [];
+        const facturasRecibidas = [];
         datos.forEach(fact => {
           const pago_a_tiempo = this.getIsPagoAtiempo(fact);
           const estatus = this.getIsActiveInfo(fact);
@@ -547,14 +554,16 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
               fact.customStyles.actions.find(item => item.key == 'selected')
             );
 
-          this.facturas.push(fact);
+          facturasRecibidas.push(fact);
         });
+        this.facturas = facturasRecibidas;
 
-        if (this.facturas.length > 0) {
+        if (facturasRecibidas.length > 0) {
           if (this.buscar_por == this.campos.numeroComprobante) {
             // this.facturas[0].detalle_facturas.push(this.facturas[0].detalle_facturas[0])
 
-            this.facturaClass.parseDataToPdf(this.facturas[0]).then(factura_parsed => {
+            this.facturaClass.parseDataToPdf(facturasRecibidas[0]).then(factura_parsed => {
+              if (requestId !== this.facturasRequestId) return;
               const crear_nota = this.buscarPara.includes('nota');
               this.facturaSelected = factura_parsed;
               const tipo = this.tipo_documento_selected() == tipoDocFacturacion.cotizacion ? 'cotizacion' : this.tipo_documento_selected() == tipoDocFacturacion.pre_venta ? 'pre_venta' : 'facturacion';
@@ -573,6 +582,10 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
         resolve();
       } catch (error) {
+        if (requestId !== this.facturasRequestId) {
+          resolve();
+          return;
+        }
         this.sinResultadosFacturas = Number(error?.status || error?.error?.status) == 409;
         if (this.sinResultadosFacturas) {
           this.table_config.total_count = 0;
