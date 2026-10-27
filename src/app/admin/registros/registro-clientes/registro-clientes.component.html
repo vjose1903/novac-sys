@@ -178,7 +178,7 @@
                   <div class="col-6 p-0 ps-2">
                     <div class="form-group" [appMsgError]="'maximo_credito'" [form]="form">
                       <label class="control-label">Limite de credito: <span style="color: red">*</span></label>
-                      <input type="text" class="form-control" (blur)="revisarPrecio('maximo_credito')" formControlName="maximo_credito" id="maximo_credito" (keydown.enter)="saltar('campoVendedor')" placeholder="cantidad maxima" autocomplete="off" />
+                      <input type="text" class="form-control" appNumeroFormato [decimals]="2" formControlName="maximo_credito" id="maximo_credito" (keydown.enter)="saltar('campoVendedor')" placeholder="cantidad maxima" autocomplete="off" />
                       <span id="msgContainer_maximo_credito"> </span>
                     </div>
                   </div>

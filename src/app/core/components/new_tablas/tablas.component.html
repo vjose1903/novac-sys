@@ -207,28 +207,46 @@
                                     }
                                     @if ((column.remplace && seleccionado == rowData?.id) || !column.remplace || rowData?.is_editing) {
                                       <div class="table_input" [style.cursor]="disableInput(rowData, column) ? 'not-allowed' : null">
-                                        <input
-                                          #inputTable
-                                          [ngStyle]="{ 'text-align': column.textAlign || 'start' }"
-                                          class="form-control m-0 inputTabla p-1 {{ column.can_reset ? 'refresh' : '' }} {{ column.inputType == 'number' ? 'input_cantidad' : '' }}"
-                                          id="input-{{ realIdTabla }}-{{ column.key }}-{{ rowIndex }}"
-                                          [min]="rowData.min_ ? rowData.min_ : 0"
-                                          [max]="rowData.max_ ? rowData.max_ : null"
-                                          type="{{ column.inputType ? column.inputType : 'text' }}"
-                                          [value]="getValueForm(column, rowData)"
-                                          [disabled]="disableInput(rowData, column)"
-                                          (input)="limitarDecimales($event, column)"
-                                          (mouseleave)="column.interactWithMouse ? inputTable.blur() : null"
-                                          (mouseenter)="column.interactWithMouse ? inputTable.focus() : null"
-                                          (focus)="handleInputsEvents('focus', $event.target, column, rowIndex, rowData)"
-                                          (blur)="checkNumber($event.target, column, rowIndex); handleInputsEvents('blur', $event.target, column, rowIndex, rowData)"
-                                          (keyup)="changeValorInput($event, column, column.key, rowIndex, htmlServ.getValue($event), rowData)" />
+                                        @if (column.inputEvents == 'formatoNumero') {
+                                          <input
+                                            #inputTable
+                                            appNumeroFormato
+                                            [decimals]="2"
+                                            [ngStyle]="{ 'text-align': column.textAlign || 'start' }"
+                                            class="form-control m-0 inputTabla p-1 {{ column.can_reset ? 'refresh' : '' }}"
+                                            id="input-{{ realIdTabla }}-{{ column.key }}-{{ rowIndex }}"
+                                            [value]="getValueForm(column, rowData)"
+                                            [disabled]="disableInput(rowData, column)"
+                                            (mouseleave)="column.interactWithMouse ? inputTable.blur() : null"
+                                            (mouseenter)="column.interactWithMouse ? inputTable.focus() : null"
+                                            (focus)="handleInputsEvents('focus', $event.target, column, rowIndex, rowData)"
+                                            (blur)="handleInputsEvents('blur', $event.target, column, rowIndex, rowData)"
+                                            (appNumeroFormatoBlur)="changeValorInput($event, column, column.key, rowIndex, $event, rowData)"
+                                            (keyup)="changeValorInput($event, column, column.key, rowIndex, htmlServ.getValue($event), rowData)" />
+                                        } @else {
+                                          <input
+                                            #inputTable
+                                            [ngStyle]="{ 'text-align': column.textAlign || 'start' }"
+                                            class="form-control m-0 inputTabla p-1 {{ column.can_reset ? 'refresh' : '' }} {{ column.inputType == 'number' ? 'input_cantidad' : '' }}"
+                                            id="input-{{ realIdTabla }}-{{ column.key }}-{{ rowIndex }}"
+                                            [min]="rowData.min_ ? rowData.min_ : 0"
+                                            [max]="rowData.max_ ? rowData.max_ : null"
+                                            type="{{ column.inputType ? column.inputType : 'text' }}"
+                                            [value]="getValueForm(column, rowData)"
+                                            [disabled]="disableInput(rowData, column)"
+                                            (input)="limitarDecimales($event, column)"
+                                            (mouseleave)="column.interactWithMouse ? inputTable.blur() : null"
+                                            (mouseenter)="column.interactWithMouse ? inputTable.focus() : null"
+                                            (focus)="handleInputsEvents('focus', $event.target, column, rowIndex, rowData)"
+                                            (blur)="checkNumber($event.target, column, rowIndex); handleInputsEvents('blur', $event.target, column, rowIndex, rowData)"
+                                            (keyup)="changeValorInput($event, column, column.key, rowIndex, htmlServ.getValue($event), rowData)" />
+                                        }
                                         @if (disableInput(rowData, column)) {
                                           <span class="table-input-disabled-overlay"></span>
                                         }
                                         <!-- (blur)="changeValorInput(column, column.key, getIndex(index_body), htmlServ.getValue($event), dato); checkNumber($event.target, column, getIndex(index_body)); handleInputsEvents('blur', $event.target, column, getIndex(index_body), dato)" -->
                                         @if (column.can_reset) {
-                                          <i pTooltip="Restablecer" tooltipPosition="left" class="fas fa-undo-alt icon no-theme text-dark" (click)="inputTable.value = getValueForm(column, rowData)"></i>
+                                          <i pTooltip="Restablecer" tooltipPosition="left" class="fas fa-undo-alt icon no-theme text-dark" (click)="restablecerInputTabla(column, rowIndex, rowData)"></i>
                                         }
                                       </div>
                                     }

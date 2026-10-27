@@ -505,19 +505,6 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
   }
 
   handleInputsEvents(type, input, column, index_body, data) {
-    if (fun.objHas(column, 'inputEvents') && fun.hasValue(column.inputEvents)) {
-      if (column.inputEvents == 'formatoNumero') {
-        if (type == 'focus') {
-          input.value = fun.is_number(input.value) ? fun.desformatearStNumber(input.value) : null;
-          input.select();
-        }
-        if (type == 'blur') {
-          input.value = fun.is_number(input.value) ? fun.roundNumberToDecimal(input.value) : null;
-          if (fun.isEmpty(input.value)) fun.enfocarInput(input.id);
-        }
-      }
-    }
-
     const obj = { column, data, index: index_body, id_tabla: this.realIdTabla };
     this.handle_table_events(type == 'blur' ? 'inputBlur' : 'inputFocus', obj);
   }
@@ -535,6 +522,11 @@ export class NewTablasComponent implements OnInit, AfterViewInit, OnChanges, OnD
       const obj = { data, newData, index, key, value, id_tabla: this.realIdTabla };
       this.handle_table_events('inputChange', obj);
     });
+  }
+
+  restablecerInputTabla(column, index, data) {
+    const input = document.getElementById(`input-${this.realIdTabla}-${column.key}-${index}`) as HTMLInputElement | null;
+    if (input) input.value = this.getValueForm(column, data);
   }
 
   updateDataCopy(data) {

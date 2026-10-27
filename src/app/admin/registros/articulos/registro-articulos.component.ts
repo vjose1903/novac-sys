@@ -334,14 +334,6 @@ export class RegistroArticulosComponent extends MixinClass implements OnInit, On
     return array.includes(value);
   }
 
-  revisarPrecio(id) {
-    const input = this.form.controls[id];
-
-    fun.revisarNumber(input, id).then(res => {
-      if (!res.error) input.setValue(res.number);
-    });
-  }
-
   cambiarCalcularSaco() {
     const formulario = this.form.getRawValue();
     if (fun.hasValue(formulario.medida) && formulario.medida !== 'Quintal' && formulario.medida !== 'Libra') {

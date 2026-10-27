@@ -64,7 +64,7 @@
                           <div class="input-group-append">
                             <span class="input-group-text prefijo" id="currency">$</span>
                           </div>
-                          <input type="Number" min="1" formControlName="current_tasa" id="campoCurrency" class="form-control input_cantidad with-left-btn" autocomplete="off" aria-describedby="currency" />
+                            <input type="text" inputmode="decimal" min="1" appNumeroFormato [decimals]="2" formControlName="current_tasa" id="campoCurrency" class="form-control input_cantidad with-left-btn" autocomplete="off" aria-describedby="currency" />
                         </div>
 
                         <span id="msgContainer"></span>

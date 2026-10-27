@@ -86,7 +86,6 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
   devuelta = '0.00';
   isLoaded = false;
   private pendingInitialEnter = false;
-  private hasUserTyped = false;
   @Output() getDevuelta = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<any>();
 
@@ -225,11 +224,6 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     this.validarForm('input');
   }
 
-  onMetodoPagoBlur(index: number, event?: Event) {
-    const monto = (event?.target as HTMLInputElement | null)?.value ?? this.metodosDePago[index]?.monto;
-    this.actualizarMontoRecibido(index, this.formatoNumero(monto || 0));
-  }
-
   totalRecibido() {
     return (this.totalRecibidoBig() || Big(0)).toNumber();
   }
@@ -276,7 +270,6 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
     event.preventDefault();
     event.stopPropagation();
 
-    this.onMetodoPagoBlur(index, event);
     if (index < this.metodosDePago.length - 1) {
       this.enfocarFormaPago(index + 1);
       return;
@@ -385,23 +378,6 @@ export class FormCantidadEfectivoComponent extends MixinClass implements OnInit,
 
     const [enteros, decimales] = monto.toFixed(2).split('.');
     return `${enteros.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}.${decimales}`;
-  }
-
-  onEfectivoInput() {
-    this.hasUserTyped = true;
-  }
-
-  onEfectivoBlur(input) {
-    if (!this.hasUserTyped) return;
-
-    fun.revisarNumber(input, `inputEfectivo`).then(res => {
-      if (!res.error) input.value = res.number;
-
-      if (this.validarForm()) {
-        fun.toastWarning(this.mensajeValidacion(), 'AVISO');
-        fun.enfocarInput('inputEfectivo');
-      }
-    });
   }
 
   calcularDevueta() {

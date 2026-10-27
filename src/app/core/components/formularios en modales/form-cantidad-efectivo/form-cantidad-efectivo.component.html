@@ -43,7 +43,7 @@
             </div>
             <div class="cash-field main-field">
               <label>Monto recibido</label>
-              <div class="currency-input"><span>{{ divisaPrincipalSimbolo }}</span><input [id]="'montoRecibido-' + $index" type="text" class="form-control inputEfectivo" (focus)="htmlServ.selectValue($event)" [ngModel]="pago.monto" (ngModelChange)="actualizarMontoRecibido($index, $event)" (keydown.enter)="handleMontoRecibidoEnter($event, $index)" (blur)="onMetodoPagoBlur($index, $event)" /></div>
+              <div class="currency-input"><span>{{ divisaPrincipalSimbolo }}</span><input [id]="'montoRecibido-' + $index" type="text" class="form-control inputEfectivo" appNumeroFormato [decimals]="2" [ngModel]="pago.monto" (ngModelChange)="actualizarMontoRecibido($index, $event)" (keydown.enter)="handleMontoRecibidoEnter($event, $index)" (appNumeroFormatoBlur)="actualizarMontoRecibido($index, $event)" /></div>
             </div>
             <button type="button" class="btn btn-text-danger cash-remove-payment" [disabled]="metodosDePago.length === 1" (click)="eliminarMetodoPago($index)" aria-label="Eliminar forma de pago"><i class="fa-solid fa-trash"></i></button>
           </div>

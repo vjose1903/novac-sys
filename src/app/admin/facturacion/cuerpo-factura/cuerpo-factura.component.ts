@@ -537,15 +537,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     return excede;
   }
 
-  limitarDecimalesCantidad(event: Event, index: number) {
-    const input = event.target as HTMLInputElement;
-    const check = fun.checkLongDecimales(input.value, 2);
-    if (!check.error) return;
-
-    input.value = check.value;
-    (this.factServ.filasDetalle.at(index) as FormGroup).controls['cantidad'].setValue(Number(check.value), { emitEvent: false });
-  }
-
   async checkCantidadExcede(index, lugar) {
     return new Promise<boolean>(async resolve => {
       let sumCantidad = 0;
@@ -764,30 +755,6 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     };
 
     this.getCalculosDinero.emit(obj);
-  }
-
-  revisarPrecio(formControlName, index) {
-    const input = (this.factServ.filasDetalle.at(index) as FormGroup).controls[formControlName];
-
-    return fun.revisarNumber(input, `${formControlName}-${index}`).then(res => {
-      if (!res.error) {
-        const roundedNumber = fun.roundNumberToDecimal(res.number);
-        const value = roundedNumber != '0.00' ? roundedNumber : null;
-        input.setValue(value);
-      } else {
-        input.setValue(null);
-      }
-    });
-  }
-
-  async handleInputEvent(type, formControlName, index) {
-    const input = (this.factServ.filasDetalle.at(index) as FormGroup).controls[formControlName];
-
-    if (type == 'focus' && fun.hasValue(input.value)) input.setValue(fun.desformatearStNumber(input.value));
-    if (type == 'blur') {
-      await this.revisarPrecio(formControlName, index);
-      await this.calcularMontosRow(index);
-    }
   }
 
   getActualPrice(index, event?) {

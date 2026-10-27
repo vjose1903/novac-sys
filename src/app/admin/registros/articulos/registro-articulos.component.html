@@ -110,12 +110,12 @@
                           (keydown.enter)="saltar('existencia')"
                           id="precio_principal"
                           formControlName="precio_principal"
+                          appNumeroFormato
+                          [decimals]="2"
                           placeholder="Introduzca precio"
                           class="form-control"
-                          (focus)="htmlServ.selectValue($event)"
                           autocomplete="off"
-                          (blur)="calculatePriceLibra()"
-                          (blur)="revisarPrecio('precio_principal')" />
+                          (appNumeroFormatoBlur)="calculatePriceLibra()" />
                         @if (!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)) {
                           <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                         }
@@ -159,12 +159,13 @@
                             (keydown.enter)="saltar('precio_principal')"
                             id="costo_principal"
                             formControlName="costo_principal"
-                            (blur)="calculatePrice()"
+                            appNumeroFormato
+                            [decimals]="2"
+                            (appNumeroFormatoBlur)="calculatePrice()"
                             placeholder="Introduzca costo"
                             class="form-control"
-                            (focus)="htmlServ.selectValue($event)"
                             autocomplete="off"
-                            (blur)="revisarPrecio('costo_principal')" />
+                            />
                           @if (!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)) {
                             <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                           }
@@ -180,12 +181,12 @@
                             (keydown.enter)="saltar('existencia')"
                             id="precio_principal"
                             formControlName="precio_principal"
+                            appNumeroFormato
+                            [decimals]="2"
                             placeholder="Introduzca precio"
                             class="form-control"
-                            (focus)="htmlServ.selectValue($event)"
                             autocomplete="off"
-                            (blur)="calculatePriceLibra()"
-                            (blur)="revisarPrecio('precio_principal')" />
+                            (appNumeroFormatoBlur)="calculatePriceLibra()" />
                           @if (!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)) {
                             <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                           }
@@ -339,10 +340,11 @@
                             (keydown.enter)="saltar('costo_principal')"
                             id="otros_costos"
                             formControlName="otros_costos"
+                            appNumeroFormato
+                            [decimals]="2"
                             placeholder="Otros Gastos"
                             class="form-control"
-                            (blur)="calculateCostoPT(); revisarPrecio('otros_costos')"
-                            (focus)="htmlServ.selectValue($event)"
+                            (appNumeroFormatoBlur)="calculateCostoPT()"
                             autocomplete="off" />
                           @if (!form.controls['otros_costos'].valid && (form.controls['otros_costos'].dirty || form.controls['otros_costos'].touched)) {
                             <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
@@ -357,12 +359,13 @@
                             (keydown.enter)="saltar('precio_principal')"
                             id="costo_principal"
                             formControlName="costo_principal"
-                            (blur)="calculatePrice()"
+                            appNumeroFormato
+                            [decimals]="2"
+                            (appNumeroFormatoBlur)="calculatePrice()"
                             placeholder="Introduzca costo"
                             class="form-control"
-                            (focus)="htmlServ.selectValue($event)"
                             autocomplete="off"
-                            (blur)="revisarPrecio('costo_principal')" />
+                            />
                           @if (!form.controls['costo_principal'].valid && (form.controls['costo_principal'].dirty || form.controls['costo_principal'].touched)) {
                             <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                           }
@@ -376,11 +379,12 @@
                             (keydown.enter)="saltar('existencia')"
                             id="precio_principal"
                             formControlName="precio_principal"
+                            appNumeroFormato
+                            [decimals]="2"
                             placeholder="Introduzca precio"
                             class="form-control"
-                            (focus)="htmlServ.selectValue($event)"
                             autocomplete="off"
-                            (blur)="calculatePriceLibra(); revisarPrecio('precio_principal')" />
+                            (appNumeroFormatoBlur)="calculatePriceLibra()" />
                           @if (!form.controls['precio_principal'].valid && (form.controls['precio_principal'].dirty || form.controls['precio_principal'].touched)) {
                             <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
                           }
@@ -425,7 +429,7 @@
                     <div class="col-3 p-0">
                       <label class="control-label">Precio por libra </label>
                       <div class="form-group">
-                        <input (keydown.enter)="saltar('send')" (focus)="htmlServ.selectValue($event)" type="text" id="precio_libra" formControlName="precio_libra" class="form-control" (blur)="revisarPrecio('precio_libra')" autocomplete="off" />
+                        <input (keydown.enter)="saltar('send')" type="text" id="precio_libra" formControlName="precio_libra" appNumeroFormato [decimals]="2" class="form-control" autocomplete="off" />
                         @if (!form.controls['precio_libra'].valid && (form.controls['precio_libra'].dirty || form.controls['precio_libra'].touched)) {
                           <div class="alerta text-danger ms-1" style="font-size: 12px">Cantidad de la caja</div>
                         }
@@ -476,12 +480,12 @@
                           (keydown.enter)="saltar(requiereContenidoHijo() ? 'contenidoHijo' : 'send')"
                           type="text"
                           id="precio_padre"
-                          (focus)="htmlServ.selectValue($event)"
                           formControlName="precio_padre"
+                          appNumeroFormato
+                          [decimals]="2"
                           placeholder="Introduzca precio"
                           class="form-control"
-                          (blur)="revisarPrecio('precio_padre')"
-                          (blur)="calculatePriceHijo()"
+                          (appNumeroFormatoBlur)="calculatePriceHijo()"
                           autocomplete="off" />
                         @if (!form.controls['precio_padre'].valid && (form.controls['precio_padre'].dirty || form.controls['precio_padre'].touched)) {
                           <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>
@@ -535,10 +539,10 @@
                           (keydown.enter)="saltar('send')"
                           type="text"
                           formControlName="precio_hijo"
+                          appNumeroFormato
+                          [decimals]="2"
                           placeholder="Introduzca precio"
                           class="form-control"
-                          (focus)="htmlServ.selectValue($event)"
-                          (blur)="revisarPrecio('precio_hijo')"
                           autocomplete="off" />
                         @if (!form.controls['precio_hijo'].valid && (form.controls['precio_hijo'].dirty || form.controls['precio_hijo'].touched)) {
                           <div class="alerta text-danger ms-1" style="font-size: 12px">Este Campo es obligatorio</div>

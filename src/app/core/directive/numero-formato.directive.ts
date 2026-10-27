@@ -9,6 +9,7 @@ import { fun } from '@services/functions.service';
 export class NumeroFormatoDirective {
   @Input() decimals: number | string = 2;
   @Input() formatOnInput: boolean | string = true;
+  @Input() padDecimalsOnBlur: boolean | string = true;
   @Output() appNumeroFormatoBlur = new EventEmitter<string>();
   private inputFormatTimer?: ReturnType<typeof setTimeout>;
 
@@ -69,13 +70,13 @@ export class NumeroFormatoDirective {
 
     let value: string;
     if (input.value.trim() === '') {
-      value = this.decimalsCount > 0 ? '0.00' : '0';
+      value = this.padsDecimalsOnBlur ? (this.decimalsCount > 0 ? '0.00' : '0') : '';
     } else if (isNaN(fun.desformatearStNumber(input.value))) {
       fun.toastError('Valor introducido es invalido', 'ERROR');
       input.focus();
       return;
     } else {
-      value = fun.roundNumberToDecimal(input.value, this.decimalsCount);
+      value = this.padsDecimalsOnBlur ? fun.roundNumberToDecimal(input.value, this.decimalsCount) : this.formatWhileTyping(input.value);
     }
 
     input.value = value;
@@ -90,6 +91,10 @@ export class NumeroFormatoDirective {
 
   private get formatsOnInput() {
     return this.formatOnInput !== false && this.formatOnInput !== 'false';
+  }
+
+  private get padsDecimalsOnBlur() {
+    return this.padDecimalsOnBlur !== false && this.padDecimalsOnBlur !== 'false';
   }
 
   private writeValue(value: string) {

@@ -100,15 +100,18 @@
                       <div class="position-relative" class="position-relative">
                         <input
                           [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
-                          type="number"
+                          type="text"
+                          inputmode="decimal"
                           min="1"
                           class="form-control entrada input_cantidad"
+                          appNumeroFormato
+                          [decimals]="2"
+                          [padDecimalsOnBlur]="false"
                           id="cantidad-{{ index_cuerpo }}"
                           (keyup.enter)="saltar('unidad-', index_cuerpo)"
                           formControlName="cantidad"
-                          (input)="limitarDecimalesCantidad($event, index_cuerpo)"
                           (focus)="verificarSecuencia(index_cuerpo)"
-                          (blur)="calcularMontosRow(index_cuerpo)"
+                          (appNumeroFormatoBlur)="calcularMontosRow(index_cuerpo)"
                           tabindex="-1" />
                         <!-- <div style="background-color: red; width: 20px; height: 20px; top:0" class="position-absolute" (click)="probando(index_cuerpo)"></div> -->
                       </div>
@@ -165,11 +168,13 @@
                           [ngClass]="{ disabled: fun.isEmpty(factServ.propietario_factura) || item_cuerpo.controls.from_pre_factura.value }"
                           type="text"
                           class="form-control entrada campoNumeros input_cantidad"
+                          appNumeroFormato
+                          [decimals]="2"
                           id="descuento_valor-{{ index_cuerpo }}"
-                          (focus)="handleInputEvent('focus', 'descuento_valor', index_cuerpo); verificarSecuencia(index_cuerpo)"
+                          (focus)="verificarSecuencia(index_cuerpo)"
                           (keyup.enter)="seleccionarCampoEnTurno()"
                           formControlName="descuento_valor"
-                          (blur)="handleInputEvent('blur', 'descuento_valor', index_cuerpo)"
+                          (appNumeroFormatoBlur)="calcularMontosRow(index_cuerpo)"
                           tabindex="-1" />
                       </div>
                     </td>
@@ -182,7 +187,9 @@
                           }
                           <input
                             type="text"
-                            (blur)="handleInputEvent('blur', precioCostoKey, index_cuerpo)"
+                            appNumeroFormato
+                            [decimals]="2"
+                            (appNumeroFormatoBlur)="calcularMontosRow(index_cuerpo)"
                             (focus)="verificarSecuencia(index_cuerpo)"
                             class="form-control entrada campoNumeros {{ factServ.isVenta() ? 'inPRE' : '' }}"
                             (keyup.enter)="ajustarSecuencia(); seleccionarCampoEnTurno()"
