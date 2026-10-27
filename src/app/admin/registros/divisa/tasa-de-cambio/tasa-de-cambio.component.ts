@@ -81,7 +81,7 @@ export class TasaDeCambioComponent implements OnInit, IDynamicModal {
 
   verificateChangeOfCurrency() {
     const formValue = this.form.getRawValue();
-    return formValue.tasa == this.divisa.current_tasa;
+    return Number(fun.desformatearStNumber(formValue.tasa)) == Number(fun.desformatearStNumber(this.divisa.current_tasa));
   }
 
   async getHistorialCambiosTasas() {
@@ -116,13 +116,14 @@ export class TasaDeCambioComponent implements OnInit, IDynamicModal {
   btn_aceptar() {
     const formValue = this.form.getRawValue();
 
-    const dataToSend = { id: this.divisa.id, divisa_id: this.divisa.id, valor: formValue.tasa, fecha_equivalente: DateUtils.format({ date: this.hastaMaxDate, dateFormat: 'YYYY-MM-DD' }) };
+    const valor = fun.desformatearStNumber(formValue.tasa);
+    const dataToSend = { id: this.divisa.id, divisa_id: this.divisa.id, valor, fecha_equivalente: DateUtils.format({ date: this.hastaMaxDate, dateFormat: 'YYYY-MM-DD' }) };
 
     this.tasaDeCambioClass.updateOne(dataToSend).then(res => {
       this.getHistorialCambiosTasas();
       this.divisaServ.getDivisas({ force: true });
 
-      this.divisa.current_tasa = formValue.tasa;
+      this.divisa.current_tasa = valor;
     });
   }
 }

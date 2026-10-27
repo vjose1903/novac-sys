@@ -70,6 +70,11 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     // this.rowFactura = new FormArray([new FormControl()]);
   }
 
+  private numero(value: any): number {
+    const desformateado = fun.desformatearStNumber(value);
+    return desformateado === null || desformateado === undefined || desformateado === '' || Number.isNaN(Number(desformateado)) ? 0 : Number(desformateado);
+  }
+
   ngOnInit() {
     this._init_mixin({ component: 'cuerpo_factura', is_routing: false });
     this.configApp = Ss.configServ.config;
@@ -108,6 +113,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
         fila.descuento_valor = fun.hasValue(fila.descuento_valor) ? fun.desformatearStNumber(fila.descuento_valor) : 0;
         fila.precio = fun.desformatearStNumber(fila.precio);
         fila.costo = fun.desformatearStNumber(fila.costo);
+        fila.cantidad = fun.desformatearStNumber(fila.cantidad);
 
         if (fila.cantidad && fila.unidad) detalle_factura.push(fun.deepCloning(fila));
       }
@@ -355,8 +361,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     detalle['precio'] = fun.roundNumberToDecimal(precio);
     detalle['costo'] = fun.roundNumberToDecimal(costo);
     detalle['descuento_valor'] = fun.isEmpty(data.descuento_valor) || data.descuento_valor == 0 ? null : fun.roundNumberToDecimal(data.descuento_valor);
-    detalle['cantidad'] = data.cantidad;
-    detalle['cantidad_initial'] = fun.hasValue(data.cantidad) ? data.cantidad : 0;
+    detalle['cantidad'] = fun.hasValue(data.cantidad) ? this.numero(data.cantidad) : data.cantidad;
+    detalle['cantidad_initial'] = fun.hasValue(data.cantidad) ? this.numero(data.cantidad) : 0;
     detalle['cantidad_en_unidades_initial'] = 0;
     detalle['cantidad_en_unidades'] = 0;
     detalle['key_initial'] = fun.hasValue(data?.key_initial) ? data.key_initial : null;
@@ -501,7 +507,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   async saliDeCantidad(index: number): Promise<boolean> {
     const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
-    const { unidad, cantidad, cantidad_ant } = formGroup.getRawValue();
+    const { unidad } = formGroup.getRawValue();
+    const cantidad = this.numero(formGroup.getRawValue().cantidad);
+    const cantidad_ant = this.numero(formGroup.getRawValue().cantidad_ant);
 
     // Si no hay cambio en cantidad o no hay unidad, solo actualizar cantidad_ant
     if (cantidad === cantidad_ant || !fun.hasValue(unidad)) {
@@ -660,7 +668,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
   calcularCantidadEnUnidades(params: { index: number; clean?: boolean } = { index: 0, clean: false }) {
     const formGroup = this.factServ.filasDetalle.at(params.index) as FormGroup;
-    const { unidad, cantidad, cantidad_initial, unidades } = formGroup.getRawValue();
+    const { unidad, unidades } = formGroup.getRawValue();
+    const cantidad = this.numero(formGroup.getRawValue().cantidad);
+    const cantidad_initial = this.numero(formGroup.getRawValue().cantidad_initial);
 
     // Calcular cantidad mínima basada en la unidad seleccionada
     const cantidadMinima = unidad && unidades?.length > 0 ? unidades.find(uni => uni.value.toLowerCase() === unidad.toLowerCase())?.cantidad || 1 : 1;
@@ -687,7 +697,8 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   calcularMontosRow(index: number) {
     const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
     const detalle: Record<string, any> = {};
-    let { cantidad, articulo, codigo, key, precio, costo, descuento_valor } = formGroup.value;
+    let { articulo, codigo, key, precio, costo, descuento_valor } = formGroup.value;
+    const cantidad = this.numero(formGroup.value.cantidad);
 
     precio = fun.desformatearStNumber(precio);
     costo = fun.desformatearStNumber(costo);
@@ -762,7 +773,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     const siFunction = () => {
       const formGroup = this.factServ.filasDetalle.at(index) as FormGroup;
-      const detalle = {};
+      const detalle: Record<string, any> = {};
       const campoToSolve = this.factServ.isCompra() ? 'costo' : 'precio';
 
       detalle['is_bad_price'] = false;
@@ -994,7 +1005,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
   }
 
   calcularPrecioSaco(cant, precio) {
-    const res = (cant / 100) * precio;
+    const res = (this.numero(cant) / 100) * this.numero(precio);
     return fun.roundNumberToDecimal(res);
   }
 
@@ -1007,7 +1018,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     ];
 
     infoRetorno.forEach(itemRetorno => {
-      if (fun.hasValue(itemRetorno?.data?.key) && itemRetorno?.data?.cantidad > 0) {
+      if (fun.hasValue(itemRetorno?.data?.key) && this.numero(itemRetorno?.data?.cantidad) > 0) {
         let articulo_devuelto = itemRetorno.contenedor_retorno.find(item => {
           const entidad = itemRetorno.tipo == 'defectuoso' ? item.value : item;
           return entidad.key == itemRetorno?.data?.key;
@@ -1023,7 +1034,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
         const retornar_info = this.parsearProductoDevueltos(fun.deepCloning(itemRetorno.data?.origin), fun.deepCloning(itemRetorno.data), false);
 
-        if (retornar_info['cantidad'] == articulo_devuelto.cantidad) {
+        if (this.numero(retornar_info['cantidad']) === this.numero(articulo_devuelto.cantidad)) {
           if (itemRetorno.tipo == 'defectuoso') {
             this.pasosQuitarArticulo(articulo_devuelto.key);
           } else {
@@ -1031,15 +1042,15 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           }
         } else {
           if (itemRetorno.tipo == 'defectuoso') {
-            detalle_devuelto['cantidad'] = articulo_devuelto.cantidad - retornar_info['cantidad'];
-            detalle_devuelto['cantidad_en_unidades'] = articulo_devuelto.cantidad_en_unidades - retornar_info['cantidad_en_unidades'];
-            detalle_devuelto['descuento_valor'] = fun.roundNumberToDecimal(articulo_devuelto.descuento_valor - retornar_info['descuento_valor']);
+            detalle_devuelto['cantidad'] = this.numero(articulo_devuelto.cantidad) - this.numero(retornar_info['cantidad']);
+            detalle_devuelto['cantidad_en_unidades'] = this.numero(articulo_devuelto.cantidad_en_unidades) - this.numero(retornar_info['cantidad_en_unidades']);
+            detalle_devuelto['descuento_valor'] = fun.roundNumberToDecimal(this.numero(articulo_devuelto.descuento_valor) - this.numero(retornar_info['descuento_valor']));
           } else {
-            articulo_devuelto['cantidad'] -= retornar_info['cantidad'];
-            articulo_devuelto['cantidad_en_unidades'] -= retornar_info['cantidad_en_unidades'];
-            articulo_devuelto['descuento_valor'] -= retornar_info['descuento_valor'];
+            articulo_devuelto['cantidad'] = this.numero(articulo_devuelto.cantidad) - this.numero(retornar_info['cantidad']);
+            articulo_devuelto['cantidad_en_unidades'] = this.numero(articulo_devuelto.cantidad_en_unidades) - this.numero(retornar_info['cantidad_en_unidades']);
+            articulo_devuelto['descuento_valor'] = this.numero(articulo_devuelto.descuento_valor) - this.numero(retornar_info['descuento_valor']);
 
-            articulo_devuelto['total'] = articulo_devuelto['cantidad'] * fun.desformatearStNumber(articulo_devuelto['precio']) - articulo_devuelto['descuento_valor'];
+            articulo_devuelto['total'] = this.numero(articulo_devuelto['cantidad']) * this.numero(articulo_devuelto['precio']) - this.numero(articulo_devuelto['descuento_valor']);
           }
           if (itemRetorno.tipo == 'defectuoso') {
             FormGroup_devuelto.patchValue(detalle_devuelto);
@@ -1055,9 +1066,9 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
           const FormGroup_origin = articulo_origin as FormGroup;
           const detalle_origin = {};
 
-          detalle_origin['cantidad'] = articulo_origin.value.cantidad + retornar_info['cantidad'];
-          detalle_origin['cantidad_en_unidades'] = articulo_origin.value.cantidad_en_unidades + retornar_info['cantidad_en_unidades'];
-          detalle_origin['descuento_valor'] = fun.roundNumberToDecimal(articulo_origin.value.descuento_valor + retornar_info['descuento_valor']);
+          detalle_origin['cantidad'] = this.numero(articulo_origin.value.cantidad) + this.numero(retornar_info['cantidad']);
+          detalle_origin['cantidad_en_unidades'] = this.numero(articulo_origin.value.cantidad_en_unidades) + this.numero(retornar_info['cantidad_en_unidades']);
+          detalle_origin['descuento_valor'] = fun.roundNumberToDecimal(this.numero(articulo_origin.value.descuento_valor) + this.numero(retornar_info['descuento_valor']));
 
           FormGroup_origin.patchValue(detalle_origin);
           this.calcularMontosRow(articulo_origin_index);
@@ -1094,13 +1105,13 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     const promiseArray = [];
 
-    if (origin_current_detalle.cantidad == data_remover.cantidad) {
+    if (this.numero(origin_current_detalle.cantidad) === this.numero(data_remover.cantidad)) {
       promiseArray.push(this.pasosQuitarArticulo(origin_current_detalle.key));
     } else {
       const detalle = {};
-      detalle['cantidad'] = current_detalle.value.cantidad - data_remover.cantidad;
-      detalle['cantidad_en_unidades'] = current_detalle.value.cantidad * current_detalle.value.articulo.contenido[medida];
-      detalle['descuento_valor'] = fun.roundNumberToDecimal((origin_current_detalle.descuento_valor / origin_current_detalle.cantidad) * current_detalle.value.cantidad);
+      detalle['cantidad'] = this.numero(current_detalle.value.cantidad) - this.numero(data_remover.cantidad);
+      detalle['cantidad_en_unidades'] = this.numero(detalle['cantidad']) * current_detalle.value.articulo.contenido[medida];
+      detalle['descuento_valor'] = fun.roundNumberToDecimal((this.numero(origin_current_detalle.descuento_valor) / this.numero(origin_current_detalle.cantidad)) * this.numero(detalle['cantidad']));
 
       current_detalle.patchValue(detalle);
       promiseArray.push(this.calcularMontosRow(index_current_detalle));
@@ -1109,7 +1120,7 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     Promise.all(promiseArray).then(res => {
       const detalles_llenos = this.factServ.getDetallesLlenos();
 
-      if (data_remover.cantidad <= origin_current_detalle.cantidad) {
+      if (this.numero(data_remover.cantidad) <= this.numero(origin_current_detalle.cantidad)) {
         if (data_remover.razon == razon_remover.producto_defectuoso) {
           const articulo_ya_retirado = _.find(detalles_llenos, detalle => detalle.key_initial == current_detalle.value.key);
           const articulo_retirado_index = fun.hasValue(articulo_ya_retirado) ? _.findIndex(this.factServ.filasDetalle.controls, detalle => detalle.value.key == articulo_ya_retirado.key) : null;
@@ -1188,21 +1199,21 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
     const data = articulo_ya_retirado.data;
 
     // Sumar valores
-    data.cantidad += producto.cantidad;
-    data.cantidad_en_unidades += producto.cantidad_en_unidades;
-    data.descuento_valor += producto.descuento_valor;
-    data.total += producto.total;
+    data.cantidad = this.numero(data.cantidad) + this.numero(producto.cantidad);
+    data.cantidad_en_unidades = this.numero(data.cantidad_en_unidades) + this.numero(producto.cantidad_en_unidades);
+    data.descuento_valor = this.numero(data.descuento_valor) + this.numero(producto.descuento_valor);
+    data.total = this.numero(data.total) + this.numero(producto.total);
 
     // Recalcular total final
-    data.total -= data.descuento_valor;
+    data.total -= this.numero(data.descuento_valor);
   }
 
   private modificarProductoDefectuoso(producto: any, articulo_ya_retirado: any): void {
     const formGroup = this.factServ.filasDetalle.at(articulo_ya_retirado.index) as FormGroup;
 
     const detalle = {
-      cantidad: producto.cantidad + articulo_ya_retirado.data.cantidad,
-      descuento_valor: fun.roundNumberToDecimal(producto.descuento_valor + articulo_ya_retirado.data.descuento_valor),
+      cantidad: this.numero(producto.cantidad) + this.numero(articulo_ya_retirado.data.cantidad),
+      descuento_valor: fun.roundNumberToDecimal(this.numero(producto.descuento_valor) + this.numero(articulo_ya_retirado.data.descuento_valor)),
     };
 
     formGroup.patchValue(detalle);
@@ -1214,12 +1225,12 @@ export class CuerpoFacturaComponent extends MixinClass implements OnInit, OnDest
 
     const medida = articulo_a_retirar.articulo.tipo_articulo.tipo == 'servicio' ? 'Servicio' : articulo_a_retirar.articulo.medida;
 
-    articulo_a_retirar.descuento_valor = (articulo_a_retirar.descuento_valor / articulo_a_retirar.cantidad) * data_remover.cantidad;
+    articulo_a_retirar.descuento_valor = (this.numero(articulo_a_retirar.descuento_valor) / this.numero(articulo_a_retirar.cantidad)) * this.numero(data_remover.cantidad);
 
-    articulo_a_retirar.cantidad = data_remover.cantidad;
-    articulo_a_retirar.cantidad_en_unidades = data_remover.cantidad * articulo_a_retirar.articulo.contenido[medida];
+    articulo_a_retirar.cantidad = this.numero(data_remover.cantidad);
+    articulo_a_retirar.cantidad_en_unidades = this.numero(data_remover.cantidad) * articulo_a_retirar.articulo.contenido[medida];
 
-    articulo_a_retirar.total = articulo_a_retirar.cantidad * fun.desformatearStNumber(articulo_a_retirar.precio);
+    articulo_a_retirar.total = this.numero(articulo_a_retirar.cantidad) * this.numero(articulo_a_retirar.precio);
     articulo_a_retirar.key_initial = articulo_a_retirar.key;
 
     articulo_a_retirar.key = fun.generateKey();

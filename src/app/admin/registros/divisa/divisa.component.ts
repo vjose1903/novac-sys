@@ -145,6 +145,9 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
 
     originalValue['img'] = this.divisaServ.listaDivisas.find(cuenta => cuenta.id == formValue.id)?.img_divisa;
 
+    formValue.current_tasa = fun.desformatearStNumber(formValue.current_tasa);
+    originalValue.current_tasa = fun.desformatearStNumber(originalValue.current_tasa);
+
     return !fun.isEqual(formValue, originalValue);
   }
 
@@ -228,6 +231,7 @@ export class DivisaComponent extends MixinClass implements OnInit, OnDestroy {
     formValue = fun.omit(formValue, ['is_principal', 'img']);
 
     if (this.botonLabel == 'Editar') delete formValue.current_tasa;
+    else formValue.current_tasa = fun.desformatearStNumber(formValue.current_tasa);
 
     if (this.botonLabel == 'Guardar' && (fun.isEmpty(this.photoData) || fun.isEmpty(this.photoData?.src_img))) {
       fun.toastError('Debe de selecciar una imagen para crear una divisa', 'ERROR');
