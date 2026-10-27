@@ -13,9 +13,11 @@ import { NgxPermissionsModule } from 'ngx-permissions';
 import { DetalleFacturaModule } from './detalle-factura/detalle-factura.module';
 import { BtnIconModule } from '@components/btn-icon-circular/btn-icon-circular.module';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { FiltrosDocumentosComponent } from './buscar-factura/components/filtros-documentos/filtros-documentos.component';
+import { DirectivesModule } from '@core/directive/directives.module';
 
 @NgModule({
-  declarations: [NotasCredDebComponent, BuscarFacturaComponent],
+  declarations: [NotasCredDebComponent, BuscarFacturaComponent, FiltrosDocumentosComponent],
   imports: [
     CommonModule,
     ManipularFacturasRoutingModule,
@@ -28,6 +30,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
     DetalleFacturaModule,
     BtnIconModule,
     SelectButtonModule,
+    DirectivesModule,
     FormulariosEnModalesModule,
   ],
 })

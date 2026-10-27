@@ -28,6 +28,7 @@ import { confirmationButtons, IButtonDynamic, ICallbackModal, modalActionsE, mod
 import { DynamicModalClass } from '@core/components/dynamic-modal/config/dynamic-modal.class';
 import { DynamicModalService } from '@core/components/dynamic-modal/dynamic-modal.service';
 import moment from '../../../core/javascript/moment';
+import type { FiltrosDocumento } from './components/filtros-documentos/filtros-documentos.component';
 
 @Component({
   selector: 'app-buscar-factura',
@@ -43,6 +44,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   para: string;
 
   noExistenComprobantes = false;
+  sinResultadosFacturas = false;
   paqueteComprobante: any;
   tipo_factura_id = null;
   valor_a_buscar: any = null;
@@ -66,30 +68,9 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   buscar_por = null;
 
   readonly tipoDocFacturacion = tipoDocFacturacion;
-  condicionFiltro = signal('todos');
-  estadoFiltro = signal('todos');
-  tipoFacturaFiltro = signal('0');
-  totalMinFiltro = signal<number | null>(null);
-  totalMaxFiltro = signal<number | null>(null);
-  balanceComparadorFiltro = signal('gt');
-  balanceValorFiltro = signal<number | null>(null);
-  condicionFiltroOptions = [
-    { label: 'Todas las condiciones', value: 'todos' },
-    { label: 'Contado', value: 'Contado' },
-    { label: 'Crédito', value: 'Crédito' },
-  ];
-  estadoFiltroOptions = [
-    { label: 'Todos los estados', value: 'todos' },
-    { label: 'Activos', value: 'true' },
-    { label: 'Inactivos', value: 'false' },
-  ];
-  balanceComparadorOptions = [
-    { symbol: '=', label: 'Igual a', value: 'eq' },
-    { symbol: '>', label: 'Mayor que', value: 'gt' },
-    { symbol: '<', label: 'Menor que', value: 'lt' },
-    { symbol: '>=', label: 'Mayor o igual a', value: 'gte' },
-    { symbol: '<=', label: 'Menor o igual a', value: 'lte' },
-  ];
+  filtrosDocumentos: FiltrosDocumento = this.filtrosDocumentosPorDefecto();
+  filtrosDocumentosResetVersion = signal(0);
+  tipoFacturaFiltroResetVersion = signal(0);
 
   tipoFacturaFiltroOptions() {
     const tipos = Ss.factServ?.lista_tipos_facturas || [];
@@ -117,16 +98,29 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
   cambiarSerieFiltro(value: serie) {
     this.serieSelected.set(value);
-    this.tipoFacturaFiltro.set('0');
+    this.filtrosDocumentos = { ...this.filtrosDocumentos, tipoFactura: '0' };
+    this.tipoFacturaFiltroResetVersion.update(version => version + 1);
   }
 
-  hayFiltrosAvanzados() {
-    return this.condicionFiltro() !== 'todos'
-      || this.estadoFiltro() !== 'todos'
-      || this.tipoFacturaFiltro() !== '0'
-      || this.totalMinFiltro() !== null
-      || this.totalMaxFiltro() !== null
-      || this.balanceValorFiltro() !== null;
+  private filtrosDocumentosPorDefecto(): FiltrosDocumento {
+    return {
+      condicion: 'todos',
+      estado: 'todos',
+      tipoFactura: '0',
+      totalMin: null,
+      totalMax: null,
+      balanceComparador: 'gt',
+      balanceValor: null,
+    };
+  }
+
+  actualizarFiltrosDocumentos(filtros: FiltrosDocumento) {
+    this.filtrosDocumentos = filtros;
+  }
+
+  resetearFiltrosDocumentos() {
+    this.filtrosDocumentos = this.filtrosDocumentosPorDefecto();
+    this.filtrosDocumentosResetVersion.update(value => value + 1);
   }
 
   campos = {
@@ -450,20 +444,25 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   }
 
   mostrarListaFacturas() {
-    let res = false;
-    if (this.facturas && this.facturas.length > 0) {
-      if (this.buscar_por == this.campos.cliente || this.buscar_por == this.campos.ultimas50 || this.buscar_por == this.campos.suplidor) {
-        res = true;
-      } else if (this.buscar_por == this.campos.numeroFactura && this.tipo_factura_id == '0') {
-        res = true;
-      } else {
-        res = false;
-      }
-    } else {
-      res = false;
-    }
+    const puedeMostrarListado = this.puedeMostrarListadoFacturas();
+    return puedeMostrarListado && (this.facturas.length > 0 || this.sinResultadosFacturas);
+  }
 
-    return res;
+  mostrarFiltrosDocumentos() {
+    return this.buscarPara == 'solo_ver' && this.puedeMostrarListadoFacturas();
+  }
+
+  private puedeMostrarListadoFacturas() {
+    return this.buscar_por == this.campos.cliente || this.buscar_por == this.campos.ultimas50 || this.buscar_por == this.campos.suplidor || (this.buscar_por == this.campos.numeroFactura && this.tipo_factura_id == '0');
+  }
+
+  descripcionDocumentosSinResultados() {
+    if (this.tipo_documento_selected() == tipoDocFacturacion.compra) return 'facturas de compra';
+    if (this.tipo_documento_selected() == tipoDocFacturacion.cotizacion) return 'cotizaciones';
+    if (this.tipo_documento_selected() == tipoDocFacturacion.pre_venta) return 'pre-ventas';
+    if (this.tipo_documento_selected() == tipoDocFacturacion.nota_credito) return 'notas de crédito';
+    if (this.tipo_documento_selected() == tipoDocFacturacion.nota_debito) return 'notas de débito';
+    return 'facturas de venta';
   }
 
   async pedirFactura(params?: { per_page?: number; page?: number; search?: string }) {
@@ -472,6 +471,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
       try {
         this.facturas.length = 0;
+        this.sinResultadosFacturas = false;
 
         const valor = fun.isEmpty(this.valor_a_buscar) ? '' : this.valor_a_buscar;
         const use_for = this.getUseForParam();
@@ -487,12 +487,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           movimientos_viaje: true,
           extra_params: {
             serie: this.getSerieForCurrentClient(this.serieSelected()),
-            ...(this.condicionFiltro() !== 'todos' ? { condicion: this.condicionFiltro() } : {}),
-            ...(this.estadoFiltro() !== 'todos' ? { estado: this.estadoFiltro() } : {}),
-            ...(this.tipoFacturaFiltro() !== '0' ? { tipo_factura_filtro: this.tipoFacturaFiltro() } : {}),
-            ...(this.totalMinFiltro() !== null ? { total_min: this.totalMinFiltro() } : {}),
-            ...(this.totalMaxFiltro() !== null ? { total_max: this.totalMaxFiltro() } : {}),
-            ...(this.balanceValorFiltro() !== null ? { balance_comparator: this.balanceComparadorFiltro(), balance_value: this.balanceValorFiltro() } : {}),
+            ...(this.filtrosDocumentos.condicion !== 'todos' ? { condicion: this.filtrosDocumentos.condicion } : {}),
+            ...(this.filtrosDocumentos.estado !== 'todos' ? { estado: this.filtrosDocumentos.estado } : {}),
+            ...(this.filtrosDocumentos.tipoFactura !== '0' ? { tipo_factura_filtro: this.filtrosDocumentos.tipoFactura } : {}),
+            ...(this.filtrosDocumentos.totalMin !== null ? { total_min: this.filtrosDocumentos.totalMin } : {}),
+            ...(this.filtrosDocumentos.totalMax !== null ? { total_max: this.filtrosDocumentos.totalMax } : {}),
+            ...(this.filtrosDocumentos.balanceValor !== null ? { balance_comparator: this.filtrosDocumentos.balanceComparador, balance_value: this.filtrosDocumentos.balanceValor } : {}),
             ...(use_for ? { use_for } : {}),
             ...(this.buscarPara === 'solo_ver' ? { is_externa: this.solicitarFacturasExternas() } : {}),
           },
@@ -500,7 +500,8 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
         const res = await this.facturaClass.getFacturasByParams(args);
 
-        res['data'].forEach(fact => {
+        const datos = res['data'] || [];
+        datos.forEach(fact => {
           const pago_a_tiempo = this.getIsPagoAtiempo(fact);
           const estatus = this.getIsActiveInfo(fact);
 
@@ -565,10 +566,26 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
               this.tablaComponent?.changeTableConfig([{ total_count: res.total_registros }]);
             }, 100);
           }
+        } else {
+          this.sinResultadosFacturas = true;
+          this.table_config.total_count = 0;
         }
 
         resolve();
       } catch (error) {
+        this.sinResultadosFacturas = Number(error?.status || error?.error?.status) == 409;
+        if (this.sinResultadosFacturas) {
+          this.table_config.total_count = 0;
+          fun.setTimeout(() => {
+            this.tablaComponent?.changeTableConfig([{ total_count: 0 }]);
+          }, 100);
+        }
+
+        if (this.buscarPara == 'solo_ver' && this.sinResultadosFacturas) {
+          resolve();
+          return;
+        }
+
         if (this.buscar_por == this.campos.cliente) {
           fun.toastError(`Este cliente no tiene ${documento_descripcion} del tipo seleccionada`, 'ERROR');
         } else if (this.buscar_por == this.campos.suplidor) {
@@ -634,24 +651,11 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
 
   resetFacturas() {
     this.facturas.length = 0;
+    this.sinResultadosFacturas = false;
   }
 
-  async aplicarFiltrosAvanzados(popover: any) {
-    popover?.hide();
-    const actualPagination = await this.getActualPagination();
-    if (actualPagination) this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
-    this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
-  }
-
-  async limpiarFiltrosAvanzados(popover: any) {
-    this.condicionFiltro.set('todos');
-    this.estadoFiltro.set('todos');
-    this.tipoFacturaFiltro.set('0');
-    this.totalMinFiltro.set(null);
-    this.totalMaxFiltro.set(null);
-    this.balanceComparadorFiltro.set('gt');
-    this.balanceValorFiltro.set(null);
-    popover?.hide();
+  async aplicarFiltrosDocumentos(filtros: FiltrosDocumento) {
+    this.actualizarFiltrosDocumentos(filtros);
     const actualPagination = await this.getActualPagination();
     if (actualPagination) this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
     this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
@@ -698,13 +702,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     if (valor == this.campos.ultimas50) this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
 
     if (tipo == 'tipo_documento') {
-      this.condicionFiltro.set('todos');
-      this.estadoFiltro.set('todos');
-      this.tipoFacturaFiltro.set('0');
-      this.totalMinFiltro.set(null);
-      this.totalMaxFiltro.set(null);
-      this.balanceComparadorFiltro.set('gt');
-      this.balanceValorFiltro.set(null);
+      this.resetearFiltrosDocumentos();
       this.buscar_por = null;
       fun.setTimeout(() => {
         this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
@@ -766,13 +764,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     this.solicitarFacturasExternas.set(false);
     this.tipo_factura_id = null;
     this.buscar_por = null;
-    this.condicionFiltro.set('todos');
-    this.estadoFiltro.set('todos');
-    this.tipoFacturaFiltro.set('0');
-    this.totalMinFiltro.set(null);
-    this.totalMaxFiltro.set(null);
-    this.balanceComparadorFiltro.set('gt');
-    this.balanceValorFiltro.set(null);
+    this.resetearFiltrosDocumentos();
     fun.enfocarInput('buscarPorI');
   }
 
