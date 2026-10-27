@@ -1,5 +1,5 @@
 import { HtmlElementsService } from '@core/services/html-elements.service';
-import { actionFacturacion, deleteDocumentosTypes, FacturasI, request_factura_campo, tipoDocFacturacion, tipoDocFacturacionLabel } from './../../facturacion/factura';
+import { actionFacturacion, deleteDocumentosTypes, FacturasI, request_factura_campo, tipoDocFacturacion, tipoDocFacturacionLabel, tFacturaKey } from './../../facturacion/factura';
 import { Ss } from '@core/services/singleton.service';
 import { serie, seriesDgiiI } from '@core/typescript/constantes';
 import { Component, OnDestroy, inject, OnChanges, SimpleChanges, Input, computed, signal, effect, OnInit } from '@angular/core';
@@ -64,6 +64,70 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
   tipo_documento_selected = signal<tipoDocFacturacion>(tipoDocFacturacion.venta);
 
   buscar_por = null;
+
+  readonly tipoDocFacturacion = tipoDocFacturacion;
+  condicionFiltro = signal('todos');
+  estadoFiltro = signal('todos');
+  tipoFacturaFiltro = signal('0');
+  totalMinFiltro = signal<number | null>(null);
+  totalMaxFiltro = signal<number | null>(null);
+  balanceComparadorFiltro = signal('gt');
+  balanceValorFiltro = signal<number | null>(null);
+  condicionFiltroOptions = [
+    { label: 'Todas las condiciones', value: 'todos' },
+    { label: 'Contado', value: 'Contado' },
+    { label: 'Crédito', value: 'Crédito' },
+  ];
+  estadoFiltroOptions = [
+    { label: 'Todos los estados', value: 'todos' },
+    { label: 'Activos', value: 'true' },
+    { label: 'Inactivos', value: 'false' },
+  ];
+  balanceComparadorOptions = [
+    { symbol: '=', label: 'Igual a', value: 'eq' },
+    { symbol: '>', label: 'Mayor que', value: 'gt' },
+    { symbol: '<', label: 'Menor que', value: 'lt' },
+    { symbol: '>=', label: 'Mayor o igual a', value: 'gte' },
+    { symbol: '<=', label: 'Menor o igual a', value: 'lte' },
+  ];
+
+  tipoFacturaFiltroOptions() {
+    const tipos = Ss.factServ?.lista_tipos_facturas || [];
+    const series = this.getSeriesForTipoFacturaFiltro();
+    const opciones = series.flatMap(serieActual => [
+      this.createTipoFacturaFiltroOption(tipos, tFacturaKey.factura_de_consumo, serieActual, 'Factura de consumo'),
+      this.createTipoFacturaFiltroOption(tipos, tFacturaKey.factura_de_credito_fiscal, serieActual, 'Factura con valor fiscal'),
+    ]);
+
+    return [{ label: 'Todas', value: '0' }, ...opciones.filter(Boolean)];
+  }
+
+  private getSeriesForTipoFacturaFiltro(): serie[] {
+    if (this.configApp?.usa_facturacion_electronica !== true) return [serie.normal];
+    if (this.serieSelected() === serie.all) return [serie.electronica, serie.normal];
+    return [this.serieSelected()];
+  }
+
+  private createTipoFacturaFiltroOption(tipos: any[], key: string, serieActual: serie, label: string) {
+    const tipo = tipos.find(item => item.key === key && item.serie === serieActual);
+    if (!tipo) return null;
+
+    return { label: `${label}${serieActual === serie.electronica ? ' electrónica' : ''}`, value: `${tipo.id}` };
+  }
+
+  cambiarSerieFiltro(value: serie) {
+    this.serieSelected.set(value);
+    this.tipoFacturaFiltro.set('0');
+  }
+
+  hayFiltrosAvanzados() {
+    return this.condicionFiltro() !== 'todos'
+      || this.estadoFiltro() !== 'todos'
+      || this.tipoFacturaFiltro() !== '0'
+      || this.totalMinFiltro() !== null
+      || this.totalMaxFiltro() !== null
+      || this.balanceValorFiltro() !== null;
+  }
 
   campos = {
     cliente: request_factura_campo.cliente_id,
@@ -197,7 +261,7 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
       this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
       this.completarTituloPag();
 
-      fun.enfocarInput(this.buscarPara === 'solo_ver' ? 'tipoI' : 'buscarPorI');
+      fun.enfocarInput('buscarPorI');
     });
 
     this.getSeriesOptions();
@@ -423,6 +487,12 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
           movimientos_viaje: true,
           extra_params: {
             serie: this.getSerieForCurrentClient(this.serieSelected()),
+            ...(this.condicionFiltro() !== 'todos' ? { condicion: this.condicionFiltro() } : {}),
+            ...(this.estadoFiltro() !== 'todos' ? { estado: this.estadoFiltro() } : {}),
+            ...(this.tipoFacturaFiltro() !== '0' ? { tipo_factura_filtro: this.tipoFacturaFiltro() } : {}),
+            ...(this.totalMinFiltro() !== null ? { total_min: this.totalMinFiltro() } : {}),
+            ...(this.totalMaxFiltro() !== null ? { total_max: this.totalMaxFiltro() } : {}),
+            ...(this.balanceValorFiltro() !== null ? { balance_comparator: this.balanceComparadorFiltro(), balance_value: this.balanceValorFiltro() } : {}),
             ...(use_for ? { use_for } : {}),
             ...(this.buscarPara === 'solo_ver' ? { is_externa: this.solicitarFacturasExternas() } : {}),
           },
@@ -566,6 +636,27 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     this.facturas.length = 0;
   }
 
+  async aplicarFiltrosAvanzados(popover: any) {
+    popover?.hide();
+    const actualPagination = await this.getActualPagination();
+    if (actualPagination) this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
+    this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
+  }
+
+  async limpiarFiltrosAvanzados(popover: any) {
+    this.condicionFiltro.set('todos');
+    this.estadoFiltro.set('todos');
+    this.tipoFacturaFiltro.set('0');
+    this.totalMinFiltro.set(null);
+    this.totalMaxFiltro.set(null);
+    this.balanceComparadorFiltro.set('gt');
+    this.balanceValorFiltro.set(null);
+    popover?.hide();
+    const actualPagination = await this.getActualPagination();
+    if (actualPagination) this.tServ.modifyPaginationById(shearchDocumentTableId, [{ page: 1 }]);
+    this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
+  }
+
   selectTableConfig() {
     return new Promise<void>(resolve => {
       this.table_config = fun.deepCloning(BuscarFacturaC.tables_config[this.tipo_documento_selected()]);
@@ -607,6 +698,13 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     if (valor == this.campos.ultimas50) this.pedirFactura(fun.deepCloning(this.tServ.obj_paginate.default));
 
     if (tipo == 'tipo_documento') {
+      this.condicionFiltro.set('todos');
+      this.estadoFiltro.set('todos');
+      this.tipoFacturaFiltro.set('0');
+      this.totalMinFiltro.set(null);
+      this.totalMaxFiltro.set(null);
+      this.balanceComparadorFiltro.set('gt');
+      this.balanceValorFiltro.set(null);
       this.buscar_por = null;
       fun.setTimeout(() => {
         this.selectTableConfig().then(() => this.tServ.initPagination(shearchDocumentTableId, this.table_config.obj_paginate));
@@ -668,7 +766,14 @@ export class BuscarFacturaComponent extends MixinClass implements OnInit, OnChan
     this.solicitarFacturasExternas.set(false);
     this.tipo_factura_id = null;
     this.buscar_por = null;
-    fun.enfocarInput(this.buscarPara === 'solo_ver' ? 'tipoI' : 'buscarPorI');
+    this.condicionFiltro.set('todos');
+    this.estadoFiltro.set('todos');
+    this.tipoFacturaFiltro.set('0');
+    this.totalMinFiltro.set(null);
+    this.totalMaxFiltro.set(null);
+    this.balanceComparadorFiltro.set('gt');
+    this.balanceValorFiltro.set(null);
+    fun.enfocarInput('buscarPorI');
   }
 
   tableClickIcon(params) {

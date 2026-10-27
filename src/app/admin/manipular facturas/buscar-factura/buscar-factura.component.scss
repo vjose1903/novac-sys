@@ -110,6 +110,7 @@
       .search-card-header {
         align-items: center;
         color: var(--app-text);
+        justify-content: space-between;
         display: flex;
         font-size: 0.82rem;
         font-weight: 800;
@@ -137,6 +138,7 @@
           &.has-document-type {
             grid-template-columns: minmax(9rem, 0.85fr) minmax(16rem, 1.5fr);
           }
+
         }
 
         &.search-row-secondary {
@@ -167,6 +169,12 @@
         justify-content: space-between;
         min-width: 0;
         padding: 0.55rem 0.65rem;
+
+        .series-panel-actions {
+          align-items: center;
+          display: inline-flex;
+          gap: 0.65rem;
+        }
 
         .series-panel-label {
           align-items: center;
@@ -314,9 +322,33 @@
   .abajo {
     grid-area: abajo;
     min-height: 0;
+    padding: 0 !important;
     position: relative;
 
     .table-top-actions {
+      .document-filters-trigger {
+        align-items: center;
+        background: var(--app-surface);
+        border: 1px solid var(--app-card-border);
+        border-radius: 0.75rem;
+        color: var(--app-text-muted);
+        display: inline-flex;
+        font-size: 0.72rem;
+        font-weight: 800;
+        gap: 0.4rem;
+        min-height: 2.2rem;
+        padding: 0.25rem 0.6rem;
+        transition: border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+
+        &:hover,
+        &:focus-visible {
+          border-color: var(--primary08);
+          box-shadow: 0 0.35rem 0.8rem rgba(15, 23, 42, 0.12);
+          color: var(--primary08);
+          outline: 0;
+        }
+      }
+
       display: flex;
       justify-content: flex-end;
       min-height: 0;
@@ -368,6 +400,144 @@
         position: absolute;
         width: 100%;
       }
+    }
+  }
+}
+
+::ng-deep .document-filters-popover .p-popover-content {
+  padding: 0 !important;
+}
+
+::ng-deep .document-filters-popover .document-filters-content {
+  display: grid;
+  gap: 0.65rem;
+  min-width: min(18rem, calc(100vw - 2rem));
+  overflow: visible;
+  padding: 0.75rem;
+  position: relative;
+
+  .document-filters-heading {
+    display: grid;
+    gap: 0.15rem;
+
+    strong {
+      color: var(--app-text);
+      font-size: 0.9rem;
+    }
+
+    span {
+      color: var(--app-text-muted);
+      font-size: 0.68rem;
+    }
+  }
+
+  .control-label {
+    color: var(--app-text-muted);
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .form-group {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0;
+  }
+
+  .document-filters-range,
+  .document-filters-balance {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .document-filters-section-title {
+    color: var(--app-text);
+    font-size: 0.75rem;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .document-filters-range {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .document-filters-balance {
+    grid-template-columns: 5rem minmax(8rem, 1fr);
+  }
+
+  .balance-comparator-selected {
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .balance-comparator-option {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.45rem;
+
+    strong {
+      font-weight: 800;
+    }
+  }
+
+  .document-filters-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+
+  .document-filters-apply,
+  .document-filters-clear {
+    border-radius: 0.55rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    min-height: 2.15rem;
+    padding: 0.35rem 0.75rem;
+  }
+
+  .document-filters-apply {
+    background: var(--primary08);
+    border: 0;
+    color: #fff;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  .document-filters-clear {
+    background: var(--app-surface-soft);
+    border: 1px solid var(--app-card-border);
+    color: var(--app-text-muted);
+  }
+}
+
+::ng-deep .balance-comparator-panel {
+  min-width: 10rem !important;
+  width: max-content !important;
+
+  .p-select-option {
+    font-weight: 400 !important;
+    white-space: nowrap;
+  }
+
+  .balance-comparator-option {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.75rem;
+
+    strong {
+      font-size: 1.05rem;
+      font-weight: 800;
+      line-height: 1;
+      min-width: 1.4rem;
+      margin-right: 0.2rem;
+    }
+
+    span {
+      font-weight: 400;
     }
   }
 }

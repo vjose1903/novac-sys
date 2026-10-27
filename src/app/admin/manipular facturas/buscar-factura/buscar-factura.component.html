@@ -77,7 +77,9 @@
                   <small>Filtra por el tipo de comprobante</small>
                 </div>
               </div>
-              <p-selectButton [options]="facturasSerieOptions" [ngModel]="serieSelected()" (ngModelChange)="serieSelected.set($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+              <div class="series-panel-actions">
+                <p-selectButton [options]="facturasSerieOptions" [ngModel]="serieSelected()" (ngModelChange)="cambiarSerieFiltro($event)" optionLabel="label" optionValue="value" optionDisabled="disabled" [allowEmpty]="false" />
+              </div>
             </div>
           }
 
@@ -166,6 +168,134 @@
     </div>
   </div>
   <div class="col-12 abajo">
+    @if (buscarPara == 'solo_ver' && mostrarListaFacturas()) {
+      <div class="table-top-actions">
+        <button type="button" class="document-filters-trigger" (click)="documentFilters.toggle($event)">
+          <i class="fa-solid fa-filter"></i>
+          <span>Filtros avanzados</span>
+        </button>
+      </div>
+      <p-popover #documentFilters appendTo="body" styleClass="document-filters-popover">
+        <div class="document-filters-content">
+          <div class="document-filters-heading">
+            <strong>Filtrar documentos</strong>
+            <span>Refina el documento que deseas consultar.</span>
+          </div>
+
+          @if (tipo_documento_selected() === tipoDocFacturacion.venta || tipo_documento_selected() === tipoDocFacturacion.compra) {
+            <div class="form-group">
+              <label class="control-label mb-0">Condición: </label>
+              <p-select
+                inputId="condicionFiltro"
+                [ngModel]="condicionFiltro()"
+                (ngModelChange)="condicionFiltro.set($event)"
+                styleClass="form-control inputE field-sm"
+                [options]="condicionFiltroOptions"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"></p-select>
+            </div>
+          } @else {
+            <div class="form-group">
+              <label class="control-label mb-0">Estado: </label>
+              <p-select
+                inputId="estadoFiltro"
+                [ngModel]="estadoFiltro()"
+                (ngModelChange)="estadoFiltro.set($event)"
+                styleClass="form-control inputE field-sm"
+                [options]="estadoFiltroOptions"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"></p-select>
+            </div>
+          }
+
+          @if (tipo_documento_selected() === tipoDocFacturacion.venta || tipo_documento_selected() === tipoDocFacturacion.compra) {
+            <div class="form-group">
+              <label class="control-label mb-0">Tipo de factura: </label>
+              <p-select
+                inputId="tipoFacturaFiltro"
+                [ngModel]="tipoFacturaFiltro()"
+                (ngModelChange)="tipoFacturaFiltro.set($event)"
+                styleClass="form-control inputE field-sm"
+                [options]="tipoFacturaFiltroOptions()"
+                optionLabel="label"
+                optionValue="value"
+                appendTo="body"></p-select>
+            </div>
+          }
+
+          <div class="document-filters-section-title">{{ tipo_documento_selected() === tipoDocFacturacion.cotizacion ? 'Total cotizado' : 'Total Facturado' }}</div>
+          <div class="document-filters-range">
+            <div class="form-group">
+              <label class="control-label mb-0">Mínimo: </label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                class="form-control inputE field-sm"
+                [ngModel]="totalMinFiltro()"
+                (ngModelChange)="totalMinFiltro.set($event)"
+                placeholder="Sin mínimo" />
+            </div>
+            <div class="form-group">
+              <label class="control-label mb-0">Máximo: </label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                class="form-control inputE field-sm"
+                [ngModel]="totalMaxFiltro()"
+                (ngModelChange)="totalMaxFiltro.set($event)"
+                placeholder="Sin máximo" />
+            </div>
+          </div>
+
+          @if (tipo_documento_selected() === tipoDocFacturacion.venta || tipo_documento_selected() === tipoDocFacturacion.compra) {
+            <div class="form-group">
+              <label class="control-label mb-0">Balance Pendiente: </label>
+              <div class="document-filters-balance">
+                <p-select
+                  inputId="balanceComparadorFiltro"
+                  [ngModel]="balanceComparadorFiltro()"
+                  (ngModelChange)="balanceComparadorFiltro.set($event)"
+                  styleClass="form-control inputE field-sm"
+                  [options]="balanceComparadorOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  panelStyleClass="balance-comparator-panel"
+                  appendTo="body">
+                  <ng-template let-option pTemplate="selectedItem">
+                    <span class="balance-comparator-selected">{{ option?.symbol }}</span>
+                  </ng-template>
+                  <ng-template let-option pTemplate="item">
+                    <span class="balance-comparator-option">
+                      <strong>{{ option.symbol }}</strong>
+                      <span>{{ option.label }}</span>
+                    </span>
+                  </ng-template>
+                </p-select>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  class="form-control inputE field-sm"
+                  [ngModel]="balanceValorFiltro()"
+                  (ngModelChange)="balanceValorFiltro.set($event)"
+                  placeholder="Monto" />
+              </div>
+            </div>
+          }
+
+          <div class="document-filters-actions">
+            @if (hayFiltrosAvanzados()) {
+              <button type="button" class="document-filters-clear" (click)="limpiarFiltrosAvanzados(documentFilters)">Limpiar filtros</button>
+            }
+            <button type="button" class="document-filters-apply" [disabled]="!hayFiltrosAvanzados()" (click)="aplicarFiltrosAvanzados(documentFilters)">Aplicar filtros</button>
+          </div>
+        </div>
+      </p-popover>
+    }
     @if (mostrarListaFacturas()) {
       <div #cardTablaVerFacturas class="card tablaContent">
         <div class="divTabla">
