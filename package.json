@@ -1,7 +1,7 @@
 {
   "name": "novac-system",
   "productName": "Novac-System",
-  "version": "10.4.12",
+  "version": "10.5.0",
   "description": "Sistema facturación e inventario NOVAC.",
   "author": {
     "name": "Victor José Vásquez Santos",
